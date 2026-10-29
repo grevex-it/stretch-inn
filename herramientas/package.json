@@ -1,0 +1,9 @@
+{
+  "name": "@app/herramientas",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tipos": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "stretch-inn",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "formato": "prettier --check .",
+    "formatear": "prettier --write .",
+    "lint": "eslint . --max-warnings 0",
+    "tamanos": "node herramientas/src/tamanos-cli.ts",
+    "arquitectura": "depcruise apps modulos paquetes db herramientas",
+    "muerto": "knip",
+    "tipos": "turbo run tipos",
+    "test": "turbo run test",
+    "check": "pnpm formato && pnpm lint && pnpm tamanos && pnpm arquitectura && pnpm muerto && pnpm tipos && pnpm test",
+    "nuevo-modulo": "node herramientas/src/nuevo-modulo-cli.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "@types/node": "^22.18.0",
+    "dependency-cruiser": "^18.0.0",
+    "eslint": "^10.0.0",
+    "eslint-plugin-react-hooks": "^7.0.0",
+    "globals": "^17.0.0",
+    "knip": "^6.0.0",
+    "prettier": "^3.6.0",
+    "turbo": "^2.6.0",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.0",
+    "vitest": "^5.0.0"
+  }
+}
