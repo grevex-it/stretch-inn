@@ -55,6 +55,12 @@ muchos centros: los datos de cada centro y de cada sede están aislados.
   haciendo dos cosas: separalo por responsabilidad.
 - Código, nombres, comentarios e interfaz en español argentino.
 
+## Commits y pull requests
+
+- La autoría es solo de las personas del equipo: Ramiro y Pedro.
+- **Nunca incluyas a un agente:** nada de `Co-Authored-By` de Claude, Codex u otro
+  agente, ni «Generated with…», ni enlaces de sesión, en commits ni en pull requests.
+
 ## Comandos
 
     pnpm check                        # formato, lint, tamaños, arquitectura, código muerto, tipos y tests
