@@ -12,7 +12,7 @@
     "formatear": "prettier --write .",
     "lint": "eslint . --max-warnings 0",
     "tamanos": "node herramientas/src/tamanos-cli.ts",
-    "arquitectura": "depcruise apps modulos paquetes db herramientas",
+    "arquitectura": "depcruise --config .dependency-cruiser.cjs .",
     "muerto": "knip",
     "tipos": "turbo run tipos",
     "test": "turbo run test",
