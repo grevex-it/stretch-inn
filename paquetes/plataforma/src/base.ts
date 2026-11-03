@@ -75,3 +75,28 @@ export async function enContexto<T>(
     cliente.release();
   }
 }
+
+let puntosDeGuardado = 0;
+
+/**
+ * Corre el bloque dentro de un punto de guardado (savepoint) y lo deshace si el resultado es una
+ * falla o si tira un error. Sirve para reglas que se verifican después de escribir, como «siempre
+ * queda alguien con acceso total» (0007): sin esto, una falla esperada igual se confirmaría.
+ */
+export async function conPuntoDeGuardado<R extends { ok: boolean }>(
+  tx: Transaccion,
+  trabajo: () => Promise<R>,
+): Promise<R> {
+  const nombre = `punto_${String(++puntosDeGuardado)}`;
+  await tx.$client.query(`savepoint ${nombre}`);
+  try {
+    const resultado = await trabajo();
+    await tx.$client.query(
+      resultado.ok ? `release savepoint ${nombre}` : `rollback to savepoint ${nombre}`,
+    );
+    return resultado;
+  } catch (error) {
+    await tx.$client.query(`rollback to savepoint ${nombre}`);
+    throw error;
+  }
+}

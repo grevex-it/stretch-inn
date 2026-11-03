@@ -1,5 +1,6 @@
 // API pública de @app/plataforma.
 export {
+  conPuntoDeGuardado,
   comprobarBase,
   crearBase,
   enContexto,

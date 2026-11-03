@@ -5,7 +5,14 @@ import { id, type ContextoCentro, type Permiso, type SedeId } from "@app/nucleo"
 import { sql } from "drizzle-orm";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
-import { crearBase, enContexto, verificarRolSeguro, type Base } from "../src/index.ts";
+import { falla, ok } from "@app/nucleo";
+import {
+  conPuntoDeGuardado,
+  crearBase,
+  enContexto,
+  verificarRolSeguro,
+  type Base,
+} from "../src/index.ts";
 
 const urlDueno = inject("urlDueno");
 const urlApp = inject("urlApp");
@@ -124,5 +131,49 @@ describe("verificarRolSeguro", () => {
     } finally {
       await delDueno.cerrar();
     }
+  });
+});
+
+describe("conPuntoDeGuardado", () => {
+  const ctx = () => contexto(CENTRO_A, [[SEDE_A1, ["caja.cobrar"]]]);
+  const insertar = (tx: Parameters<Parameters<typeof enContexto>[2]>[0], fila: number) =>
+    tx.execute(sql`insert into prueba_plataforma values (${fila}, ${CENTRO_A}, ${SEDE_A1})`);
+
+  it("si el resultado es una falla, deshace lo del bloque y la transacción sigue", async () => {
+    const despues = await enContexto(base, ctx(), async (tx) => {
+      const resultado = await conPuntoDeGuardado(tx, async () => {
+        await insertar(tx, 10);
+        return falla("regla", "No se cumple la regla.");
+      });
+      expect(resultado.ok).toBe(false);
+      await insertar(tx, 11);
+      const filas = await tx.execute<{ id: number }>(
+        sql`select id from prueba_plataforma where id >= 10 order by id`,
+      );
+      return filas.rows.map((fila) => fila.id);
+    });
+    expect(despues).toEqual([11]);
+  });
+
+  it("si el resultado es ok, conserva lo del bloque", async () => {
+    await enContexto(base, ctx(), (tx) =>
+      conPuntoDeGuardado(tx, async () => {
+        await insertar(tx, 12);
+        return ok(null);
+      }),
+    );
+    expect(await idsVisibles(ctx())).toContain(12);
+  });
+
+  it("si el bloque tira un error, deshace lo del bloque y lo propaga", async () => {
+    await expect(
+      enContexto(base, ctx(), async (tx) => {
+        await conPuntoDeGuardado(tx, async () => {
+          await insertar(tx, 13);
+          throw new Error("bug");
+        });
+      }),
+    ).rejects.toThrow("bug");
+    expect(await idsVisibles(ctx())).not.toContain(13);
   });
 });
