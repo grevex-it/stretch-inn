@@ -1,5 +1,5 @@
 // Test de aislamiento entre centros y sedes (ver docs/decisiones/0002).
-// Recorre todas las tablas con centro_id: las tablas nuevas quedan cubiertas sin agregarlas a mano.
+// Recorre todas las tablas de los centros: las nuevas quedan cubiertas sin agregarlas a mano.
 import pg from "pg";
 import { afterEach, beforeAll, beforeEach, describe, expect, inject, it } from "vitest";
 import { migrar } from "../src/migrar.ts";
@@ -13,15 +13,22 @@ const SEDE_A1 = "00000000-0000-4000-b000-0000000000a1";
 const SEDE_A2 = "00000000-0000-4000-b000-0000000000a2";
 const SEDE_B1 = "00000000-0000-4000-b000-0000000000b1";
 
-/** Tablas con centro_id sin RLS activado, sin RLS forzado o sin ninguna política. */
+/**
+ * Tablas sin RLS activado, sin RLS forzado o sin ninguna política, entre:
+ * - todas las de public, el esquema de los datos de los centros (tengan centro_id o no, como centros);
+ * - las que tengan centro_id en cualquier otro esquema que no esté exceptuado.
+ * Exceptuados: los del sistema, drizzle y pgboss (herramientas), logs (datos de la plataforma: su
+ * centro_id es para filtrar, 0016) y plataforma (cuentas y sesiones, previas a elegir centro, 0017).
+ */
 const TABLAS_SIN_AISLAMIENTO = `
   select n.nspname || '.' || c.relname as tabla
   from pg_class c
   join pg_namespace n on n.oid = c.relnamespace
-  join pg_attribute a on a.attrelid = c.oid and a.attname = 'centro_id' and not a.attisdropped
   where c.relkind in ('r', 'p')
-    -- logs: datos de la plataforma; su centro_id es para filtrar, no para aislar (0016).
-    and n.nspname not in ('pg_catalog', 'information_schema', 'drizzle', 'logs')
+    and n.nspname not in ('pg_catalog', 'information_schema', 'drizzle', 'pgboss', 'logs', 'plataforma')
+    and (n.nspname = 'public'
+         or exists (select 1 from pg_attribute a
+                    where a.attrelid = c.oid and a.attname = 'centro_id' and not a.attisdropped))
     and (not c.relrowsecurity or not c.relforcerowsecurity
          or not exists (select 1 from pg_policy p where p.polrelid = c.oid))
   order by 1`;
@@ -47,7 +54,7 @@ afterEach(async () => {
   await cliente.end();
 });
 
-describe("toda tabla con centro_id", () => {
+describe("toda tabla de los centros", () => {
   it("tiene RLS activado, forzado y con política", async () => {
     expect(await tablasSinAislamiento(cliente)).toEqual([]);
   });
@@ -58,6 +65,11 @@ describe("toda tabla con centro_id", () => {
     await cliente.query("alter table sin_forzar enable row level security");
     await cliente.query("create policy p on sin_forzar using (true)");
     expect(await tablasSinAislamiento(cliente)).toEqual(["public.sin_forzar", "public.sin_rls"]);
+  });
+
+  it("el control detecta una tabla de public sin RLS aunque no tenga centro_id", async () => {
+    await cliente.query("create table sin_centro_id (id int, nombre text)");
+    expect(await tablasSinAislamiento(cliente)).toEqual(["public.sin_centro_id"]);
   });
 });
 

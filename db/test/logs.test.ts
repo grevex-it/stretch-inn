@@ -22,7 +22,14 @@ beforeAll(async () => {
   await migrar({ urlDueno, urlApp, urlLogs });
   await consultar(urlDueno, "create table logs.prueba_log (id int, mensaje text)");
   await consultar(urlDueno, "insert into logs.prueba_log values (1, 'hola')");
-  await consultar(urlDueno, "create table dato_de_centro (id int, centro_id uuid)");
+  // Con RLS como toda tabla de centro: el test de aislamiento corre en paralelo sobre esta base.
+  await consultar(
+    urlDueno,
+    `create table dato_de_centro (id int, centro_id uuid);
+     alter table dato_de_centro enable row level security;
+     alter table dato_de_centro force row level security;
+     create policy p on dato_de_centro using (centro_id = (select app_centro_actual()));`,
+  );
 });
 
 afterAll(async () => {
