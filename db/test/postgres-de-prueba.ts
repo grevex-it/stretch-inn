@@ -1,5 +1,6 @@
 // Levanta un Postgres real y descartable para los tests de integración, en una carpeta temporal
-// y en un puerto libre. Funciona igual en cualquier máquina y en el CI, sin Docker.
+// y en un puerto libre, con las migraciones aplicadas. Funciona igual en cualquier máquina y en
+// el CI, sin Docker. Otros paquetes lo usan como globalSetup: "@app/db/pruebas".
 import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
@@ -7,6 +8,7 @@ import { join } from "node:path";
 import { setTimeout } from "node:timers/promises";
 import EmbeddedPostgres from "embedded-postgres";
 import type { TestProject } from "vitest/node";
+import { migrar } from "../src/migrar.ts";
 
 declare module "vitest" {
   export interface ProvidedContext {
@@ -65,9 +67,15 @@ export default async function preparar(proyecto: TestProject): Promise<() => Pro
   await postgres.createDatabase("stretch_inn_test");
 
   const base = `localhost:${puerto}/stretch_inn_test`;
-  proyecto.provide("urlDueno", `postgres://postgres:clave-prueba@${base}`);
-  proyecto.provide("urlApp", `postgres://app_usuario:clave-app-prueba@${base}`);
-  proyecto.provide("urlLogs", `postgres://logs_lector:clave-logs-prueba@${base}`);
+  const urls = {
+    urlDueno: `postgres://postgres:clave-prueba@${base}`,
+    urlApp: `postgres://app_usuario:clave-app-prueba@${base}`,
+    urlLogs: `postgres://logs_lector:clave-logs-prueba@${base}`,
+  };
+  await migrar(urls);
+  proyecto.provide("urlDueno", urls.urlDueno);
+  proyecto.provide("urlApp", urls.urlApp);
+  proyecto.provide("urlLogs", urls.urlLogs);
 
   return async () => {
     await postgres.stop();

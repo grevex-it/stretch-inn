@@ -71,6 +71,25 @@ importers:
 
   paquetes/nucleo: {}
 
+  paquetes/plataforma:
+    dependencies:
+      '@app/nucleo':
+        specifier: workspace:*
+        version: link:../nucleo
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@types/pg@8.23.1)(pg@8.23.1)
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
+    devDependencies:
+      '@app/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+
 packages:
 
   '@babel/code-frame@7.29.7':

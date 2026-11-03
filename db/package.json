@@ -2,6 +2,9 @@
   "name": "@app/db",
   "private": true,
   "type": "module",
+  "exports": {
+    "./pruebas": "./test/postgres-de-prueba.ts"
+  },
   "scripts": {
     "tipos": "tsc -p tsconfig.json",
     "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"

@@ -65,3 +65,10 @@ agregarlas a mano.
   `centro_id` sirve para filtrar, no para aislar.
 - El contexto lo fija cada transacción con `set_config('app.centro_id', …, true)` y
   `set_config('app.sedes', '{…}', true)`. Sin contexto, las políticas no devuelven filas.
+  Desde el código se fija **siempre** con `enContexto` de `@app/plataforma`, nunca a mano.
+- Al arrancar, la app llama a `verificarRolSeguro`: no arranca con un rol que saltee RLS.
+
+## Tests de integración en otros paquetes
+
+Usá `globalSetup: ["@app/db/pruebas"]` en su `vitest.config.ts`: levanta un Postgres
+descartable con las migraciones aplicadas y deja `urlDueno`, `urlApp` y `urlLogs` en `inject`.
