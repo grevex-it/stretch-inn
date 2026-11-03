@@ -109,6 +109,22 @@ importers:
       '@app/nucleo':
         specifier: workspace:*
         version: link:../../paquetes/nucleo
+      '@app/plataforma':
+        specifier: workspace:*
+        version: link:../../paquetes/plataforma
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
+    devDependencies:
+      '@app/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
 
   paquetes/nucleo: {}
 
@@ -136,6 +152,8 @@ importers:
       '@types/pg':
         specifier: ^8.23.1
         version: 8.23.1
+
+  paquetes/ui: {}
 
 packages:
 

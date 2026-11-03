@@ -17,6 +17,7 @@ de los permisos efectivos (0007).
 ## Depende de
 
 - `@app/nucleo`
+- `@app/plataforma`
 
 ## API pública
 
@@ -28,6 +29,14 @@ Dominio (puro):
 - `tieneMenosPermisos(objetivo, quien)`: para resetear contraseñas (0017).
 - `tieneAccesoTotal(efectivos, catalogo, sedes)`.
 - `crearCatalogo(secciones)`, `PERMISOS_IDENTIDAD`, `plantillasDelSistema(catalogo)`.
+
+Casos de uso (reciben la `Transaccion` de `enContexto`):
+
+- `cargarPermisos(tx, cuentaId, centroId)`: permisos efectivos, para armar el `ContextoCentro`.
+- `crearRol(tx, quien, { nombre, permisos })`.
+- `asignarRol(tx, quien, { usuarioId, sedeId, rolId })`.
+- `quitarAsignacion(tx, asignacion, catalogo)` y `ajustarPermiso(tx, quien, ajuste, catalogo)`:
+  si el centro se quedaría sin nadie con acceso total, devuelven falla y no cambian nada.
 
 ## Eventos
 
@@ -62,4 +71,7 @@ _Ninguna por ahora._
 
 - Plantillas de encargado, recepción y profesor: cuando existan los permisos de caja, agenda y
   asistencia.
-- Tablas, casos de uso, login y sesiones (0017).
+- Login, sesiones, alta de usuarios y reset de contraseña (0017).
+- Avisar a `auditoria` de cada cambio de permisos, cuando exista ese módulo.
+- «Acceso total» exige todos los permisos en todas las sedes: al crear una sede nueva, el alta
+  tiene que darle permisos al admin general en ella.
