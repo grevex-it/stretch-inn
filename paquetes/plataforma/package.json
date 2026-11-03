@@ -1,0 +1,21 @@
+{
+  "name": "@app/plataforma",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "tipos": "tsc -p tsconfig.json",
+    "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
+  },
+  "dependencies": {
+    "@app/nucleo": "workspace:*",
+    "drizzle-orm": "^0.45.4",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@app/db": "workspace:*",
+    "@types/pg": "^8.23.1"
+  }
+}
