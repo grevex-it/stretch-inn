@@ -19,5 +19,6 @@ Una decisión por archivo, con su contexto y su porqué. Una decisión aceptada 
 | [0013](0013-rendimiento-y-robustez.md) | Rendimiento y robustez |
 | [0014](0014-portal-sin-conexion.md) | Portal de alumnos con funcionamiento sin conexión |
 | [0015](0015-logs-y-alertas.md) | Logs y alertas |
+| [0016](0016-diagnostico-de-errores-por-agentes.md) | Diagnóstico de errores por agentes |
 
 Temas abiertos: [`../pendientes.md`](../pendientes.md).

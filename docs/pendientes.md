@@ -2,9 +2,13 @@
 
 Temas abiertos para trabajar. Cuando uno se cierra, se escribe su decisión en `docs/decisiones/` y se borra de acá. Cuando el repo esté en GitHub, esto pasa a issues.
 
-_Última actualización: 29/10/2026._
+_Última actualización: 03/11/2026._
 
 ## Para definir
+
+### Monitor externo
+
+Elegir el servicio que consulta `/salud` cada minuto y avisa al grupo de Telegram (0016). Opciones gratuitas: UptimeRobot, Better Stack.
 
 ### Railway
 

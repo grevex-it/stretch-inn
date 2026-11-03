@@ -1,6 +1,6 @@
 # 0015 — Logs y alertas
 
-**Fecha:** 29/10/2026 · **Estado:** aceptada
+**Fecha:** 29/10/2026 · **Estado:** aceptada · Retención reemplazada por 0016.
 
 ## Contexto
 
@@ -17,7 +17,7 @@ Necesitamos ver qué está fallando y qué se está haciendo, en un lenguaje que
 - **Textos generados con plantillas** por tipo de evento, nunca con IA: un log no puede inventar detalles.
 - Cada log guarda además los datos estructurados (centro, sede, usuario, módulo, identificadores) para filtrar.
 - **Id de traza** en cada pedido y cada tarea, desde que entra hasta que termina: permite ver todos los logs de un mismo pedido en orden.
-- **Retención: 6 meses.** Lo más viejo se borra automáticamente.
+- **Retención: 6 meses.** Lo más viejo se borra automáticamente. _Reemplazada por 0016._
 - Los logs son datos de la plataforma, no de un centro: GREVEX ve los de todos los centros juntos. Para operar dentro de un centro sigue valiendo la entrada como soporte (ver 0008).
 
 ### Datos personales
