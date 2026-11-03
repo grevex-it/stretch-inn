@@ -43,8 +43,8 @@ Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@ap
 
 ## Del repo
 
-- **Estado de esta carpeta:** se empezó a armar el esqueleto antes de tiempo. Hay configuración raíz (pnpm, Turborepo, TypeScript, Prettier), `herramientas/` (control de tamaños y generador de módulos, con tests que pasan) y tests de `paquetes/nucleo` escritos sin implementar. No hay commits. Decidir si se conserva o se arranca de cero.
-- El generador de módulos todavía crea `CLAUDE.md` con la plantilla vieja: pasarlo a `AGENTS.md` + `CLAUDE.md` con `@AGENTS.md` (0005).
-- `Dinero` en `paquetes/nucleo` se pensó en centavos: pasarlo a pesos enteros con redondeo al peso (0009).
 - Crear el repo privado en la organización `grevex-it` y subirlo.
-- Escribir los `AGENTS.md` definitivos a partir de `docs/borradores-agents/`.
+- Escribir `db/AGENTS.md` y `apps/web/AGENTS.md` a partir de `docs/borradores-agents/` cuando
+  existan esas carpetas (el raíz ya está).
+- **Postgres local:** Docker no está instalado en la máquina de Ramiro. Elegir Docker Desktop o
+  Postgres nativo antes de armar `db/`.
