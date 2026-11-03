@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import pg from "pg";
+import { instalarCola } from "./cola.ts";
 
 export interface OpcionesMigrar {
   /** Dueño del esquema (DATABASE_URL_MIGRACIONES). */
@@ -34,6 +35,7 @@ export async function migrar({ urlDueno, urlApp, urlLogs }: OpcionesMigrar): Pro
     // Si dos procesos migran a la vez (dos deploys), el segundo espera al primero.
     await cliente.query("select pg_advisory_lock(hashtext('app_migraciones'))");
     await migrate(drizzle(cliente), { migrationsFolder: CARPETA_MIGRACIONES });
+    await instalarCola(urlDueno, cliente);
     await fijarClave(cliente, urlApp, "app_usuario");
     if (urlLogs !== undefined) await fijarClave(cliente, urlLogs, "logs_lector");
   } finally {

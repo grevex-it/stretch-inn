@@ -40,6 +40,17 @@ describe("migrar", () => {
     expect(fila?.usuario).toBe("app_usuario");
   });
 
+  it("instala el esquema de la cola (pg-boss) y app_usuario puede usarlo", async () => {
+    const [permisos] = await consultar<{ esquema: boolean; insertar: boolean; ejecutar: boolean }>(
+      urlDueno,
+      `select has_schema_privilege('app_usuario', 'pgboss', 'usage') as esquema,
+              has_table_privilege('app_usuario', 'pgboss.job', 'insert') as insertar,
+              has_function_privilege('app_usuario', 'pgboss.create_queue(text, jsonb)', 'execute')
+                as ejecutar`,
+    );
+    expect(permisos).toEqual({ esquema: true, insertar: true, ejecutar: true });
+  });
+
   it("app_usuario no puede cambiar el esquema", async () => {
     await expect(consultar(urlApp, "create table intrusa (id int)")).rejects.toThrow(
       /permission denied|permiso denegado/,

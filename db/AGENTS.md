@@ -61,6 +61,9 @@ agregarlas a mano.
   nunca usa esa conexión.
 - `logs_lector` (para `pnpm logs`, ver 0016): solo lectura y solo sobre el esquema `logs`.
   Su clave sale de `LOGS_DATABASE_URL`. La app escribe logs, pero no los modifica ni los borra.
+- La cola (pg-boss, esquema `pgboss`) la instala y actualiza `pnpm db:migrar` con el dueño;
+  `app_usuario` la usa sin poder cambiar su estructura. Se usa con `publicar` / `trabajar` de
+  `@app/plataforma`, que guardan el evento en la misma transacción del cambio (outbox).
 - El esquema `logs` queda fuera del test de aislamiento: son datos de la plataforma y su
   `centro_id` sirve para filtrar, no para aislar.
 - El contexto lo fija cada transacción con `set_config('app.centro_id', …, true)` y
