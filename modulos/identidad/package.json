@@ -1,0 +1,15 @@
+{
+  "name": "@app/identidad",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "tipos": "tsc -p tsconfig.json",
+    "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
+  },
+  "dependencies": {
+    "@app/nucleo": "workspace:*"
+  }
+}

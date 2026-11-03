@@ -104,6 +104,12 @@ importers:
         specifier: workspace:*
         version: link:../../db
 
+  modulos/identidad:
+    dependencies:
+      '@app/nucleo':
+        specifier: workspace:*
+        version: link:../../paquetes/nucleo
+
   paquetes/nucleo: {}
 
   paquetes/plataforma:
