@@ -20,11 +20,24 @@ export function restar(a: Dinero, b: Dinero): Dinero {
   return pesos(a - b);
 }
 
-/** Multiplica y redondea al peso más cercano; ,5 se redondea lejos del cero. */
-export function multiplicar(monto: Dinero, factor: number): Dinero {
-  if (!Number.isFinite(factor)) {
-    throw new RangeError(`El factor ${factor} no es un número finito.`);
+/**
+ * Multiplica por la fracción numerador/denominador y redondea al peso más cercano; ,5 se
+ * redondea lejos del cero. El factor es una fracción de enteros (15 % = 15/100) y el cálculo
+ * se hace con bigint: un decimal de punto flotante corre los empates (0,29 × 50 = 14,4999…).
+ */
+export function multiplicar(monto: Dinero, numerador: number, denominador = 1): Dinero {
+  if (!Number.isSafeInteger(numerador) || !Number.isSafeInteger(denominador) || denominador <= 0) {
+    throw new RangeError(
+      `El factor ${numerador}/${denominador} no es una fracción de enteros con denominador positivo.`,
+    );
   }
-  const exacto = monto * factor;
-  return pesos(Math.sign(exacto) * Math.round(Math.abs(exacto)));
+  const producto = BigInt(monto) * BigInt(numerador);
+  const divisor = BigInt(denominador);
+  const absoluto = producto < 0n ? -producto : producto;
+  const redondeado = (2n * absoluto + divisor) / (2n * divisor);
+  const resultado = producto < 0n ? -redondeado : redondeado;
+  if (resultado > BigInt(Number.MAX_SAFE_INTEGER) || resultado < BigInt(Number.MIN_SAFE_INTEGER)) {
+    throw new RangeError(`El resultado ${resultado} no es un entero de pesos válido.`);
+  }
+  return pesos(Number(resultado));
 }
