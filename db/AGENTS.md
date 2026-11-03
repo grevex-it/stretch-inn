@@ -14,7 +14,8 @@ Postgres con aislamiento por RLS (ver `docs/decisiones/0002` y `0013`).
 
 - Se crean siempre con `pnpm db:migracion`: quedan en `migraciones/`, nombradas por fecha y hora.
 - **Nunca se edita una migración ya mergeada.** Para corregir, se escribe otra.
-- Las tablas de un módulo las define el módulo (`src/infraestructura/esquema.ts`) y la
+- Las tablas de un módulo las define el módulo (`src/infraestructura/esquema.ts`, o
+  `src/datos/esquema.ts` en los livianos) y la
   migración se genera desde ahí. Lo que Drizzle no genera (políticas, funciones) va en una
   migración `--custom`.
 

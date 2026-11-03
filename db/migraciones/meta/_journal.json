@@ -15,6 +15,20 @@
       "when": 1793722409529,
       "tag": "20261103161329_logs-y-lector",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793727603255,
+      "tag": "20261103174003_centros-y-sedes",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793727702636,
+      "tag": "20261103174142_rls-centros-y-sedes",
+      "breakpoints": true
     }
   ]
 }

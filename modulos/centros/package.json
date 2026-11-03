@@ -1,0 +1,20 @@
+{
+  "name": "@app/centros",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "tipos": "tsc -p tsconfig.json",
+    "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
+  },
+  "dependencies": {
+    "@app/nucleo": "workspace:*",
+    "@app/plataforma": "workspace:*",
+    "drizzle-orm": "^0.45.4"
+  },
+  "devDependencies": {
+    "@app/db": "workspace:*"
+  }
+}

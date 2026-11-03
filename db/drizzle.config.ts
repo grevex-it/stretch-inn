@@ -4,7 +4,11 @@ import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
   dialect: "postgresql",
-  schema: ["./src/esquema.ts", "../modulos/*/src/infraestructura/esquema.ts"],
+  schema: [
+    "./src/esquema.ts",
+    "../modulos/*/src/infraestructura/esquema.ts",
+    "../modulos/*/src/datos/esquema.ts",
+  ],
   out: "./migraciones",
   migrations: { prefix: "timestamp" },
   dbCredentials: {
