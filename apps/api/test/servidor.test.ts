@@ -30,8 +30,9 @@ function arrancar(urlBase: string, puerto: number): { salida: () => string } {
   return { salida: () => salida };
 }
 
+/** Hasta 30 s: con varios Postgres de prueba corriendo en paralelo, arrancar puede tardar. */
 async function esperarSalud(puerto: number): Promise<Response> {
-  for (let intento = 0; intento < 100; intento++) {
+  for (let intento = 0; intento < 300; intento++) {
     try {
       return await fetch(`http://localhost:${puerto}/salud`);
     } catch {
@@ -53,7 +54,7 @@ describe("servidor", () => {
     const respuesta = await esperarSalud(puerto);
     expect(respuesta.status).toBe(200);
     expect(await respuesta.json()).toEqual({ estado: "ok" });
-  });
+  }, 45_000);
 
   it("no arranca con un rol que saltea RLS (superusuario)", async () => {
     const puerto = await puertoLibre();
