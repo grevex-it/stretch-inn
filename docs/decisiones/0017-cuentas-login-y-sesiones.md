@@ -78,6 +78,14 @@ lo que haga un centro puede darle acceso a otro.
 - Buscar la cuenta por email y listar los centros de una cuenta necesitan ver más de un centro.
   Pasan por **dos funciones de base de alcance mínimo** (`security definer`): devuelven solo lo
   indispensable (id y nombre del centro, nunca datos de sus usuarios).
+- Lo mismo para tres datos que identidad necesita antes de tener contexto o en sedes que el actor
+  no ve (agregado el 03/11/2026, al implementarlo):
+  - `identidad_permisos_de(cuenta, centro)`: los permisos de esa cuenta en ese centro, para
+    armar el `ContextoCentro`. Sin ellos no se sabe qué sedes ve.
+  - `identidad_permisos_del_centro()` e `identidad_sedes_del_centro()`: los permisos de todos
+    los usuarios y los ids de todas las sedes del centro del contexto, para la regla de que
+    siempre quede alguien con acceso total (0007). Quien hace el cambio puede no ver todas las
+    sedes.
 - Fuera de esas funciones, ninguna consulta de la app saltea RLS.
 
 ### Soporte de GREVEX (0008)
