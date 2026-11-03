@@ -20,7 +20,8 @@ const TABLAS_SIN_AISLAMIENTO = `
   join pg_namespace n on n.oid = c.relnamespace
   join pg_attribute a on a.attrelid = c.oid and a.attname = 'centro_id' and not a.attisdropped
   where c.relkind in ('r', 'p')
-    and n.nspname not in ('pg_catalog', 'information_schema', 'drizzle')
+    -- logs: datos de la plataforma; su centro_id es para filtrar, no para aislar (0016).
+    and n.nspname not in ('pg_catalog', 'information_schema', 'drizzle', 'logs')
     and (not c.relrowsecurity or not c.relforcerowsecurity
          or not exists (select 1 from pg_policy p where p.polrelid = c.oid))
   order by 1`;

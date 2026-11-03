@@ -8,6 +8,13 @@
       "when": 1793721689334,
       "tag": "20261103160129_base-aislamiento",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793722409529,
+      "tag": "20261103161329_logs-y-lector",
+      "breakpoints": true
     }
   ]
 }

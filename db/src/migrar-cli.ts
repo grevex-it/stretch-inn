@@ -7,5 +7,5 @@ if (urlDueno === undefined || urlApp === undefined) {
   console.error("Faltan DATABASE_URL_MIGRACIONES y DATABASE_URL. Copiá .env.example a .env.");
   process.exit(1);
 }
-await migrar({ urlDueno, urlApp });
+await migrar({ urlDueno, urlApp, urlLogs: process.env["LOGS_DATABASE_URL"] });
 console.log("Migraciones aplicadas.");

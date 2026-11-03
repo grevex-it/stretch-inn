@@ -12,6 +12,7 @@ declare module "vitest" {
   export interface ProvidedContext {
     urlDueno: string;
     urlApp: string;
+    urlLogs: string;
   }
 }
 
@@ -66,6 +67,7 @@ export default async function preparar(proyecto: TestProject): Promise<() => Pro
   const base = `localhost:${puerto}/stretch_inn_test`;
   proyecto.provide("urlDueno", `postgres://postgres:clave-prueba@${base}`);
   proyecto.provide("urlApp", `postgres://app_usuario:clave-app-prueba@${base}`);
+  proyecto.provide("urlLogs", `postgres://logs_lector:clave-logs-prueba@${base}`);
 
   return async () => {
     await postgres.stop();

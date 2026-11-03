@@ -59,5 +59,9 @@ agregarlas a mano.
   escribir datos, no cambiar el esquema. Su clave la pone `pnpm db:migrar` desde `DATABASE_URL`.
 - Las migraciones corren con el dueño del esquema (`DATABASE_URL_MIGRACIONES`). La app
   nunca usa esa conexión.
+- `logs_lector` (para `pnpm logs`, ver 0016): solo lectura y solo sobre el esquema `logs`.
+  Su clave sale de `LOGS_DATABASE_URL`. La app escribe logs, pero no los modifica ni los borra.
+- El esquema `logs` queda fuera del test de aislamiento: son datos de la plataforma y su
+  `centro_id` sirve para filtrar, no para aislar.
 - El contexto lo fija cada transacción con `set_config('app.centro_id', …, true)` y
   `set_config('app.sedes', '{…}', true)`. Sin contexto, las políticas no devuelven filas.
