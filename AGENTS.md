@@ -71,6 +71,8 @@ Las carpetas que todavía no existen se crean a medida que se construyen.
     pnpm --filter @app/<paquete> test   # tests de un paquete
     pnpm nuevo-modulo <nombre> <completo|liviano>
     pnpm db:levantar                    # Postgres local real, sin Docker (Ctrl+C lo detiene)
+    pnpm db:migrar                      # aplica las migraciones (ver db/AGENTS.md)
+    pnpm db:migracion <nombre>          # crea una migración (ver db/AGENTS.md)
 
 `pnpm check` controla automáticamente formato, tamaños, límites entre módulos y capas,
 tipos estrictos, código muerto y que cada `AGENTS.md` esté completo. No hace falta

@@ -43,5 +43,5 @@ Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@ap
 
 ## Del repo
 
-- Escribir `db/AGENTS.md` junto con las migraciones y `apps/web/AGENTS.md` cuando exista la
-  app, a partir de `docs/borradores-agents/` (el raíz ya está).
+- Escribir `apps/web/AGENTS.md` cuando exista la app, a partir de `docs/borradores-agents/`.
+- Verificar que la versión de Postgres de Railway sea la 18, la misma que se usa en local y en los tests.

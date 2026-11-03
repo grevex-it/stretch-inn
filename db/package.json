@@ -3,13 +3,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "tipos": "tsc -p tsconfig.json"
+    "tipos": "tsc -p tsconfig.json",
+    "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
   },
   "devDependencies": {
     "@types/pg": "^8.23.1",
+    "drizzle-kit": "^0.31.11",
     "embedded-postgres": "18.4.0-beta.17"
   },
   "dependencies": {
+    "drizzle-orm": "^0.45.4",
     "pg": "^8.23.1"
   }
 }
