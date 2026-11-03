@@ -43,8 +43,5 @@ Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@ap
 
 ## Del repo
 
-- Crear el repo privado en la organización `grevex-it` y subirlo.
-- Escribir `db/AGENTS.md` y `apps/web/AGENTS.md` a partir de `docs/borradores-agents/` cuando
-  existan esas carpetas (el raíz ya está).
-- **Postgres local:** Docker no está instalado en la máquina de Ramiro. Elegir Docker Desktop o
-  Postgres nativo antes de armar `db/`.
+- Escribir `db/AGENTS.md` junto con las migraciones y `apps/web/AGENTS.md` cuando exista la
+  app, a partir de `docs/borradores-agents/` (el raíz ya está).

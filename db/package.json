@@ -1,0 +1,15 @@
+{
+  "name": "@app/db",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "tipos": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "embedded-postgres": "18.4.0-beta.17"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}

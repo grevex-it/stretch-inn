@@ -7,3 +7,6 @@ coverage/
 .env.*
 !.env.example
 .DS_Store
+
+# Datos del Postgres local (pnpm db:levantar)
+db/.datos/

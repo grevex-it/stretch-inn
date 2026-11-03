@@ -9,6 +9,7 @@
   "scripts": {
     "prepare": "lefthook install",
     "dev": "turbo run dev",
+    "db:levantar": "node --env-file-if-exists=.env db/src/levantar.ts",
     "formato": "prettier --check .",
     "formatear": "prettier --write .",
     "lint": "eslint . --max-warnings 0",

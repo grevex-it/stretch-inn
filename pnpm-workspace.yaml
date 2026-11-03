@@ -7,3 +7,12 @@ packages:
 
 # No instalar versiones publicadas hace menos de 7 días (ataques a la cadena de suministro).
 minimumReleaseAge: 10080
+
+# Únicos paquetes autorizados a correr scripts de instalación: los binarios de Postgres
+# embebido recrean sus enlaces simbólicos (Linux y macOS). Ver db/.
+onlyBuiltDependencies:
+  - "@embedded-postgres/darwin-arm64"
+  - "@embedded-postgres/darwin-x64"
+  - "@embedded-postgres/linux-arm64"
+  - "@embedded-postgres/linux-x64"
+  - "@embedded-postgres/windows-x64"
