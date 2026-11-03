@@ -21,5 +21,6 @@ Una decisión por archivo, con su contexto y su porqué. Una decisión aceptada 
 | [0015](0015-logs-y-alertas.md)                     | Logs y alertas                                              |
 | [0016](0016-diagnostico-de-errores-por-agentes.md) | Diagnóstico de errores por agentes                          |
 | [0017](0017-cuentas-login-y-sesiones.md)           | Cuentas, login y sesiones                                   |
+| [0018](0018-identidad-visual.md)                   | Identidad visual                                            |
 
 Temas abiertos: [`../pendientes.md`](../pendientes.md).
