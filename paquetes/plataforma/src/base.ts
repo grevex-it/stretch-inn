@@ -6,9 +6,10 @@ import pg from "pg";
 
 /**
  * Drizzle atado a la conexión de una transacción abierta. `$client` es esa conexión: la usa la
- * cola para guardar eventos en la misma transacción (outbox).
+ * cola para guardar eventos en la misma transacción (outbox). Sin `transaction()`: una
+ * transacción anidada sobre la misma conexión confirmaría la de afuera antes de tiempo.
  */
-export type Transaccion = NodePgDatabase & { $client: pg.PoolClient };
+export type Transaccion = Omit<NodePgDatabase, "transaction"> & { $client: pg.PoolClient };
 
 export interface Base {
   readonly db: NodePgDatabase;
