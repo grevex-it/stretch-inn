@@ -21,7 +21,29 @@ describe("crearModulo", () => {
     };
     expect(paquete.name).toBe("@app/asistencia");
     expect(paquete.exports).toEqual({ ".": "./src/index.ts" });
-    expect(readFileSync(join(modulo, "CLAUDE.md"), "utf8")).toContain("Nivel: completo");
+  });
+
+  it("crea su AGENTS.md con la plantilla de la 0005 y un CLAUDE.md que lo importa", () => {
+    const raiz = raizTemporal();
+    crearModulo({ raiz, nombre: "caja", nivel: "completo" });
+
+    const modulo = join(raiz, "modulos", "caja");
+    const agents = readFileSync(join(modulo, "AGENTS.md"), "utf8");
+    const secciones = [
+      "Alcance",
+      "Fuera de alcance",
+      "Depende de",
+      "API pública",
+      "Eventos",
+      "Invariantes",
+      "Glosario",
+      "Configuración por centro",
+      "Pendientes",
+    ];
+    for (const seccion of secciones) expect(agents).toContain(`\n## ${seccion}\n`);
+    expect(agents).toContain("Nivel: completo");
+    expect(agents).toContain("- `@app/nucleo`");
+    expect(readFileSync(join(modulo, "CLAUDE.md"), "utf8")).toBe("@AGENTS.md\n");
   });
 
   it("crea un módulo liviano solo con datos y http", () => {

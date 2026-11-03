@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { CONTENIDO_CLAUDE_MD, SECCIONES_MODULO } from "./plantilla-agents.ts";
 
 export type Nivel = "completo" | "liviano";
 
@@ -28,32 +29,26 @@ function paquete(nombre: string): string {
   return `${JSON.stringify(contenido, null, 2)}\n`;
 }
 
-function claudeMd(nombre: string, nivel: Nivel): string {
+const GUIAS: Record<(typeof SECCIONES_MODULO)[number], string> = {
+  Alcance: "_Qué hace este módulo._",
+  "Fuera de alcance": "_Qué no hace y qué módulo se encarga._",
+  "Depende de": "- `@app/nucleo`",
+  "API pública": "_Casos de uso exportados en `src/index.ts` y sus tipos._",
+  Eventos: "- Emite: _ninguno por ahora_.\n- Escucha: _ninguno por ahora_.",
+  Invariantes: "_Reglas que nunca se pueden romper._",
+  Glosario: "_Términos del módulo._",
+  "Configuración por centro": "_Ninguna por ahora._",
+  Pendientes: "_Decisiones abiertas._",
+};
+
+function agentsMd(nombre: string, nivel: Nivel): string {
   const capas = CAPAS[nivel].map((capa) => `\`src/${capa}/\``).join(", ");
+  const secciones = SECCIONES_MODULO.map((seccion) => `## ${seccion}\n\n${GUIAS[seccion]}\n`);
   return `# Módulo ${nombre}
 
 Nivel: ${nivel} (${capas}). Ver \`docs/decisiones/0003-hexagonal-por-niveles.md\`.
 
-## Alcance
-
-_Qué hace este módulo._
-
-## Fuera de alcance
-
-_Qué no hace y qué módulo se encarga._
-
-## Depende de
-
-- \`@app/nucleo\`
-
-## Reglas
-
-_Invariantes que no se pueden romper._
-
-## Pendientes
-
-_Decisiones abiertas._
-`;
+${secciones.join("\n")}`;
 }
 
 export function crearModulo({ raiz, nombre, nivel }: OpcionesModulo): string {
@@ -74,7 +69,8 @@ export function crearModulo({ raiz, nombre, nivel }: OpcionesModulo): string {
     join(modulo, "tsconfig.json"),
     `${JSON.stringify({ extends: "../../tsconfig.base.json", include: ["src", "test"] }, null, 2)}\n`,
   );
-  writeFileSync(join(modulo, "CLAUDE.md"), claudeMd(nombre, nivel));
+  writeFileSync(join(modulo, "AGENTS.md"), agentsMd(nombre, nivel));
+  writeFileSync(join(modulo, "CLAUDE.md"), CONTENIDO_CLAUDE_MD);
   writeFileSync(
     join(modulo, "src", "index.ts"),
     "// API pública del módulo. Lo único que pueden importar los demás.\nexport {};\n",

@@ -7,4 +7,4 @@ if (nombre === undefined || (nivel !== "completo" && nivel !== "liviano")) {
   process.exit(1);
 }
 const ruta = crearModulo({ raiz: process.cwd(), nombre, nivel: nivel satisfies Nivel });
-console.log(`Módulo creado en ${ruta}. Completá su CLAUDE.md y corré pnpm install.`);
+console.log(`Módulo creado en ${ruta}. Completá su AGENTS.md y corré pnpm install.`);
