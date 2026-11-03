@@ -17,6 +17,10 @@ Elegir el servicio que consulta `/salud` cada minuto y avisa al grupo de Telegra
 - Backups automáticos de Railway más un `pg_dump` diario a un almacenamiento externo.
 - Infraestructura definida en el repo: verificar el formato vigente de configuración como código de Railway antes de armarlo.
 
+### Dominio propio
+
+El panel y la API tienen que estar en el mismo sitio para que la cookie de sesión funcione (0017): por ejemplo `app.dominio` y `api.dominio`. Los dominios `*.up.railway.app` no sirven entre sí. Comprarlo antes de salir a producción.
+
 ### Nombre del producto
 
 Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@app/...`. Se define más adelante. A tener en cuenta: la regla de GREVEX de no usar nombres de clientes en redes, y que otros centros (posibles competidores) usarían un sistema con el nombre de Stretch Inn.
