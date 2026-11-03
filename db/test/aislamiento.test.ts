@@ -3,6 +3,7 @@
 import pg from "pg";
 import { afterEach, beforeAll, beforeEach, describe, expect, inject, it } from "vitest";
 import { migrar } from "../src/migrar.ts";
+import { politicasInseguras, tablasSinAislamiento } from "./control-aislamiento.ts";
 
 const urlDueno = inject("urlDueno");
 const urlApp = inject("urlApp");
@@ -12,30 +13,6 @@ const CENTRO_B = "00000000-0000-4000-a000-00000000000b";
 const SEDE_A1 = "00000000-0000-4000-b000-0000000000a1";
 const SEDE_A2 = "00000000-0000-4000-b000-0000000000a2";
 const SEDE_B1 = "00000000-0000-4000-b000-0000000000b1";
-
-/**
- * Tablas sin RLS activado, sin RLS forzado o sin ninguna política, entre:
- * - todas las de public, el esquema de los datos de los centros (tengan centro_id o no, como centros);
- * - las que tengan centro_id en cualquier otro esquema que no esté exceptuado.
- * Exceptuados: los del sistema, drizzle y pgboss (herramientas), logs (datos de la plataforma: su
- * centro_id es para filtrar, 0016) y plataforma (cuentas y sesiones, previas a elegir centro, 0017).
- */
-const TABLAS_SIN_AISLAMIENTO = `
-  select n.nspname || '.' || c.relname as tabla
-  from pg_class c
-  join pg_namespace n on n.oid = c.relnamespace
-  where c.relkind in ('r', 'p')
-    and n.nspname not in ('pg_catalog', 'information_schema', 'drizzle', 'pgboss', 'logs', 'plataforma')
-    and (n.nspname = 'public'
-         or exists (select 1 from pg_attribute a
-                    where a.attrelid = c.oid and a.attname = 'centro_id' and not a.attisdropped))
-    and (not c.relrowsecurity or not c.relforcerowsecurity
-         or not exists (select 1 from pg_policy p where p.polrelid = c.oid))
-  order by 1`;
-
-async function tablasSinAislamiento(cliente: pg.Client): Promise<string[]> {
-  return (await cliente.query<{ tabla: string }>(TABLAS_SIN_AISLAMIENTO)).rows.map((f) => f.tabla);
-}
 
 let cliente: pg.Client;
 
@@ -70,6 +47,65 @@ describe("toda tabla de los centros", () => {
   it("el control detecta una tabla de public sin RLS aunque no tenga centro_id", async () => {
     await cliente.query("create table sin_centro_id (id int, nombre text)");
     expect(await tablasSinAislamiento(cliente)).toEqual(["public.sin_centro_id"]);
+  });
+});
+
+async function tablaConRls(tabla: string, columnas: string): Promise<void> {
+  await cliente.query(`create table ${tabla} (${columnas})`);
+  await cliente.query(`alter table ${tabla} enable row level security`);
+  await cliente.query(`alter table ${tabla} force row level security`);
+}
+
+describe("toda política de una tabla de centro (R4)", () => {
+  it("aísla por centro en las tablas reales", async () => {
+    expect(await politicasInseguras(cliente)).toEqual([]);
+  });
+
+  it("el control rechaza una política que deja ver todo", async () => {
+    await tablaConRls("abierta", "id int, centro_id uuid");
+    await cliente.query("create policy todo on abierta using (true) with check (true)");
+    expect(await politicasInseguras(cliente)).toEqual([
+      "public.abierta.todo: no filtra por app_centro_actual()",
+    ]);
+  });
+
+  it("el control rechaza una política con OR, aunque mencione el centro", async () => {
+    await tablaConRls("con_or", "id int, centro_id uuid");
+    await cliente.query(
+      "create policy p on con_or using (centro_id = (select app_centro_actual()) or id > 0)",
+    );
+    expect(await politicasInseguras(cliente)).toEqual([
+      "public.con_or.p: usa OR, NOT o CASE: puede abrir más allá del centro",
+    ]);
+  });
+
+  it("el control rechaza una escritura sin control de centro", async () => {
+    await tablaConRls("escritura_abierta", "id int, centro_id uuid");
+    await cliente.query("create policy p on escritura_abierta for insert with check (true)");
+    expect(await politicasInseguras(cliente)).toEqual([
+      "public.escritura_abierta.p: no filtra por app_centro_actual()",
+    ]);
+  });
+
+  it("el control rechaza una tabla con sede_id cuya política no filtra por sede", async () => {
+    await tablaConRls("solo_centro", "id int, centro_id uuid, sede_id uuid");
+    await cliente.query(
+      "create policy p on solo_centro using (centro_id = (select app_centro_actual()))",
+    );
+    expect(await politicasInseguras(cliente)).toEqual([
+      "public.solo_centro.p: la tabla tiene sede_id y la política no filtra por sedes visibles",
+    ]);
+  });
+
+  it("el control acepta la política estándar de db/AGENTS.md", async () => {
+    await tablaConRls("estandar", "id int, centro_id uuid, sede_id uuid");
+    await cliente.query(`
+      create policy aislamiento on estandar
+        using (centro_id = (select app_centro_actual())
+               and sede_id = any ((select app_sedes_visibles())::uuid[]))
+        with check (centro_id = (select app_centro_actual())
+                    and sede_id = any ((select app_sedes_visibles())::uuid[]))`);
+    expect(await politicasInseguras(cliente)).toEqual([]);
   });
 });
 

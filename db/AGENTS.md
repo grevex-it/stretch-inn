@@ -50,9 +50,16 @@ compare contra el arreglo.
 - Migraciones en dos pasos: nunca renombrar ni borrar una columna en el mismo deploy
   en que el código deja de usarla.
 
-El test de aislamiento (`test/aislamiento.test.ts`) recorre **todas** las tablas con
-`centro_id` y falla si alguna no tiene RLS activado, forzado y con política. No hay que
-agregarlas a mano.
+El test de aislamiento (`test/aislamiento.test.ts`) recorre **todas** las tablas de `public`
+y las que tengan `centro_id`, sin agregarlas a mano, y falla si alguna:
+
+- no tiene RLS activado, forzado y con política;
+- tiene una política que no es una conjunción con `centro_id = (select app_centro_actual())`
+  (nada de `OR`, `NOT` ni `CASE`, que pueden abrir más allá del centro);
+- tiene `sede_id` y alguna política no filtra por las sedes visibles.
+
+Ese control mira la forma de las políticas. **Cada módulo prueba además el comportamiento** de
+las suyas con datos de dos centros y sedes distintas (ver `modulos/centros/test/`).
 
 ## Roles
 
