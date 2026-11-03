@@ -1,14 +1,15 @@
 // Controla el tamaño de todos los archivos de código del repo, CSS incluido.
 // ESLint ya controla TypeScript; esto cubre además CSS y cualquier archivo que ESLint no vea.
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { excedidos, LIMITE_LINEAS } from "./tamanos.ts";
 
 const rutas = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard"], {
   encoding: "utf8",
 })
   .split("\n")
-  .filter((ruta) => ruta !== "");
+  // Un archivo borrado pero todavía registrado en git no existe en el disco: se saltea.
+  .filter((ruta) => ruta !== "" && existsSync(ruta));
 
 const archivos = rutas.map((ruta) => ({ ruta, contenido: readFileSync(ruta, "utf8") }));
 const resultado = excedidos(archivos, LIMITE_LINEAS);

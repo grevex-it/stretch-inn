@@ -1,6 +1,6 @@
 // Controla que las instrucciones para agentes estén completas y no mientan (ver 0005).
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { problemasDeInstrucciones } from "./agentes.ts";
 
 const RELEVANTES = /(^|\/)(AGENTS|CLAUDE)\.md$|^modulos\/[^/]+\/package\.json$/;
@@ -9,7 +9,8 @@ const rutas = execFileSync("git", ["ls-files", "--cached", "--others", "--exclud
   encoding: "utf8",
 })
   .split("\n")
-  .filter((ruta) => RELEVANTES.test(ruta));
+  // Un archivo borrado pero todavía registrado en git no existe en el disco: se saltea.
+  .filter((ruta) => RELEVANTES.test(ruta) && existsSync(ruta));
 
 const archivos = rutas.map((ruta) => ({ ruta, contenido: readFileSync(ruta, "utf8") }));
 const problemas = problemasDeInstrucciones(archivos);
