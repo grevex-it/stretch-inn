@@ -3,6 +3,9 @@
   "workspaces": {
     "herramientas": {
       "entry": ["src/*-cli.ts"]
+    },
+    "db": {
+      "entry": ["src/*-cli.ts", "test/postgres-proceso.ts", "test/fixtures/*.ts"]
     }
   }
 }
