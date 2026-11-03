@@ -35,9 +35,9 @@ describe("crearModulo", () => {
   });
 
   it("rechaza nombres que no están en minúsculas con guiones", () => {
-    expect(() => crearModulo({ raiz: raizTemporal(), nombre: "Asistencia", nivel: "liviano" })).toThrow(
-      /nombre/,
-    );
+    expect(() =>
+      crearModulo({ raiz: raizTemporal(), nombre: "Asistencia", nivel: "liviano" }),
+    ).toThrow(/nombre/);
   });
 
   it("no pisa un módulo existente", () => {

@@ -43,12 +43,12 @@ Cada log de error tiene un botón que copia un bloque en Markdown listo para peg
 
 ### Alertas por Telegram, por capas
 
-| Capa | Cuándo avisa | Ejemplos |
-|---|---|---|
-| **1 · Crítica** | En el momento, con sonido, a cualquier hora | Sistema caído; base inaccesible; un cobro falló por error del sistema; posible fuga entre centros; backup fallido; deploy fallido o revertido |
-| **2 · Alta** | En el momento, sin sonido de noche | Más del 5 % de pedidos con error en 5 minutos; cola atascada (tareas esperando más de 10 minutos); WhatsApp rechazando muchos envíos; 95 % de los pedidos tardando más de 1 s durante 10 minutos |
-| **3 · Media** | Resumen cada hora, solo si hubo algo | Errores aislados que se repiten; reintentos de la cola; muchos logins fallidos de un mismo origen; plantilla de WhatsApp rechazada |
-| **4 · Informativa** | Resumen diario a las 9:00 | Actividad por centro, total de errores, backups OK, tareas en la lista de fallidos |
+| Capa                | Cuándo avisa                                | Ejemplos                                                                                                                                                                                         |
+| ------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **1 · Crítica**     | En el momento, con sonido, a cualquier hora | Sistema caído; base inaccesible; un cobro falló por error del sistema; posible fuga entre centros; backup fallido; deploy fallido o revertido                                                    |
+| **2 · Alta**        | En el momento, sin sonido de noche          | Más del 5 % de pedidos con error en 5 minutos; cola atascada (tareas esperando más de 10 minutos); WhatsApp rechazando muchos envíos; 95 % de los pedidos tardando más de 1 s durante 10 minutos |
+| **3 · Media**       | Resumen cada hora, solo si hubo algo        | Errores aislados que se repiten; reintentos de la cola; muchos logins fallidos de un mismo origen; plantilla de WhatsApp rechazada                                                               |
+| **4 · Informativa** | Resumen diario a las 9:00                   | Actividad por centro, total de errores, backups OK, tareas en la lista de fallidos                                                                                                               |
 
 Contra el ruido:
 

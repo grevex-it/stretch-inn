@@ -10,10 +10,10 @@ Las reglas de negocio (cupos, recuperaciones, abonos, cobros) tienen que poder p
 
 Dos niveles según el módulo:
 
-| Nivel | Capas | Módulos |
-|---|---|---|
-| **Completo** | `dominio/` · `aplicacion/` · `infraestructura/` · `http/` | agenda, asistencia, abonos, caja, mensajeria |
-| **Liviano** | `datos/` · `http/` | personas, centros, reportes y los que sean principalmente ABM o consultas |
+| Nivel        | Capas                                                     | Módulos                                                                   |
+| ------------ | --------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Completo** | `dominio/` · `aplicacion/` · `infraestructura/` · `http/` | agenda, asistencia, abonos, caja, mensajeria                              |
+| **Liviano**  | `datos/` · `http/`                                        | personas, centros, reportes y los que sean principalmente ABM o consultas |
 
 - `dominio/`: reglas puras, sin base ni HTTP. Solo importa `@app/nucleo`.
 - `aplicacion/`: casos de uso; declara en `puertos.ts` lo que necesita.

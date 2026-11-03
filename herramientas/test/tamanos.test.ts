@@ -16,7 +16,10 @@ describe("excedidos", () => {
   });
 
   it("también controla CSS", () => {
-    const resultado = excedidos([{ ruta: "apps/web/src/estilos.css", contenido: lineas(400) }], 300);
+    const resultado = excedidos(
+      [{ ruta: "apps/web/src/estilos.css", contenido: lineas(400) }],
+      300,
+    );
     expect(resultado).toEqual([{ ruta: "apps/web/src/estilos.css", lineas: 400 }]);
   });
 

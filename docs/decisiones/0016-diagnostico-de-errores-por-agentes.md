@@ -85,10 +85,10 @@ CLI en `herramientas/` que consulta las tablas de logs y devuelve Markdown pensa
 
 ### Retención (reemplaza la de 0015)
 
-| Qué | Cuánto |
-|---|---|
-| Errores y sus grupos | 6 meses |
-| Bitácora de actividad | 6 meses |
+| Qué                          | Cuánto  |
+| ---------------------------- | ------- |
+| Errores y sus grupos         | 6 meses |
+| Bitácora de actividad        | 6 meses |
 | Registro de pedidos exitosos | 30 días |
 
 Las tablas de logs se particionan por mes y se borran particiones enteras, sin `DELETE` masivos. La auditoría del centro sigue sin vencer (0015).

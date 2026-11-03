@@ -75,6 +75,9 @@ export function crearModulo({ raiz, nombre, nivel }: OpcionesModulo): string {
     `${JSON.stringify({ extends: "../../tsconfig.base.json", include: ["src", "test"] }, null, 2)}\n`,
   );
   writeFileSync(join(modulo, "CLAUDE.md"), claudeMd(nombre, nivel));
-  writeFileSync(join(modulo, "src", "index.ts"), "// API pública del módulo. Lo único que pueden importar los demás.\nexport {};\n");
+  writeFileSync(
+    join(modulo, "src", "index.ts"),
+    "// API pública del módulo. Lo único que pueden importar los demás.\nexport {};\n",
+  );
   return modulo;
 }

@@ -8,17 +8,17 @@ El código lo escriben agentes. Gana el stack donde las reglas se pueden **verif
 
 ## Decisión
 
-| Capa | Elección |
-|---|---|
-| Lenguaje | TypeScript estricto en todo (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`; prohibidos `any` y `@ts-ignore`) |
-| Monorepo | pnpm workspaces + Turborepo |
-| Backend | Fastify + Zod, dependencias conectadas a mano |
-| Base de datos | Postgres + Drizzle + RLS |
-| Tareas y cola | pg-boss, sobre el mismo Postgres |
-| Front | React + TypeScript + Vite + TanStack Router y TanStack Query |
-| Contratos | Esquemas Zod en `paquetes/contratos`, compartidos por API y front; OpenAPI generado |
-| Tests | Vitest, Postgres real para integración, Playwright para flujos críticos |
-| Alojamiento | Railway |
+| Capa          | Elección                                                                                                                          |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Lenguaje      | TypeScript estricto en todo (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`; prohibidos `any` y `@ts-ignore`) |
+| Monorepo      | pnpm workspaces + Turborepo                                                                                                       |
+| Backend       | Fastify + Zod, dependencias conectadas a mano                                                                                     |
+| Base de datos | Postgres + Drizzle + RLS                                                                                                          |
+| Tareas y cola | pg-boss, sobre el mismo Postgres                                                                                                  |
+| Front         | React + TypeScript + Vite + TanStack Router y TanStack Query                                                                      |
+| Contratos     | Esquemas Zod en `paquetes/contratos`, compartidos por API y front; OpenAPI generado                                               |
+| Tests         | Vitest, Postgres real para integración, Playwright para flujos críticos                                                           |
+| Alojamiento   | Railway                                                                                                                           |
 
 ## Por qué
 
@@ -30,15 +30,15 @@ El código lo escriben agentes. Gana el stack donde las reglas se pueden **verif
 
 ## Controles que mantienen el orden
 
-| Control | Herramienta |
-|---|---|
-| Límites físicos entre paquetes | pnpm workspaces + `exports` |
-| Capas y módulos, sin ciclos | dependency-cruiser |
-| Tamaño: 300 líneas por archivo, 50 por función, complejidad | ESLint + control propio que incluye CSS |
-| Código muerto | Knip |
-| Estructura de módulos | Generador `pnpm nuevo-modulo` |
-| Aislamiento entre centros y sedes | Test de RLS (ver 0002) |
-| Rutas sin permiso declarado | Test que falla si una ruta no exige permiso (ver 0007) |
-| Antes de subir | Hook `pre-push` con `pnpm check` (lefthook) |
+| Control                                                     | Herramienta                                            |
+| ----------------------------------------------------------- | ------------------------------------------------------ |
+| Límites físicos entre paquetes                              | pnpm workspaces + `exports`                            |
+| Capas y módulos, sin ciclos                                 | dependency-cruiser                                     |
+| Tamaño: 300 líneas por archivo, 50 por función, complejidad | ESLint + control propio que incluye CSS                |
+| Código muerto                                               | Knip                                                   |
+| Estructura de módulos                                       | Generador `pnpm nuevo-modulo`                          |
+| Aislamiento entre centros y sedes                           | Test de RLS (ver 0002)                                 |
+| Rutas sin permiso declarado                                 | Test que falla si una ruta no exige permiso (ver 0007) |
+| Antes de subir                                              | Hook `pre-push` con `pnpm check` (lefthook)            |
 
 Ningún control es obligatorio en GitHub (ver 0006): el CI corre y avisa, pero no bloquea el merge.
