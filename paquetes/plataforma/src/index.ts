@@ -7,3 +7,10 @@ export {
   type OpcionesBase,
   type Transaccion,
 } from "./base.ts";
+export {
+  codigoDeTraza,
+  crearLogger,
+  nuevaTraza,
+  type Logger,
+  type OpcionesLogger,
+} from "./logs.ts";
