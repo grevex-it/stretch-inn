@@ -7,6 +7,6 @@
   },
   "scripts": {
     "tipos": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
   }
 }

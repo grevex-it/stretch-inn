@@ -23,7 +23,10 @@ function paquete(nombre: string): string {
     private: true,
     type: "module",
     exports: { ".": "./src/index.ts" },
-    scripts: { tipos: "tsc -p tsconfig.json", test: "vitest run --passWithNoTests" },
+    scripts: {
+      tipos: "tsc -p tsconfig.json",
+      test: "vitest run --passWithNoTests --fsModuleCachePath node_modules/.vitest-cache",
+    },
     dependencies: { "@app/nucleo": "workspace:*" },
   };
   return `${JSON.stringify(contenido, null, 2)}\n`;
