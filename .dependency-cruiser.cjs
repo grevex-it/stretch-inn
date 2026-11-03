@@ -44,6 +44,13 @@ module.exports = {
       },
     },
     {
+      name: "solo-index-desde-afuera",
+      severity: "error",
+      comment: "Las apps y todo lo que está fuera de modulos/ usan un módulo solo por su index.ts.",
+      from: { pathNot: "^modulos/" },
+      to: { path: "^modulos/[^/]+/", pathNot: "^modulos/[^/]+/src/index\\.ts$" },
+    },
+    {
       name: "dominio-puro",
       severity: "error",
       comment:
