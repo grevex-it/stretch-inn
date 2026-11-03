@@ -1,6 +1,5 @@
 // Punto de entrada de la API: conecta la base, el logger y la app, y escucha en PUERTO.
-import { crearBase, crearLogger, verificarRolSeguro } from "@app/plataforma";
-import { sql } from "drizzle-orm";
+import { comprobarBase, crearBase, crearLogger, verificarRolSeguro } from "@app/plataforma";
 import { construirApp } from "./app.ts";
 
 const logger = crearLogger({ nivel: "info" });
@@ -25,9 +24,7 @@ await verificarRolSeguro(base);
 
 const app = construirApp({
   logger,
-  comprobarBase: async () => {
-    await base.db.execute(sql`select 1`);
-  },
+  comprobarBase: () => comprobarBase(base),
 });
 
 // Railway manda SIGTERM antes de cambiar al deploy nuevo: se terminan los pedidos en curso.

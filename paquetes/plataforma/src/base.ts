@@ -4,10 +4,15 @@ import { sql } from "drizzle-orm";
 import { drizzle, type NodePgDatabase } from "drizzle-orm/node-postgres";
 import pg from "pg";
 
-export type Transaccion = Parameters<Parameters<NodePgDatabase["transaction"]>[0]>[0];
+/**
+ * Drizzle atado a la conexión de una transacción abierta. `$client` es esa conexión: la usa la
+ * cola para guardar eventos en la misma transacción (outbox).
+ */
+export type Transaccion = NodePgDatabase & { $client: pg.PoolClient };
 
 export interface Base {
   readonly db: NodePgDatabase;
+  readonly pool: pg.Pool;
   cerrar(): Promise<void>;
 }
 
@@ -17,7 +22,12 @@ export interface OpcionesBase {
 
 export function crearBase(url: string, opciones: OpcionesBase = {}): Base {
   const pool = new pg.Pool({ connectionString: url, max: opciones.maximoConexiones ?? 10 });
-  return { db: drizzle(pool), cerrar: () => pool.end() };
+  return { db: drizzle(pool), pool, cerrar: () => pool.end() };
+}
+
+/** Falla si la base no responde. La usa el chequeo de salud. */
+export async function comprobarBase(base: Base): Promise<void> {
+  await base.pool.query("select 1");
 }
 
 /**
@@ -42,17 +52,25 @@ export async function verificarRolSeguro(base: Base): Promise<void> {
  * Corre el trabajo en una transacción con el centro y las sedes visibles del contexto fijados
  * con SET LOCAL: vencen al terminar la transacción y no quedan en la conexión del pool.
  */
-export function enContexto<T>(
+export async function enContexto<T>(
   base: Base,
   ctx: ContextoCentro,
   trabajo: (tx: Transaccion) => Promise<T>,
 ): Promise<T> {
-  const sedes = `{${sedesVisibles(ctx).join(",")}}`;
-  return base.db.transaction(async (tx) => {
-    await tx.execute(
-      sql`select set_config('app.centro_id', ${ctx.centroId}, true),
-                 set_config('app.sedes', ${sedes}, true)`,
+  const cliente = await base.pool.connect();
+  try {
+    await cliente.query("begin");
+    await cliente.query(
+      "select set_config('app.centro_id', $1, true), set_config('app.sedes', $2, true)",
+      [ctx.centroId, `{${sedesVisibles(ctx).join(",")}}`],
     );
-    return trabajo(tx);
-  });
+    const resultado = await trabajo(drizzle(cliente));
+    await cliente.query("commit");
+    return resultado;
+  } catch (error) {
+    await cliente.query("rollback");
+    throw error;
+  } finally {
+    cliente.release();
+  }
 }
