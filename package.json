@@ -7,6 +7,7 @@
     "node": ">=22.18"
   },
   "scripts": {
+    "prepare": "lefthook install",
     "dev": "turbo run dev",
     "formato": "prettier --check .",
     "formatear": "prettier --write .",
@@ -28,6 +29,7 @@
     "eslint-plugin-react-hooks": "^7.0.0",
     "globals": "^17.0.0",
     "knip": "^6.0.0",
+    "lefthook": "^2.2.2",
     "prettier": "^3.6.0",
     "turbo": "^2.6.0",
     "typescript": "~6.0.3",

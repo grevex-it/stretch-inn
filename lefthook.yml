@@ -1,0 +1,6 @@
+# Antes de subir se corre el mismo control que el CI (ver docs/decisiones/0006).
+# Se puede saltear con `git push --no-verify`, pero el CI lo vuelve a correr.
+pre-push:
+  commands:
+    check:
+      run: pnpm check
