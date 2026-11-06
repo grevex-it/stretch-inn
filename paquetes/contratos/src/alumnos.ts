@@ -52,6 +52,12 @@ export const alumno = z.object({
 
 export const paginaDeAlumnos = paginaDe(alumno);
 
+/** Respuesta de POST /alumnos. */
+export const alumnoCreado = z.object({ id: z.uuid() });
+
+/** Respuesta de PUT /alumnos/:id: la versión nueva. */
+export const alumnoEditado = z.object({ version: z.number().int() });
+
 export type PedidoDeAlumnos = z.infer<typeof pedidoDeAlumnos>;
 export type FichaDeAlumno = z.infer<typeof fichaDeAlumno>;
 export type EdicionDeAlumno = z.infer<typeof edicionDeAlumno>;

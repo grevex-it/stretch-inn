@@ -1,0 +1,6 @@
+.paginacion {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--si-texto-medio);
+}

@@ -5,6 +5,7 @@ import { usePermiso } from "../sesion.ts";
 import estilos from "./Navegacion.module.css";
 
 export function Navegacion() {
+  const veAlumnos = usePermiso("personas.ver");
   const veEquipo = usePermiso("usuarios.ver");
   const enlace = { className: estilos.enlace, activeProps: { "aria-current": "page" as const } };
   return (
@@ -12,6 +13,11 @@ export function Navegacion() {
       <Link to="/" activeOptions={{ exact: true }} {...enlace}>
         Inicio
       </Link>
+      {veAlumnos && (
+        <Link to="/alumnos" {...enlace}>
+          Alumnos
+        </Link>
+      )}
       {veEquipo && (
         <Link to="/equipo" {...enlace}>
           Equipo

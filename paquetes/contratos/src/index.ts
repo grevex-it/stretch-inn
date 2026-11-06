@@ -26,6 +26,8 @@ export {
 } from "./equipo.ts";
 export {
   alumno,
+  alumnoCreado,
+  alumnoEditado,
   edicionDeAlumno,
   fichaDeAlumno,
   paginaDeAlumnos,
