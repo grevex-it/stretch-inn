@@ -18,6 +18,7 @@ de los permisos efectivos (0007).
 
 - `@app/nucleo`
 - `@app/plataforma`
+- `@app/contratos` (rutas HTTP)
 
 ## API pública
 
@@ -38,6 +39,16 @@ Casos de uso (reciben la `Transaccion` de `enContexto`):
 - `quitarAsignacion(tx, asignacion, catalogo)` y `ajustarPermiso(tx, quien, ajuste, catalogo)`:
   si el centro se quedaría sin nadie con acceso total, devuelven falla y no cambian nada.
 
+Login y sesiones (0017):
+
+- `crearAcceso(base, { ahora?, limite? })`: una instancia por proceso, porque el límite de
+  intentos vive en su memoria. Devuelve `Acceso`: `entrar`, `resolver(token)` (la sesión con su
+  `ContextoCentro` ya limitado a la sede activa), `centros`, `elegirCentro`, `elegirSede`,
+  `salir` y `cambiarClave`.
+- `rutasDeSesion(acceso)`: plugin de Fastify con `POST/GET/DELETE /sesion` y
+  `PUT /sesion/centro`, `/sesion/sede` y `/sesion/clave`. La API resuelve la sesión antes
+  (`apps/api/src/base/sesion.ts`).
+
 ## Eventos
 
 - Emite: _ninguno por ahora_.
@@ -53,6 +64,11 @@ Casos de uso (reciben la `Transaccion` de `enContexto`):
 - Solo se resetea la contraseña de quien tiene menos permisos (subconjunto en cada sede y al
   menos uno menos), y nunca la de una cuenta con usuarios en otros centros (0017).
 - Los permisos se calculan en cada pedido; no se guardan en la sesión.
+- En la base se guarda solo el hash del token de sesión. La sesión vence a las 12 horas sin uso
+  y siempre a los 7 días; salir y cambiar la clave la revocan.
+- Ante cualquier falla del login, la misma respuesta: «Email o contraseña incorrectos». Con un
+  email que no existe se verifica igual contra un hash de relleno, para que tarde lo mismo.
+- Con una sede activa, el contexto lleva solo esa sede: RLS no le muestra las demás.
 - Todo cambio de permisos queda en `auditoria`.
 
 ## Glosario
@@ -62,6 +78,9 @@ Casos de uso (reciben la `Transaccion` de `enContexto`):
 - **Rol:** conjunto de permisos. Las plantillas del sistema se copian al centro en el alta.
 - **Ajuste:** permiso extra o quitado a un usuario en una sede.
 - **Acceso total:** todos los permisos del catálogo en todas las sedes del centro.
+- **Sede activa:** la sede con la que trabaja la sesión, o «Todas mis sedes».
+- **Clave temporal:** la que genera un reset; hasta cambiarla solo se puede ver la sesión,
+  cambiar la clave o salir.
 
 ## Configuración por centro
 
@@ -71,7 +90,10 @@ _Ninguna por ahora._
 
 - Plantillas de encargado, recepción y profesor: cuando existan los permisos de caja, agenda y
   asistencia.
-- Login, sesiones, alta de usuarios y reset de contraseña (0017).
+- Alta de usuarios y reset de contraseña (0017).
+- Bloquear un usuario tiene que revocar sus sesiones en ese centro (0017).
+- Login de operadores de soporte y sesión fijada a un centro por 2 horas (0008).
+- Limpiar las sesiones vencidas o revocadas viejas: tarea del worker cuando exista.
 - Avisar a `auditoria` de cada cambio de permisos, cuando exista ese módulo.
 - «Acceso total» exige todos los permisos en todas las sedes: al crear una sede nueva, el alta
   tiene que darle permisos al admin general en ella.

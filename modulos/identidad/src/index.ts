@@ -27,3 +27,6 @@ export {
   crearRol,
   quitarAsignacion,
 } from "./modulo.ts";
+export { crearAcceso } from "./modulo-acceso.ts";
+export type { Acceso, SesionResuelta } from "./aplicacion/puertos-acceso.ts";
+export { rutasDeSesion } from "./http/rutas-sesion.ts";
