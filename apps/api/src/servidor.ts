@@ -1,5 +1,6 @@
 // Punto de entrada de la API: conecta la base, el logger y la app, y escucha en PUERTO.
 import { comprobarBase, crearBase, crearLogger, verificarRolSeguro } from "@app/plataforma";
+import { crearAcceso, rutasDeSesion } from "@app/identidad";
 import { construirApp } from "./app.ts";
 
 const logger = crearLogger({ nivel: "info" });
@@ -19,13 +20,25 @@ if (urlBase === undefined) {
   process.exit(1);
 }
 
+const origenPanel = process.env["ORIGEN_PANEL"];
+if (origenPanel === undefined) {
+  logger.fatal("Falta ORIGEN_PANEL (por ejemplo https://app.dominio). Copiá .env.example a .env.");
+  process.exit(1);
+}
+
 const base = crearBase(urlBase);
 await verificarRolSeguro(base);
 
+// Una sola instancia por proceso: el límite de intentos de login vive en su memoria (0017).
+const acceso = crearAcceso(base);
 const app = construirApp({
   logger,
   comprobarBase: () => comprobarBase(base),
+  origenPanel,
+  resolverSesion: (token) => acceso.resolver(token),
+  detrasDeProxy: process.env["DETRAS_DE_PROXY"] === "1",
 });
+await app.register(rutasDeSesion(acceso));
 
 // Railway manda SIGTERM antes de cambiar al deploy nuevo: se terminan los pedidos en curso.
 process.on("SIGTERM", () => {
