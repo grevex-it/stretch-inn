@@ -1,0 +1,26 @@
+/* En pantallas chicas la tabla se desliza de costado en vez de romper el diseño. */
+.tabla {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  color: var(--si-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde);
+  border-collapse: collapse;
+  border-radius: var(--si-radio-md);
+}
+
+.tabla thead th {
+  padding: 12px;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto-suave);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.paginacion {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--si-texto-medio);
+}

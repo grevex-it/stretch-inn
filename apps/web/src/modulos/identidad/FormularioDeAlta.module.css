@@ -1,0 +1,72 @@
+.alta {
+  display: grid;
+  gap: 16px;
+  max-width: 560px;
+  padding: 20px;
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde);
+  border-radius: var(--si-radio-md);
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+.campo {
+  display: grid;
+  gap: 6px;
+}
+
+.etiqueta {
+  padding: 0;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Mismo aspecto que los campos de texto (controles/Campo). */
+.lista {
+  min-height: var(--si-alto-control);
+  padding: 0 14px;
+  font: inherit;
+  color: var(--si-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-sm);
+}
+
+.sedes {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.opcion {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: var(--si-alto-control-min);
+  color: var(--si-texto);
+}
+
+.casilla {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--si-oliva-700);
+}
+
+.lista:focus-visible,
+.casilla:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}

@@ -49,14 +49,28 @@ async function errorDe(respuesta: Response): Promise<ErrorDeApi> {
   return new ErrorDeApi(respuesta.status, "error", ALGO_FALLO);
 }
 
-/** GET validado con el contrato. Una respuesta que no lo cumple es un error, no un dato a medias. */
-export async function consultar<T>(ruta: string, esquema: z.ZodType<T>): Promise<T> {
-  const respuesta = await pedido("GET", ruta);
+/** Una respuesta que no cumple el contrato es un error, no un dato a medias. */
+async function leer<T>(respuesta: Response, esquema: z.ZodType<T>): Promise<T> {
   const resultado = esquema.safeParse(await respuesta.json().catch(() => undefined));
   if (!resultado.success) {
     throw new ErrorDeApi(respuesta.status, "respuesta-invalida", ALGO_FALLO);
   }
   return resultado.data;
+}
+
+/** GET validado con el contrato. */
+export async function consultar<T>(ruta: string, esquema: z.ZodType<T>): Promise<T> {
+  return leer(await pedido("GET", ruta), esquema);
+}
+
+/** POST o PUT cuya respuesta hace falta (una clave temporal, por ejemplo), validada. */
+export async function enviarYLeer<T>(
+  metodo: "POST" | "PUT",
+  ruta: string,
+  esquema: z.ZodType<T>,
+  cuerpo?: unknown,
+): Promise<T> {
+  return leer(await pedido(metodo, ruta, cuerpo), esquema);
 }
 
 /** POST, PUT o DELETE. La respuesta se ignora: las pantallas vuelven a consultar lo que cambió. */

@@ -4,6 +4,7 @@ import { Aviso } from "../controles/Aviso.tsx";
 import { useSesion } from "../sesion.ts";
 import { Barra } from "./Barra.tsx";
 import estilos from "./Estructura.module.css";
+import { Navegacion } from "./Navegacion.tsx";
 
 export function Estructura() {
   const { data: sesion } = useSesion();
@@ -16,6 +17,7 @@ export function Estructura() {
   return (
     <div className={estilos.estructura}>
       <Barra centros={sesion.centros} centro={centro} />
+      <Navegacion />
       <main className={estilos.contenido}>
         {centro.sedeCambiada && (
           <Aviso tono="alerta">

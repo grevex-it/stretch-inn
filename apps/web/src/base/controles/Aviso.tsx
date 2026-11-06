@@ -5,7 +5,7 @@ import estilos from "./Aviso.module.css";
 
 interface Props {
   children: ReactNode;
-  tono: "error" | "alerta";
+  tono: "error" | "alerta" | "ok";
 }
 
 export function Aviso({ children, tono }: Props) {

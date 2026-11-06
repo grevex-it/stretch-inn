@@ -24,6 +24,15 @@ export function useSesion() {
   });
 }
 
+/**
+ * Si tiene el permiso en alguna sede del centro activo. Solo para mostrar u ocultar: la seguridad
+ * la aplica la API en cada pedido.
+ */
+export function usePermiso(permiso: string): boolean {
+  const { data: sesion } = useSesion();
+  return sesion?.centroActivo?.permisos.includes(permiso) ?? false;
+}
+
 /** Cambiar algo de la sesión cambia qué datos se ven: se vuelve a pedir todo. */
 function useCambioDeSesion<Datos>(cambiar: (datos: Datos) => Promise<void>) {
   const cliente = useQueryClient();

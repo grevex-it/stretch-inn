@@ -1,0 +1,30 @@
+.navegacion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 20px;
+  background: var(--si-crema-200);
+  border-bottom: 1px solid var(--si-borde);
+}
+
+/* Pares de color controlados por el test de @app/ui. */
+.enlace {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--si-alto-control-min);
+  padding: 0 16px;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto-suave);
+  text-decoration: none;
+  border-radius: var(--si-radio-pildora);
+}
+
+.enlace[aria-current="page"] {
+  color: var(--si-crema-50);
+  background: var(--si-oliva-700);
+}
+
+.enlace:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}

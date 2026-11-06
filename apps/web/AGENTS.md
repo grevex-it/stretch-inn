@@ -9,13 +9,18 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
 - `src/base/`: sesión, cliente de la API, ruteo, estructura de pantalla y controles comunes. Es
   estructura (0006): no se cambia de paso desde una tarea de negocio.
   - `api.ts`: el único lugar que hace `fetch`. `consultar(ruta, esquema)` valida la respuesta
-    con el contrato; `enviar(metodo, ruta, cuerpo)` para los cambios.
+    con el contrato; `enviar(metodo, ruta, cuerpo)` para los cambios, y
+    `enviarYLeer(metodo, ruta, esquema, cuerpo)` cuando hace falta la respuesta.
   - `consultas.ts`: cliente de TanStack Query. Un 401 en cualquier pedido vuelve al login.
-  - `sesion.ts`: `useSesion` y las acciones de la sesión (entrar, salir, centro, sede, clave).
+  - `sesion.ts`: `useSesion`, `usePermiso(permiso)` y las acciones de la sesión (entrar, salir,
+    centro, sede, clave).
+  - `estructura/Navegacion.tsx`: las secciones del menú. Cada una se muestra solo con su permiso.
   - `Puerta.tsx`: según la sesión muestra login, clave temporal, elegir centro o el panel.
   - `rutas.tsx`: las rutas. Cada módulo suma las suyas como hijas de la raíz.
   - `controles/`: campo, botón, aviso y formulario.
 - `src/modulos/<modulo>/`: pantallas de cada módulo. Una carpeta por módulo, como en el backend.
+  - `identidad/`: pantalla Equipo (lista, alta, clave temporal, bloqueo). La clave temporal se
+    muestra una sola vez y no se guarda en ninguna consulta.
 
 ## Reglas
 

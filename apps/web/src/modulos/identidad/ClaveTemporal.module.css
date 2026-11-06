@@ -1,0 +1,34 @@
+/* Pares de color controlados por el test de @app/ui. */
+.clave {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  color: var(--si-ok-texto);
+  background: var(--si-ok-fondo);
+  border-radius: var(--si-radio-md);
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: var(--si-peso-medio);
+}
+
+.valor {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: var(--si-peso-medio);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+  user-select: all;
+}
+
+.texto {
+  margin: 0;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
