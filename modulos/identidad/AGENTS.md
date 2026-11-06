@@ -43,7 +43,8 @@ Login y sesiones (0017):
 
 - `crearAcceso(base, { ahora?, limite? })`: una instancia por proceso, porque el límite de
   intentos vive en su memoria. Devuelve `Acceso`: `entrar`, `resolver(token)` (la sesión con su
-  `ContextoCentro` ya limitado a la sede activa), `centros`, `elegirCentro`, `elegirSede`,
+  `ContextoCentro` ya limitado a la sede activa), `centros`, `sedes` (las del selector, con
+  nombre), `elegirCentro`, `elegirSede`,
   `salir` y `cambiarClave`.
 - `rutasDeSesion(acceso)`: plugin de Fastify con `POST/GET/DELETE /sesion` y
   `PUT /sesion/centro`, `/sesion/sede` y `/sesion/clave`. La API resuelve la sesión antes

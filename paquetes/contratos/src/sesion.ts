@@ -28,18 +28,19 @@ export const pedidoDeCambioDeClave = z.object({
     .pipe(z.string().max(LARGO_MAXIMO_DE_CLAVE)),
 });
 
-const centro = z.object({ id: z.uuid(), nombre: z.string() });
+const conNombre = z.object({ id: z.uuid(), nombre: z.string() });
 
 /** Respuesta de GET /sesion: quién es y dónde está trabajando. */
 export const estadoDeSesion = z.object({
   debeCambiarClave: z.boolean(),
-  centros: z.array(centro),
+  centros: z.array(conNombre),
   centroActivo: z
     .object({
       id: z.uuid(),
+      nombre: z.string(),
       sedeActiva: z.union([z.uuid(), z.literal("todas")]),
       /** Sedes donde tiene algún permiso: con una sola, el selector no aparece. */
-      sedes: z.array(z.uuid()),
+      sedes: z.array(conNombre),
       /** Le quitaron los permisos en la sede que tenía y se lo pasó a otra: avisarle. */
       sedeCambiada: z.boolean(),
     })

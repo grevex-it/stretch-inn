@@ -31,6 +31,7 @@ function accesoDoble() {
     ),
     resolver: vi.fn<Acceso["resolver"]>(() => Promise.resolve(sesion)),
     centros: vi.fn<Acceso["centros"]>(() => Promise.resolve([{ id: SEDE, nombre: "Centro" }])),
+    sedes: vi.fn<Acceso["sedes"]>(() => Promise.resolve([{ id: SEDE, nombre: "Norte" }])),
     elegirCentro: vi.fn<Acceso["elegirCentro"]>(() => Promise.resolve(ok(null))),
     elegirSede: vi.fn<Acceso["elegirSede"]>(() => Promise.resolve(ok(null))),
     salir: vi.fn<Acceso["salir"]>(() => Promise.resolve()),
@@ -112,7 +113,13 @@ describe("estado, centro, sede, clave y salida", () => {
     expect(respuesta.json()).toEqual({
       debeCambiarClave: false,
       centros: [{ id: SEDE, nombre: "Centro" }],
-      centroActivo: { id: SEDE, sedeActiva: "todas", sedes: [SEDE], sedeCambiada: false },
+      centroActivo: {
+        id: SEDE,
+        nombre: "Centro",
+        sedeActiva: "todas",
+        sedes: [{ id: SEDE, nombre: "Norte" }],
+        sedeCambiada: false,
+      },
     });
   });
 

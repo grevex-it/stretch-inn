@@ -1,6 +1,7 @@
 // Contratos de sesión (ver docs/decisiones/0017): lo que el panel manda y la API acepta.
 import { describe, expect, it } from "vitest";
 import {
+  estadoDeSesion,
   pedidoDeCambioDeClave,
   pedidoDeCentro,
   pedidoDeIngreso,
@@ -38,6 +39,25 @@ describe("pedidoDeCentro y pedidoDeSede", () => {
     expect(pedidoDeSede.safeParse({ sede: UUID }).success).toBe(true);
     expect(pedidoDeSede.safeParse({ sede: "todas" }).success).toBe(true);
     expect(pedidoDeSede.safeParse({ sede: "ninguna" }).success).toBe(false);
+  });
+});
+
+describe("estadoDeSesion", () => {
+  it("el centro activo y sus sedes llegan con nombre, para el selector", () => {
+    const estado = {
+      debeCambiarClave: false,
+      centros: [{ id: UUID, nombre: "Centro" }],
+      centroActivo: {
+        id: UUID,
+        nombre: "Centro",
+        sedeActiva: "todas",
+        sedes: [{ id: UUID, nombre: "Norte" }],
+        sedeCambiada: false,
+      },
+    };
+    expect(estadoDeSesion.parse(estado)).toEqual(estado);
+    const sinNombres = { ...estado, centroActivo: { ...estado.centroActivo, sedes: [UUID] } };
+    expect(estadoDeSesion.safeParse(sinNombres).success).toBe(false);
   });
 });
 

@@ -85,6 +85,22 @@ describe("sede activa", () => {
   });
 });
 
+describe("nombres de las sedes", () => {
+  it("devuelve las sedes donde tiene permisos, con nombre, aunque la sede activa sea una", async () => {
+    const { centro, sur, email } = await enDosSedes();
+    const sinPermisos = await centroConSedes("Otro", ["Lejos"]);
+    const acceso = crearAcceso(base);
+    const { token, sesion } = await entrarYResolver(acceso, email);
+    await acceso.elegirSede(sesion, sur);
+    const enSur = await acceso.resolver(token);
+    if (enSur === undefined) throw new Error("sin sesión");
+    const sedes = await acceso.sedes(enSur);
+    expect(sedes.map((s) => s.nombre)).toEqual(["Norte", "Sur"]);
+    expect(sedes.map((s) => s.id)).toEqual(centro.sedeIds);
+    expect(sedes.map((s) => s.id)).not.toContain(sinPermisos.sedeIds[0]);
+  });
+});
+
 describe("cambiar la clave", () => {
   it("exige la clave actual y una nueva de 10 caracteres o más", async () => {
     const { email } = await cuenta();

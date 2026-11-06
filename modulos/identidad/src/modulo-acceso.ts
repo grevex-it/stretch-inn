@@ -39,6 +39,10 @@ export function crearAcceso(base: Base, opciones: OpcionesAcceso = {}): Acceso {
         id: centroId,
         nombre,
       })),
+    sedes: async ({ cuentaId, centro }) =>
+      centro === null
+        ? []
+        : deps.repo.nombresDeSedes(cuentaId, centro.contexto.centroId, centro.sedes),
     elegirCentro: (sesion, centroId) => casos.elegirCentro(deps, sesion, centroId),
     elegirSede: (sesion, sede) => casos.elegirSede(deps, sesion, sede),
     salir: (sesion) => deps.repo.revocar(sesion.sesionId, deps.ahora()),

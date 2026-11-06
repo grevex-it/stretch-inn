@@ -36,3 +36,23 @@ create function identidad_centros_de(p_cuenta uuid)
 
 revoke execute on function identidad_centros_de(uuid) from public;
 grant execute on function identidad_centros_de(uuid) to app_usuario;
+
+-- Nombres de las sedes del selector. Con una sede activa, RLS solo deja ver esa: el selector
+-- necesita las demás donde tiene permisos. Solo id y nombre, solo de las sedes pedidas, y solo
+-- si la cuenta es un usuario activo de ese centro.
+create function identidad_nombres_de_sedes(p_cuenta uuid, p_centro uuid, p_sedes uuid[])
+  returns table (id uuid, nombre text)
+  language sql stable security definer
+  set search_path = public, pg_temp
+  as $$
+    select s.id, s.nombre
+    from sedes s
+    where s.centro_id = p_centro
+      and s.id = any (p_sedes)
+      and exists (select 1 from usuarios u
+                  where u.cuenta_id = p_cuenta and u.centro_id = p_centro and u.activo)
+    order by s.nombre, s.id
+  $$;
+
+revoke execute on function identidad_nombres_de_sedes(uuid, uuid, uuid[]) from public;
+grant execute on function identidad_nombres_de_sedes(uuid, uuid, uuid[]) to app_usuario;

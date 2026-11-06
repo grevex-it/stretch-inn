@@ -36,6 +36,12 @@ export interface RepositorioAcceso {
   cuentaPorId(cuentaId: string): Promise<CuentaGuardada | undefined>;
   cambiarClave(cuentaId: string, hashClave: string): Promise<void>;
   centrosDe(cuentaId: string): Promise<CentroDeCuenta[]>;
+  /** Id y nombre de esas sedes del centro, si la cuenta es un usuario activo de él. */
+  nombresDeSedes(
+    cuentaId: string,
+    centroId: string,
+    sedeIds: readonly string[],
+  ): Promise<{ id: string; nombre: string }[]>;
   permisosDe(cuentaId: string, centroId: string): Promise<FilaDePermiso[]>;
   crearSesion(sesion: { hashToken: string; cuentaId: string; ahora: Date }): Promise<string>;
   /** La sesión no revocada con ese hash de token, con datos de su cuenta. */
@@ -84,6 +90,8 @@ export interface Acceso {
   /** La sesión del token, o undefined si no existe, venció o fue revocada. */
   resolver(token: string): Promise<SesionResuelta | undefined>;
   centros(sesion: SesionResuelta): Promise<{ id: string; nombre: string }[]>;
+  /** Las sedes del selector (donde tiene algún permiso), con nombre. Vacío sin centro. */
+  sedes(sesion: SesionResuelta): Promise<{ id: string; nombre: string }[]>;
   elegirCentro(sesion: SesionResuelta, centroId: string): Promise<Resultado<null, ErrorDeCentro>>;
   elegirSede(sesion: SesionResuelta, sede: SedeActiva): Promise<Resultado<null, ErrorDeSede>>;
   salir(sesion: SesionResuelta): Promise<void>;

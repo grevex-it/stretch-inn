@@ -16,7 +16,7 @@ import { cuentas, sesiones, usuarios } from "./esquema.ts";
 type Cuentas = Pick<RepositorioAcceso, "cuentaPorEmail" | "cuentaPorId" | "cambiarClave">;
 type Sesiones = Omit<
   RepositorioAcceso,
-  keyof Cuentas | "centrosDe" | "permisosDe" | "recordarSede"
+  keyof Cuentas | "centrosDe" | "nombresDeSedes" | "permisosDe" | "recordarSede"
 >;
 
 const columnasDeCuenta = {
@@ -44,6 +44,12 @@ export function repositorioAcceso(base: Base): RepositorioAcceso {
         usuarioId: f.usuario_id,
         ultimaSedeId: f.ultima_sede_id,
       }));
+    },
+    async nombresDeSedes(cuentaId, centroId, sedeIds) {
+      const filas = await base.db.execute<{ id: string; nombre: string }>(
+        sql`select id, nombre from identidad_nombres_de_sedes(${cuentaId}, ${centroId}, ${`{${sedeIds.join(",")}}`}::uuid[])`,
+      );
+      return filas.rows;
     },
     // Misma función de alcance mínimo que usa cargarPermisos: no necesita contexto.
     async permisosDe(cuentaId, centroId): Promise<FilaDePermiso[]> {

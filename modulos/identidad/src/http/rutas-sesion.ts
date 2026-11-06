@@ -31,16 +31,19 @@ function responder(respuesta: FastifyReply, estado: number, error: Falla) {
 
 async function estado(acceso: Acceso, sesion: SesionResuelta): Promise<EstadoDeSesion> {
   const centro = sesion.centro;
+  const [centros, sedes] = await Promise.all([acceso.centros(sesion), acceso.sedes(sesion)]);
+  const activo = centros.find((c) => c.id === centro?.contexto.centroId);
   return {
     debeCambiarClave: sesion.debeCambiarClave,
-    centros: await acceso.centros(sesion),
+    centros,
     centroActivo:
-      centro === null
+      centro === null || activo === undefined
         ? null
         : {
-            id: centro.contexto.centroId,
+            id: activo.id,
+            nombre: activo.nombre,
             sedeActiva: centro.sedeActiva,
-            sedes: centro.sedes,
+            sedes,
             sedeCambiada: centro.sedeCambiada,
           },
   };
