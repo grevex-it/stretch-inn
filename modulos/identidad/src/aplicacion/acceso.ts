@@ -13,6 +13,7 @@ import { efectivosDe } from "./casos-de-uso.ts";
 import type {
   CentroActivo,
   Claves,
+  CuentaGuardada,
   ErrorDeCentro,
   ErrorDeClave,
   ErrorDeIngreso,
@@ -34,22 +35,34 @@ export interface DependenciasAcceso {
 
 const INCORRECTAS = falla("credenciales-incorrectas", "Email o contraseña incorrectos.");
 
+/** La cuenta si la clave es correcta. Con un email que no existe verifica igual, contra el relleno. */
+async function verificarCredenciales(
+  deps: DependenciasAcceso,
+  email: string,
+  clave: string,
+): Promise<CuentaGuardada | undefined> {
+  const cuenta = await deps.repo.cuentaPorEmail(email.trim());
+  const hash = cuenta?.hashClave ?? (await deps.hashDeRelleno);
+  const valida = await deps.claves.verificar(clave, hash);
+  return valida ? cuenta : undefined;
+}
+
 export async function entrar(
   deps: DependenciasAcceso,
   { email, clave, origen }: { email: string; clave: string; origen: string },
 ): Promise<Resultado<Ingreso, ErrorDeIngreso>> {
   const par = { email, origen };
-  if (deps.limite.bloqueado(par, deps.ahora())) return INCORRECTAS;
-  const cuenta = await deps.repo.cuentaPorEmail(email.trim());
-  const valida = await deps.claves.verificar(
-    clave,
-    cuenta?.hashClave ?? (await deps.hashDeRelleno),
-  );
-  if (cuenta === undefined || !valida) {
+  // Se reserva el intento antes de cualquier espera: ver dominio/intentos.ts.
+  if (!deps.limite.intentar(par, deps.ahora())) return INCORRECTAS;
+  const cuenta = await verificarCredenciales(deps, email, clave).catch((error: unknown) => {
+    deps.limite.liberar(par);
+    throw error;
+  });
+  if (cuenta === undefined) {
     deps.limite.registrarFallo(par, deps.ahora());
     return INCORRECTAS;
   }
-  deps.limite.limpiar(par);
+  deps.limite.registrarExito(par);
   const token = deps.claves.nuevoToken();
   const sesionId = await deps.repo.crearSesion({
     hashToken: deps.claves.hashDeToken(token),
