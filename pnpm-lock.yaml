@@ -50,6 +50,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@app/identidad':
+        specifier: workspace:*
+        version: link:../../modulos/identidad
       '@app/nucleo':
         specifier: workspace:*
         version: link:../../paquetes/nucleo
@@ -106,6 +109,9 @@ importers:
 
   modulos/identidad:
     dependencies:
+      '@app/contratos':
+        specifier: workspace:*
+        version: link:../../paquetes/contratos
       '@app/nucleo':
         specifier: workspace:*
         version: link:../../paquetes/nucleo
@@ -115,6 +121,12 @@ importers:
       drizzle-orm:
         specifier: ^0.45.4
         version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
+      fastify:
+        specifier: ^5.12.7
+        version: 5.12.7
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
     devDependencies:
       '@app/db':
         specifier: workspace:*
@@ -126,6 +138,12 @@ importers:
         specifier: ^8.23.1
         version: 8.23.1
 
+  paquetes/contratos:
+    dependencies:
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+
   paquetes/nucleo: {}
 
   paquetes/plataforma:
@@ -136,6 +154,9 @@ importers:
       drizzle-orm:
         specifier: ^0.45.4
         version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
+      fastify:
+        specifier: ^5.12.7
+        version: 5.12.7
       pg:
         specifier: ^8.23.1
         version: 8.23.1

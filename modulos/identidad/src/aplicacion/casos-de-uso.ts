@@ -25,7 +25,8 @@ export type ErrorDePermisos =
   | "asignacion-inexistente"
   | "ultimo-acceso-total";
 
-function efectivosDe(filas: readonly FilaDePermiso[]): PermisosPorSede {
+/** Permisos efectivos a partir de las filas de roles y ajustes. */
+export function efectivosDe(filas: readonly FilaDePermiso[]): PermisosPorSede {
   return permisosEfectivos(
     filas
       .filter((fila) => fila.origen === "rol")

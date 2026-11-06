@@ -4,6 +4,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  index,
   integer,
   pgSchema,
   pgTable,
@@ -31,6 +32,31 @@ export const cuentas = plataforma.table(
   (tabla) => [uniqueIndex("cuentas_email").on(sql`lower(${tabla.email})`)],
 );
 
+/**
+ * Sesión del panel (0017). Se guarda solo el hash del token. El centro y el usuario quedan en
+ * null hasta que elige centro; sedeActivaId en null es «Todas mis sedes».
+ */
+export const sesiones = plataforma.table(
+  "sesiones",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    hashToken: text("hash_token").notNull(),
+    cuentaId: uuid("cuenta_id")
+      .notNull()
+      .references(() => cuentas.id),
+    centroId: uuid("centro_id"),
+    usuarioId: uuid("usuario_id"),
+    sedeActivaId: uuid("sede_activa_id"),
+    creadaEn: timestamp("creada_en", { withTimezone: true }).notNull(),
+    ultimoUsoEn: timestamp("ultimo_uso_en", { withTimezone: true }).notNull(),
+    revocadaEn: timestamp("revocada_en", { withTimezone: true }),
+  },
+  (tabla) => [
+    uniqueIndex("sesiones_hash_token").on(tabla.hashToken),
+    index("sesiones_cuenta").on(tabla.cuentaId),
+  ],
+);
+
 /** La membresía de una cuenta en un centro. */
 export const usuarios = pgTable(
   "usuarios",
@@ -42,6 +68,8 @@ export const usuarios = pgTable(
       .references(() => cuentas.id),
     nombre: text("nombre").notNull(),
     activo: boolean("activo").notNull().default(true),
+    /** Última sede que eligió en este centro; null es «Todas mis sedes» o todavía ninguna (0017). */
+    ultimaSedeId: uuid("ultima_sede_id"),
     creadoEn: timestamp("creado_en", { withTimezone: true }).notNull().defaultNow(),
     version: integer("version").notNull().default(1),
   },

@@ -1,24 +1,9 @@
-import { Writable } from "node:stream";
-import { codigoDeTraza, crearLogger } from "@app/plataforma";
+import { codigoDeTraza } from "@app/plataforma";
 import { describe, expect, it } from "vitest";
-import { construirApp } from "../src/app.ts";
+import { appDePrueba as app, conCookie, sesionCon } from "./ayudas.ts";
 
-function appDePrueba(comprobarBase: () => Promise<void> = () => Promise.resolve()) {
-  const crudo: string[] = [];
-  const destino = new Writable({
-    write(trozo: Buffer, _codificacion, listo) {
-      crudo.push(trozo.toString());
-      listo();
-    },
-  });
-  const logs = () =>
-    crudo
-      .join("")
-      .split("\n")
-      .filter((linea) => linea !== "")
-      .map((linea) => JSON.parse(linea) as Record<string, unknown>);
-  const app = construirApp({ logger: crearLogger({ nivel: "info", destino }), comprobarBase });
-  return { app, logs };
+function appDePrueba(comprobarBase?: () => Promise<void>) {
+  return app({ comprobarBase, sesiones: { t: sesionCon(["caja.ver"]) } });
 }
 
 describe("/salud", () => {
@@ -70,7 +55,7 @@ describe("errores no previstos (0016)", () => {
     app.get("/rompe", { config: { permiso: "caja.ver" } }, () => {
       throw new Error("se cortó la conexión");
     });
-    const respuesta = await app.inject({ method: "GET", url: "/rompe" });
+    const respuesta = await app.inject({ method: "GET", url: "/rompe", headers: conCookie("t") });
     const traza = String(respuesta.headers["x-traza"]);
 
     expect(respuesta.statusCode).toBe(500);

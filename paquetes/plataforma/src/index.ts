@@ -27,3 +27,12 @@ export {
   type OpcionesPublicar,
   type OpcionesTarea,
 } from "./cola.ts";
+export {
+  borrarCookieDeSesion,
+  contextoDe,
+  fijarCookieDeSesion,
+  sesionDe,
+  tokenDelPedido,
+  type CentroDelPedido,
+  type SesionDelPedido,
+} from "./http.ts";
