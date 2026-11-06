@@ -40,6 +40,10 @@ describe("sembrar", () => {
     const sesion = await acceso.resolver(ingreso.valor.token);
     if (sesion === undefined) throw new Error("sin sesión");
     expect((await acceso.sedes(sesion)).map((s) => s.nombre)).toEqual(["Norte", "Sur"]);
+    // Acceso total: también los permisos de los módulos de negocio.
+    for (const permisos of sesion.centro?.contexto.permisosPorSede.values() ?? []) {
+      expect([...permisos]).toEqual(expect.arrayContaining(["personas.ver", "personas.editar"]));
+    }
   });
 
   it("si la cuenta ya existe no vuelve a crear nada", async () => {

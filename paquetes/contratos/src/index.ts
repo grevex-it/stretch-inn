@@ -24,3 +24,15 @@ export {
   type PaginaDeRoles,
   type PedidoDeAlta,
 } from "./equipo.ts";
+export {
+  alumno,
+  edicionDeAlumno,
+  fichaDeAlumno,
+  paginaDeAlumnos,
+  pedidoDeAlumnos,
+  type Alumno,
+  type EdicionDeAlumno,
+  type FichaDeAlumno,
+  type PaginaDeAlumnos,
+  type PedidoDeAlumnos,
+} from "./alumnos.ts";

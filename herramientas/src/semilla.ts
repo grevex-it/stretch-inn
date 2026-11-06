@@ -7,6 +7,7 @@ import {
   PERMISOS_IDENTIDAD,
   plantillasDelSistema,
 } from "@app/identidad";
+import { PERMISOS_PERSONAS } from "@app/personas";
 import { randomUUID } from "node:crypto";
 import pg from "pg";
 
@@ -15,8 +16,8 @@ export interface CuentaDePrueba {
   clave: string;
 }
 
-/** Por ahora el catálogo tiene solo los permisos de identidad: se suman al crear cada módulo. */
-const catalogo = crearCatalogo([PERMISOS_IDENTIDAD]);
+/** Los permisos de cada módulo: se suman al crear cada uno. */
+const catalogo = crearCatalogo([PERMISOS_IDENTIDAD, PERMISOS_PERSONAS]);
 
 async function crearCentro(cliente: pg.Client, cuenta: CuentaDePrueba): Promise<void> {
   const [centro, norte, sur, usuario, cuentaId] = Array.from({ length: 5 }, () => randomUUID());

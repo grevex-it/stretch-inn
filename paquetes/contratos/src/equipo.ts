@@ -1,14 +1,10 @@
 // Equipo del centro (ver docs/decisiones/0017): lista, alta, reset de clave y bloqueo.
 import { z } from "zod";
-
-/** Ninguna lista sin paginar (regla 8): siempre de a 50. */
-const POR_PAGINA = 50;
+import { numeroDePagina, paginaDe, POR_PAGINA } from "./paginas.ts";
 
 /** Query de una lista: `?pagina=N`, desde 1. */
 export const pedidoDePagina = z
-  .object({
-    pagina: z.coerce.number().int().min(1, "La página arranca en 1.").default(1),
-  })
+  .object({ pagina: numeroDePagina })
   .transform(({ pagina }) => ({ pagina, porPagina: POR_PAGINA }));
 
 export const pedidoDeAlta = z.object({
@@ -17,15 +13,6 @@ export const pedidoDeAlta = z.object({
   rolId: z.uuid("Elegí un rol."),
   sedeIds: z.array(z.uuid()).min(1, "Elegí al menos una sede."),
 });
-
-function paginaDe<T extends z.ZodType>(elemento: T) {
-  return z.object({
-    pagina: z.number().int(),
-    porPagina: z.number().int(),
-    total: z.number().int(),
-    elementos: z.array(elemento),
-  });
-}
 
 export const paginaDeEquipo = paginaDe(
   z.object({
