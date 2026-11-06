@@ -16,6 +16,11 @@ import { leer, responder } from "./comun.ts";
 const conSesion = { soloSesion: true } as const;
 const aunConClaveTemporal = { soloSesion: true, aunConClaveTemporal: true } as const;
 
+/** Los permisos en alguna sede del contexto, para mostrar u ocultar en pantalla (solo UX). */
+function permisosDelContexto(porSede: ReadonlyMap<unknown, ReadonlySet<string>>): string[] {
+  return [...new Set([...porSede.values()].flatMap((permisos) => [...permisos]))].sort();
+}
+
 async function estado(acceso: Acceso, sesion: SesionResuelta): Promise<EstadoDeSesion> {
   const centro = sesion.centro;
   const [centros, sedes] = await Promise.all([acceso.centros(sesion), acceso.sedes(sesion)]);
@@ -32,6 +37,7 @@ async function estado(acceso: Acceso, sesion: SesionResuelta): Promise<EstadoDeS
             sedeActiva: centro.sedeActiva,
             sedes,
             sedeCambiada: centro.sedeCambiada,
+            permisos: permisosDelContexto(centro.contexto.permisosPorSede),
           },
   };
 }

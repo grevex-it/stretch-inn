@@ -31,6 +31,7 @@ interface Cambios {
   sedeActiva?: string;
   sedeCambiada?: boolean;
   centros?: number;
+  permisos?: string[];
 }
 
 /** Estado de una sesión trabajando en el centro, con las sedes indicadas. */
@@ -51,6 +52,7 @@ export function enCentro(sedes: { id: string; nombre: string }[], cambios: Cambi
         sedeActiva: cambios.sedeActiva ?? porDefecto,
         sedes,
         sedeCambiada: cambios.sedeCambiada ?? false,
+        permisos: cambios.permisos ?? [],
       },
     },
   };
