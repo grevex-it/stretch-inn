@@ -70,10 +70,11 @@ Las carpetas que todavía no existen se crean a medida que se construyen.
     pnpm formatear                      # aplica el formato de Prettier
     pnpm --filter @app/<paquete> test   # tests de un paquete
     pnpm nuevo-modulo <nombre> <completo|liviano>
-    pnpm dev                            # levanta la API (antes: pnpm db:levantar y pnpm db:migrar)
+    pnpm dev                            # levanta la API y el panel (antes: pnpm db:levantar y pnpm db:migrar)
     pnpm db:levantar                    # Postgres local real, sin Docker (Ctrl+C lo detiene)
     pnpm db:migrar                      # aplica las migraciones (ver db/AGENTS.md)
     pnpm db:migracion <nombre>          # crea una migración (ver db/AGENTS.md)
+    pnpm db:semilla                     # centro de prueba local con un admin (ver apps/web/AGENTS.md)
 
 `pnpm check` controla automáticamente formato, tamaños, límites entre módulos y capas,
 tipos estrictos, código muerto y que cada `AGENTS.md` esté completo. No hace falta

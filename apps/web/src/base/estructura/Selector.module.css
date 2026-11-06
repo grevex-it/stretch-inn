@@ -1,0 +1,26 @@
+.selector {
+  display: grid;
+  gap: 2px;
+}
+
+/* Pares de color controlados por el test de @app/ui. */
+.etiqueta {
+  font-size: 0.8rem;
+  font-weight: var(--si-peso-liviano);
+  color: var(--si-texto-sobre-oliva);
+}
+
+.lista {
+  min-height: var(--si-alto-control-min);
+  padding: 0 10px;
+  font: inherit;
+  color: var(--si-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-sm);
+}
+
+.lista:focus-visible {
+  outline: 2px solid var(--si-foco-sobre-oliva);
+  outline-offset: 2px;
+}

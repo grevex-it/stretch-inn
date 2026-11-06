@@ -1,0 +1,17 @@
+/* Único CSS global del panel (ver AGENTS.md): tokens de @app/ui y lo básico del documento. */
+@import "@app/ui/tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--si-fuente);
+  font-weight: var(--si-peso-normal);
+  line-height: 1.5;
+  color: var(--si-texto);
+  background: var(--si-crema-50);
+}

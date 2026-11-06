@@ -1,0 +1,17 @@
+.inicio {
+  display: grid;
+  gap: 8px;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+.texto {
+  margin: 0;
+  font-weight: var(--si-peso-liviano);
+  color: var(--si-texto-suave);
+}

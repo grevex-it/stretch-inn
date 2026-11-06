@@ -1,0 +1,36 @@
+.fondo {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  background: var(--si-crema-100);
+}
+
+.tarjeta {
+  display: grid;
+  gap: 20px;
+  width: min(100%, 420px);
+  padding: 32px 28px;
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde);
+  border-radius: var(--si-radio-lg);
+  box-shadow: var(--si-sombra-flotante);
+}
+
+.logo {
+  width: 140px;
+  height: auto;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+.bajada {
+  margin: -12px 0 0;
+  font-weight: var(--si-peso-liviano);
+  color: var(--si-texto-suave);
+}

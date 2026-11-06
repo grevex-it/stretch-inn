@@ -1,0 +1,23 @@
+/* Pares de color controlados por el test de @app/ui. */
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  align-items: center;
+  padding: 12px 20px;
+  color: var(--si-texto-sobre-oliva);
+  background: var(--si-oliva-900);
+}
+
+.logo {
+  width: 36px;
+  height: 36px;
+}
+
+.nombre {
+  font-weight: var(--si-peso-medio);
+}
+
+.salir {
+  margin-left: auto;
+}

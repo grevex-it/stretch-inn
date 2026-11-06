@@ -1,0 +1,18 @@
+.aviso {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--si-radio-sm);
+}
+
+/* Pares de color controlados por el test de @app/ui. */
+.error {
+  color: var(--si-error-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde);
+  border-left: 4px solid var(--si-error-texto);
+}
+
+.alerta {
+  color: var(--si-alerta-texto);
+  background: var(--si-alerta-fondo);
+}
