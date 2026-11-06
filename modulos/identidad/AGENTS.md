@@ -50,6 +50,15 @@ Login y sesiones (0017):
   `PUT /sesion/centro`, `/sesion/sede` y `/sesion/clave`. La API resuelve la sesión antes
   (`apps/api/src/base/sesion.ts`).
 
+Equipo del centro (0017):
+
+- `crearEquipo(base, { ahora? })`: devuelve `Equipo`, con `listar` y `roles` (paginados),
+  `darDeAlta`, `resetearClave`, `bloquear` y `reactivar`. Cada uno recibe el `ContextoCentro` de
+  quien lo pide y corre en su propia transacción.
+- `rutasDeEquipo(equipo)`: `GET /equipo` (`usuarios.ver`), `GET /equipo/roles`, `POST /equipo`,
+  `POST /equipo/:id/clave` y `PUT`/`DELETE /equipo/:id/bloqueo` (`usuarios.gestionar`). Las
+  respuestas con clave temporal van con `Cache-Control: no-store`.
+
 ## Eventos
 
 - Emite: _ninguno por ahora_.
@@ -63,7 +72,16 @@ Login y sesiones (0017):
 - Nadie da permisos que no tiene: en una asignación, en esa sede; en un rol, en alguna sede.
 - Siempre queda al menos un usuario con acceso total en el centro.
 - Solo se resetea la contraseña de quien tiene menos permisos (subconjunto en cada sede y al
-  menos uno menos), y nunca la de una cuenta con usuarios en otros centros (0017).
+  menos uno menos), y nunca la de una cuenta con usuarios en otros centros (0017). Bloquear y
+  reactivar siguen la misma regla de «menos permisos»; nadie se resetea ni se bloquea a sí mismo.
+- La comparación de permisos usa los del objetivo en **todas** sus sedes, aunque quien gestiona
+  tenga una sede activa: con la sede Norte activa no se gestiona a alguien con permisos en Sur.
+- La clave temporal la genera el sistema y se muestra una sola vez. Un alta con un email que ya
+  tiene cuenta la vincula, sin clave nueva. Resetear cierra todas las sesiones de la cuenta;
+  bloquear, las de ese centro.
+- La app no tiene permisos sobre `plataforma.cuentas`: login, alta, reset y emails del equipo
+  pasan por funciones de alcance mínimo (`identidad_cuenta_por_email`, `identidad_cuenta_para_alta`,
+  `identidad_resetear_clave`, `identidad_emails_de_usuarios`, …).
 - Los permisos se calculan en cada pedido; no se guardan en la sesión.
 - En la base se guarda solo el hash del token de sesión. La sesión vence a las 12 horas sin uso
   y siempre a los 7 días; salir y cambiar la clave la revocan.
@@ -91,8 +109,9 @@ _Ninguna por ahora._
 
 - Plantillas de encargado, recepción y profesor: cuando existan los permisos de caja, agenda y
   asistencia.
-- Alta de usuarios y reset de contraseña (0017).
-- Bloquear un usuario tiene que revocar sus sesiones en ese centro (0017).
+- Editar el nombre y los roles de un usuario desde el equipo, y la pantalla de roles a medida.
+- El actor de soporte (0008) sigue las mismas reglas que un usuario; revisarlas cuando exista
+  su login.
 - Login de operadores de soporte y sesión fijada a un centro por 2 horas (0008).
 - Limpiar las sesiones vencidas o revocadas viejas: tarea del worker cuando exista.
 - Avisar a `auditoria` de cada cambio de permisos, cuando exista ese módulo.

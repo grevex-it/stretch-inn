@@ -1,6 +1,6 @@
 // Repositorio del login y las sesiones (ver docs/decisiones/0017). Cuentas y sesiones son datos
-// de la plataforma, previos a elegir centro: se leen sin contexto. Lo de un centro pasa por las
-// funciones de alcance mínimo o por enContexto.
+// de la plataforma, previos a elegir centro: se usan sin contexto. Las cuentas y lo de un centro
+// pasan por las funciones de alcance mínimo; lo demás del centro, por enContexto.
 import type { Permiso } from "@app/nucleo";
 import { enContexto, type Base } from "@app/plataforma";
 import { and, eq, isNull, ne, sql } from "drizzle-orm";
@@ -11,7 +11,7 @@ import type {
   SesionGuardada,
 } from "../aplicacion/puertos-acceso.ts";
 import type { FilaDePermiso } from "../aplicacion/puertos.ts";
-import { cuentas, sesiones, usuarios } from "./esquema.ts";
+import { sesiones, usuarios } from "./esquema.ts";
 
 type Cuentas = Pick<RepositorioAcceso, "cuentaPorEmail" | "cuentaPorId" | "cambiarClave">;
 type Sesiones = Omit<
@@ -19,10 +19,15 @@ type Sesiones = Omit<
   keyof Cuentas | "centrosDe" | "nombresDeSedes" | "permisosDe" | "recordarSede"
 >;
 
-const columnasDeCuenta = {
-  id: cuentas.id,
-  hashClave: cuentas.hashClave,
-  debeCambiarClave: cuentas.debeCambiarClave,
+type FilaDeSesion = {
+  id: string;
+  cuenta_id: string;
+  centro_id: string | null;
+  usuario_id: string | null;
+  sede_activa_id: string | null;
+  creada_en: string | Date;
+  ultimo_uso_en: string | Date;
+  debe_cambiar_clave: boolean;
 };
 
 export function repositorioAcceso(base: Base): RepositorioAcceso {
@@ -68,29 +73,49 @@ export function repositorioAcceso(base: Base): RepositorioAcceso {
   };
 }
 
+type FilaDeCuenta = { id: string; hash_clave: string; debe_cambiar_clave: boolean };
+
+function deCuenta(fila: FilaDeCuenta | undefined): CuentaGuardada | undefined {
+  return (
+    fila && { id: fila.id, hashClave: fila.hash_clave, debeCambiarClave: fila.debe_cambiar_clave }
+  );
+}
+
+// Las cuentas son de toda la plataforma: la app no tiene permisos sobre la tabla y pasa por las
+// funciones de alcance mínimo (0017).
 function repositorioDeCuentas({ db }: Base): Cuentas {
   return {
-    async cuentaPorEmail(email): Promise<CuentaGuardada | undefined> {
-      const [cuenta] = await db
-        .select(columnasDeCuenta)
-        .from(cuentas)
-        .where(sql`lower(${cuentas.email}) = lower(${email})`);
-      return cuenta;
+    async cuentaPorEmail(email) {
+      const filas = await db.execute<FilaDeCuenta>(
+        sql`select id, hash_clave, debe_cambiar_clave from identidad_cuenta_por_email(${email})`,
+      );
+      return deCuenta(filas.rows[0]);
     },
     async cuentaPorId(cuentaId) {
-      const [cuenta] = await db
-        .select(columnasDeCuenta)
-        .from(cuentas)
-        .where(eq(cuentas.id, cuentaId));
-      return cuenta;
+      const filas = await db.execute<FilaDeCuenta>(
+        sql`select id, hash_clave, debe_cambiar_clave from identidad_cuenta_por_id(${cuentaId})`,
+      );
+      return deCuenta(filas.rows[0]);
     },
     async cambiarClave(cuentaId, hashClave) {
-      await db
-        .update(cuentas)
-        .set({ hashClave, debeCambiarClave: false, version: sql`${cuentas.version} + 1` })
-        .where(eq(cuentas.id, cuentaId));
+      await db.execute(sql`select identidad_cambiar_clave(${cuentaId}, ${hashClave})`);
     },
   };
+}
+
+function deSesion(f: FilaDeSesion | undefined): SesionGuardada | undefined {
+  return (
+    f && {
+      id: f.id,
+      cuentaId: f.cuenta_id,
+      centroId: f.centro_id,
+      usuarioId: f.usuario_id,
+      sedeActivaId: f.sede_activa_id,
+      creadaEn: new Date(f.creada_en),
+      ultimoUsoEn: new Date(f.ultimo_uso_en),
+      debeCambiarClave: f.debe_cambiar_clave,
+    }
+  );
 }
 
 function repositorioDeSesiones({ db }: Base): Sesiones {
@@ -105,21 +130,10 @@ function repositorioDeSesiones({ db }: Base): Sesiones {
       return fila.id;
     },
     async sesionPorToken(hashToken): Promise<SesionGuardada | undefined> {
-      const [fila] = await db
-        .select({
-          id: sesiones.id,
-          cuentaId: sesiones.cuentaId,
-          centroId: sesiones.centroId,
-          usuarioId: sesiones.usuarioId,
-          sedeActivaId: sesiones.sedeActivaId,
-          creadaEn: sesiones.creadaEn,
-          ultimoUsoEn: sesiones.ultimoUsoEn,
-          debeCambiarClave: cuentas.debeCambiarClave,
-        })
-        .from(sesiones)
-        .innerJoin(cuentas, eq(cuentas.id, sesiones.cuentaId))
-        .where(and(eq(sesiones.hashToken, hashToken), isNull(sesiones.revocadaEn)));
-      return fila;
+      const filas = await db.execute<FilaDeSesion>(
+        sql`select * from identidad_sesion_por_token(${hashToken})`,
+      );
+      return deSesion(filas.rows[0]);
     },
     async marcarUso(sesionId, ahora) {
       await db.update(sesiones).set({ ultimoUsoEn: ahora }).where(vigente(sesionId));

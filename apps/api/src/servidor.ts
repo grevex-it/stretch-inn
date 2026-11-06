@@ -1,6 +1,6 @@
 // Punto de entrada de la API: conecta la base, el logger y la app, y escucha en PUERTO.
 import { comprobarBase, crearBase, crearLogger, verificarRolSeguro } from "@app/plataforma";
-import { crearAcceso, rutasDeSesion } from "@app/identidad";
+import { crearAcceso, crearEquipo, rutasDeEquipo, rutasDeSesion } from "@app/identidad";
 import { construirApp } from "./app.ts";
 
 const logger = crearLogger({ nivel: "info" });
@@ -39,6 +39,7 @@ const app = construirApp({
   detrasDeProxy: process.env["DETRAS_DE_PROXY"] === "1",
 });
 await app.register(rutasDeSesion(acceso));
+await app.register(rutasDeEquipo(crearEquipo(base)));
 
 // Railway manda SIGTERM antes de cambiar al deploy nuevo: se terminan los pedidos en curso.
 process.on("SIGTERM", () => {

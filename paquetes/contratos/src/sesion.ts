@@ -43,6 +43,11 @@ export const estadoDeSesion = z.object({
       sedes: z.array(conNombre),
       /** Le quitaron los permisos en la sede que tenía y se lo pasó a otra: avisarle. */
       sedeCambiada: z.boolean(),
+      /**
+       * Permisos en alguna sede del contexto. Solo para mostrar u ocultar en pantalla: la
+       * seguridad la aplica la API en cada pedido.
+       */
+      permisos: z.array(z.string()),
     })
     .nullable(),
 });

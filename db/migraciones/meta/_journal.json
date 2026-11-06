@@ -57,6 +57,20 @@
       "when": 1793924923332,
       "tag": "20261106002843_rls-login-y-sesiones",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793986825077,
+      "tag": "20261106174025_cuentas-solo-por-funciones",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793987068630,
+      "tag": "20261106174428_equipo",
+      "breakpoints": true
     }
   ]
 }

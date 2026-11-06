@@ -42,6 +42,20 @@ export async function centroConSedes(nombre: string, sedes: string[]) {
   return { centroId, rolId, sedeIds };
 }
 
+/** Un rol del centro con esos permisos. */
+export async function rolCon(centroId: string, nombre: string, permisos: string[]) {
+  const rolId = randomUUID();
+  await comoDueno("insert into roles (id, centro_id, nombre) values ($1, $2, $3)", [
+    rolId,
+    centroId,
+    nombre,
+  ]);
+  for (const permiso of permisos) {
+    await comoDueno("insert into permisos_de_rol values ($1, $2, $3)", [centroId, rolId, permiso]);
+  }
+  return rolId;
+}
+
 /** Una cuenta con clave conocida. El email es único por corrida. */
 export async function cuenta(opciones: { debeCambiarClave?: boolean } = {}) {
   const cuentaId = randomUUID();

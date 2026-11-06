@@ -15,7 +15,10 @@ const sesion: SesionDelPedido = {
     contexto: {
       centroId: id(SEDE),
       actor: { tipo: "usuario", usuarioId: id("u-1") },
-      permisosPorSede: new Map(),
+      permisosPorSede: new Map([
+        [id(SEDE), new Set(["usuarios.ver", "caja.ver"] as const)],
+        [id("otra-sede"), new Set(["caja.ver"] as const)],
+      ]),
     },
     sedeActiva: "todas",
     sedes: [id(SEDE)],
@@ -107,7 +110,7 @@ describe("POST /sesion (entrar)", () => {
 });
 
 describe("estado, centro, sede, clave y salida", () => {
-  it("GET /sesion devuelve el estado con el centro activo", async () => {
+  it("GET /sesion devuelve el estado con el centro activo y sus permisos, sin repetir", async () => {
     const { servidor } = await app();
     const respuesta = await servidor.inject({ url: "/sesion" });
     expect(respuesta.json()).toEqual({
@@ -119,6 +122,7 @@ describe("estado, centro, sede, clave y salida", () => {
         sedeActiva: "todas",
         sedes: [{ id: SEDE, nombre: "Norte" }],
         sedeCambiada: false,
+        permisos: ["caja.ver", "usuarios.ver"],
       },
     });
   });

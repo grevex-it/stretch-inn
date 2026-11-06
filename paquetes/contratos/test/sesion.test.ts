@@ -53,6 +53,7 @@ describe("estadoDeSesion", () => {
         sedeActiva: "todas",
         sedes: [{ id: UUID, nombre: "Norte" }],
         sedeCambiada: false,
+        permisos: ["usuarios.ver"],
       },
     };
     expect(estadoDeSesion.parse(estado)).toEqual(estado);
