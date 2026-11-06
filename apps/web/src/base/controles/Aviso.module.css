@@ -12,6 +12,11 @@
   border-left: 4px solid var(--si-error-texto);
 }
 
+.ok {
+  color: var(--si-ok-texto);
+  background: var(--si-ok-fondo);
+}
+
 .alerta {
   color: var(--si-alerta-texto);
   background: var(--si-alerta-fondo);

@@ -1,0 +1,19 @@
+.equipo {
+  display: grid;
+  gap: 16px;
+}
+
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}

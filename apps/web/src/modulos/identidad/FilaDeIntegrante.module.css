@@ -1,0 +1,41 @@
+.fila > * {
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+  border-top: 1px solid var(--si-borde);
+}
+
+.nombre {
+  font-weight: var(--si-peso-medio);
+}
+
+/* Pares de color controlados por el test de @app/ui. */
+.activo,
+.bloqueado {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--si-radio-pildora);
+}
+
+.activo {
+  color: var(--si-ok-texto);
+  background: var(--si-ok-fondo);
+}
+
+.bloqueado {
+  color: var(--si-neutro-texto);
+  background: var(--si-neutro-fondo);
+}
+
+.acciones,
+.confirmar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.pregunta {
+  flex-basis: 100%;
+  margin: 0;
+}
