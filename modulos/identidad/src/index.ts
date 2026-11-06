@@ -30,3 +30,5 @@ export {
 export { crearAcceso } from "./modulo-acceso.ts";
 export type { Acceso, SesionResuelta } from "./aplicacion/puertos-acceso.ts";
 export { rutasDeSesion } from "./http/rutas-sesion.ts";
+/** Para cargar cuentas fuera de la app (datos de prueba locales, alta desde soporte). */
+export { hashearClave } from "./infraestructura/claves.ts";
