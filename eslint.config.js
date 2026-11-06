@@ -36,7 +36,7 @@ export default tseslint.config(
   },
   {
     // Las funciones de los tests (describe) agrupan casos y pueden ser largas.
-    files: ["**/test/**/*.ts"],
+    files: ["**/test/**/*.{ts,tsx}"],
     rules: { "max-lines-per-function": "off" },
   },
   {

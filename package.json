@@ -11,6 +11,7 @@
     "dev": "turbo run dev",
     "db:levantar": "node --env-file-if-exists=.env db/src/levantar.ts",
     "db:migrar": "node --env-file-if-exists=.env db/src/migrar-cli.ts",
+    "db:semilla": "node --env-file-if-exists=.env herramientas/src/semilla-cli.ts",
     "db:migracion": "pnpm --filter @app/db exec drizzle-kit generate --name",
     "formato": "prettier --check .",
     "formatear": "prettier --write .",

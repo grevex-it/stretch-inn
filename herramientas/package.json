@@ -5,5 +5,14 @@
   "scripts": {
     "tipos": "tsc -p tsconfig.json",
     "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
+  },
+  "dependencies": {
+    "@app/identidad": "workspace:*",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@app/db": "workspace:*",
+    "@app/plataforma": "workspace:*",
+    "@types/pg": "^8.23.1"
   }
 }
