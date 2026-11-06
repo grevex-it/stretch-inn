@@ -1,6 +1,13 @@
 // Contraseñas y tokens de sesión (ver docs/decisiones/0017). scrypt viene con Node; los
 // parámetros se guardan junto al hash para poder subirlos sin invalidar los existentes.
-import { createHash, randomBytes, scrypt, timingSafeEqual, type ScryptOptions } from "node:crypto";
+import {
+  createHash,
+  randomBytes,
+  randomInt,
+  scrypt,
+  timingSafeEqual,
+  type ScryptOptions,
+} from "node:crypto";
 
 export interface ParametrosScrypt {
   N: number;
@@ -56,6 +63,22 @@ export async function verificarClave(clave: string, guardado: string): Promise<b
 /** Token de sesión: 32 bytes aleatorios. Viaja solo en la cookie. */
 export function nuevoToken(): string {
   return randomBytes(32).toString("base64url");
+}
+
+/** Sin i, l, o, 0 ni 1: se confunden al dictarla. */
+const LETRAS_TEMPORALES = "abcdefghjkmnpqrstuvwxyz23456789";
+
+/**
+ * Clave temporal del alta y del reset, para dictar o copiar: 3 grupos de 4 (unos 59 bits). Sirve
+ * solo para entrar una vez y cambiarla, y el login tiene límite de intentos.
+ */
+export function claveTemporal(): string {
+  const grupos = Array.from({ length: 3 }, () =>
+    Array.from({ length: 4 }, () => LETRAS_TEMPORALES[randomInt(LETRAS_TEMPORALES.length)]).join(
+      "",
+    ),
+  );
+  return grupos.join("-");
 }
 
 /** Lo que se guarda en la base: si se filtra la tabla, no sirve para entrar. */

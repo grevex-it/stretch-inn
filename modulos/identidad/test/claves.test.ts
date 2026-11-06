@@ -1,6 +1,8 @@
 // Hash de contraseñas con scrypt y tokens de sesión (ver docs/decisiones/0017).
 import { describe, expect, it } from "vitest";
+import { validarClaveNueva } from "../src/dominio/sesion.ts";
 import {
+  claveTemporal,
   hashDeToken,
   hashearClave,
   nuevoToken,
@@ -29,6 +31,20 @@ describe("hashearClave y verificarClave", () => {
   it("un hash mal formado no verifica nada, ni tira error", async () => {
     await expect(verificarClave("x", "x")).resolves.toBe(false);
     await expect(verificarClave("x", "scrypt$N=abc$$")).resolves.toBe(false);
+  });
+});
+
+describe("claveTemporal", () => {
+  it("cumple el mínimo de la clave nueva y no se repite", () => {
+    const a = claveTemporal();
+    expect(validarClaveNueva(a)).toEqual({ ok: true, valor: null });
+    expect(claveTemporal()).not.toBe(a);
+  });
+
+  it("se puede dictar: grupos de minúsculas y números sin caracteres que se confundan", () => {
+    for (let i = 0; i < 50; i++) {
+      expect(claveTemporal()).toMatch(/^[a-hjkmnp-z2-9]{4}-[a-hjkmnp-z2-9]{4}-[a-hjkmnp-z2-9]{4}$/);
+    }
   });
 });
 

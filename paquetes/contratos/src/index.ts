@@ -11,3 +11,16 @@ export {
   type PedidoDeIngreso,
   type PedidoDeSede,
 } from "./sesion.ts";
+export {
+  altaHecha,
+  claveGenerada,
+  paginaDeEquipo,
+  paginaDeRoles,
+  pedidoDeAlta,
+  pedidoDePagina,
+  type AltaHecha,
+  type ClaveGenerada,
+  type PaginaDeEquipo,
+  type PaginaDeRoles,
+  type PedidoDeAlta,
+} from "./equipo.ts";

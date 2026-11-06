@@ -7,27 +7,14 @@ import {
   pedidoDeSede,
   type EstadoDeSesion,
 } from "@app/contratos";
-import { id, type Falla } from "@app/nucleo";
+import { id } from "@app/nucleo";
 import { borrarCookieDeSesion, fijarCookieDeSesion, sesionDe } from "@app/plataforma";
-import type { FastifyPluginCallback, FastifyReply } from "fastify";
-import type { z } from "zod";
+import type { FastifyPluginCallback } from "fastify";
 import type { Acceso, SesionResuelta } from "../aplicacion/puertos-acceso.ts";
+import { leer, responder } from "./comun.ts";
 
 const conSesion = { soloSesion: true } as const;
 const aunConClaveTemporal = { soloSesion: true, aunConClaveTemporal: true } as const;
-
-/** El cuerpo validado, o undefined si ya se respondió 400. */
-function leer<T>(esquema: z.ZodType<T>, cuerpo: unknown, respuesta: FastifyReply): T | undefined {
-  const resultado = esquema.safeParse(cuerpo);
-  if (resultado.success) return resultado.data;
-  const mensaje = resultado.error.issues[0]?.message ?? "Revisá los datos.";
-  void respuesta.code(400).send({ error: { codigo: "pedido-invalido", mensaje } });
-  return undefined;
-}
-
-function responder(respuesta: FastifyReply, estado: number, error: Falla) {
-  return respuesta.code(estado).send({ error });
-}
 
 async function estado(acceso: Acceso, sesion: SesionResuelta): Promise<EstadoDeSesion> {
   const centro = sesion.centro;

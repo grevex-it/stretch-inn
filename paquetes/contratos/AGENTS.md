@@ -7,6 +7,7 @@ acuerdo.
 ## Alcance
 
 - `src/sesion.ts`: login, estado de la sesión, centro y sede activa, cambio de clave (0017).
+- `src/equipo.ts`: lista del equipo y de roles, alta, clave temporal (0017).
 
 ## Fuera de alcance
 
@@ -22,6 +23,8 @@ acuerdo.
 
 - `pedidoDeIngreso`, `pedidoDeCentro`, `pedidoDeSede`, `pedidoDeCambioDeClave` y
   `estadoDeSesion`, con sus tipos (`PedidoDeIngreso`, `EstadoDeSesion`, …).
+- `pedidoDePagina` (query `?pagina=N`, de a 50), `pedidoDeAlta`, `paginaDeEquipo`,
+  `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
 
 ## Reglas de uso
 
@@ -33,7 +36,8 @@ acuerdo.
 
 - Los ids son uuid; la sede activa es un uuid o `"todas"`.
 - Las claves tienen un tope de largo: scrypt sobre textos enormes sirve para atacar la CPU.
+- Toda lista es una página: `{ pagina, porPagina, total, elementos }`.
 
 ## Pendientes
 
-- Paginación obligatoria para los listados (0013), cuando exista el primero.
+_Ninguno por ahora._
