@@ -5,6 +5,7 @@ export {
   fijarActivo,
   listarAlumnos,
   obtenerAlumno,
+  obtenerAlumnos,
 } from "./datos/alumnos.ts";
 export type {
   Alumno,

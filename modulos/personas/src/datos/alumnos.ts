@@ -2,7 +2,7 @@
 // limita al centro del contexto.
 import { falla, ok, type Resultado } from "@app/nucleo";
 import { conPuntoDeGuardado, type Transaccion } from "@app/plataforma";
-import { and, asc, count, eq, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, eq, inArray, sql, type SQL } from "drizzle-orm";
 import { alumnos } from "./esquema.ts";
 import { limpiarFicha, terminosDeBusqueda, textoDeBusqueda } from "./ficha.ts";
 import type {
@@ -59,6 +59,24 @@ export async function listarAlumnos(
 export async function obtenerAlumno(tx: Transaccion, id: string): Promise<Alumno | undefined> {
   const [alumno] = await tx.select(columnas).from(alumnos).where(eq(alumnos.id, id));
   return alumno;
+}
+
+/** Una página de otro módulo, como mucho: más que eso es un error de quien llama (regla 8). */
+const MAXIMO_POR_CONSULTA = 100;
+
+/**
+ * Los alumnos del centro con esos ids, en una sola consulta: para que otro módulo muestre una
+ * página con sus alumnos sin pedirlos de a uno. Los ids que no son del centro no vuelven.
+ */
+export async function obtenerAlumnos(tx: Transaccion, ids: readonly string[]): Promise<Alumno[]> {
+  if (ids.length > MAXIMO_POR_CONSULTA) {
+    throw new Error(`obtenerAlumnos acepta hasta ${String(MAXIMO_POR_CONSULTA)} ids por consulta.`);
+  }
+  if (ids.length === 0) return [];
+  return tx
+    .select(columnas)
+    .from(alumnos)
+    .where(inArray(alumnos.id, [...ids]));
 }
 
 export async function crearAlumno(
