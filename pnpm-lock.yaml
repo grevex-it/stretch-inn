@@ -177,6 +177,9 @@ importers:
       '@app/nucleo':
         specifier: workspace:*
         version: link:../../paquetes/nucleo
+      '@app/personas':
+        specifier: workspace:*
+        version: link:../personas
       '@app/plataforma':
         specifier: workspace:*
         version: link:../../paquetes/plataforma

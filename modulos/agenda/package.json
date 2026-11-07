@@ -13,6 +13,7 @@
     "@app/centros": "workspace:*",
     "@app/contratos": "workspace:*",
     "@app/nucleo": "workspace:*",
+    "@app/personas": "workspace:*",
     "@app/plataforma": "workspace:*",
     "drizzle-orm": "^0.45.4",
     "fastify": "^5.12.7",

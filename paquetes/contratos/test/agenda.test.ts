@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import {
   edicionDeClase,
   fichaDeClase,
+  paginaDeClasesDeAlumno,
   paginaDeOcurrencias,
   pedidoDeClases,
+  pedidoDeInscripcion,
   pedidoDeOcurrencias,
 } from "../src/index.ts";
 
@@ -41,6 +43,14 @@ describe("pedidos de la agenda", () => {
     expect(fichaDeClase.safeParse({ ...CLASE, dia: "lunes", sedeId: SEDE }).success).toBe(false);
   });
 
+  it("inscribir pide el alumno; las clases de un alumno van paginadas", () => {
+    expect(pedidoDeInscripcion.parse({ alumnoId: SEDE })).toEqual({ alumnoId: SEDE });
+    expect(pedidoDeInscripcion.safeParse({ alumnoId: "x" }).success).toBe(false);
+    const clase = { ...CLASE, id: SEDE, sedeId: SEDE, activa: true, inscriptos: 3, version: 1 };
+    const pagina = { pagina: 1, porPagina: 50, total: 1, elementos: [{ id: SEDE, clase }] };
+    expect(paginaDeClasesDeAlumno.parse(pagina)).toEqual(pagina);
+  });
+
   it("las fechas viajan en UTC, como texto ISO", () => {
     const pagina = {
       pagina: 1,
@@ -52,6 +62,7 @@ describe("pedidos de la agenda", () => {
           claseId: SEDE,
           nombre: "Stretching",
           cupo: 12,
+          inscriptos: 4,
           fecha: "2026-11-09",
           empiezaEn: "2026-11-09T21:30:00.000Z",
           terminaEn: "2026-11-09T22:30:00.000Z",

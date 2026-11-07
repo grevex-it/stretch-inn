@@ -13,8 +13,15 @@ const ESTADOS: Record<ErrorDeAgenda, number> = {
   "sin-permiso": 403,
   "clase-inexistente": 404,
   "fecha-inexistente": 404,
+  "alumno-inexistente": 404,
+  "inscripcion-inexistente": 404,
   "fecha-pasada": 409,
   "cambio-concurrente": 409,
+  "clase-completa": 409,
+  "clase-inactiva": 409,
+  "alumno-de-baja": 409,
+  "ya-inscripto": 409,
+  "cupo-menor-que-inscriptos": 409,
 };
 
 /** El dato validado, o undefined si ya se respondió 400. */

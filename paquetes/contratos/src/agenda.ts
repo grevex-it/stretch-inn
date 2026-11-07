@@ -47,6 +47,8 @@ export const clase = datosDeClase.extend({
   id: z.uuid(),
   sedeId: z.uuid(),
   activa: z.boolean(),
+  /** Inscripciones vigentes: nunca más que el cupo. */
+  inscriptos: z.number().int(),
   version: z.number().int(),
 });
 
@@ -63,6 +65,8 @@ export const ocurrencia = z.object({
   claseId: z.uuid(),
   nombre: z.string(),
   cupo: z.number().int(),
+  /** Los inscriptos fijos de la clase. */
+  inscriptos: z.number().int(),
   /** La fecha local del centro. */
   fecha: z.iso.date(),
   /** En UTC: se pasa a la zona del centro solo al mostrarla. */
@@ -73,6 +77,18 @@ export const ocurrencia = z.object({
 
 export const paginaDeOcurrencias = paginaDe(ocurrencia);
 
+/** Cuerpo de POST /agenda/clases/:id/inscriptos. */
+export const pedidoDeInscripcion = z.object({ alumnoId: z.uuid("Ese alumno no existe.") });
+
+/** Respuesta de POST /agenda/clases/:id/inscriptos: con este id se da de baja. */
+export const inscripcionHecha = z.object({ id: z.uuid() });
+
+/** Una inscripción vigente de un alumno, con su clase. */
+export const claseDeAlumno = z.object({ id: z.uuid(), clase });
+
+/** Respuesta de GET /alumnos/:id/clases. */
+export const paginaDeClasesDeAlumno = paginaDe(claseDeAlumno);
+
 export type PedidoDeClases = z.infer<typeof pedidoDeClases>;
 export type PedidoDeOcurrencias = z.infer<typeof pedidoDeOcurrencias>;
 export type FichaDeClase = z.infer<typeof fichaDeClase>;
@@ -81,3 +97,6 @@ export type Clase = z.infer<typeof clase>;
 export type PaginaDeClases = z.infer<typeof paginaDeClases>;
 export type Ocurrencia = z.infer<typeof ocurrencia>;
 export type PaginaDeOcurrencias = z.infer<typeof paginaDeOcurrencias>;
+export type PedidoDeInscripcion = z.infer<typeof pedidoDeInscripcion>;
+export type ClaseDeAlumno = z.infer<typeof claseDeAlumno>;
+export type PaginaDeClasesDeAlumno = z.infer<typeof paginaDeClasesDeAlumno>;

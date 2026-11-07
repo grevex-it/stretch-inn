@@ -17,6 +17,7 @@ const columnasDeClase = {
   hora: clases.hora,
   duracionMinutos: clases.duracionMinutos,
   cupo: clases.cupo,
+  inscriptos: clases.inscriptos,
   activa: clases.activa,
   version: clases.version,
 };
@@ -47,8 +48,9 @@ function lecturas(
       const [total] = await tx.select({ total: count() }).from(clases).where(donde);
       return { pagina, porPagina, total: total?.total ?? 0, elementos };
     },
-    async clase(id) {
-      const [clase] = await tx.select(conAlta).from(clases).where(eq(clases.id, id));
+    async clase(id, bloquear = false) {
+      const consulta = tx.select(conAlta).from(clases).where(eq(clases.id, id));
+      const [clase] = bloquear ? await consulta.for("update") : await consulta;
       return clase;
     },
     async clasesActivasDeSede(sedeId) {
@@ -101,6 +103,7 @@ function lecturasDeFechas(
           claseId: ocurrencias.claseId,
           nombre: clases.nombre,
           cupo: clases.cupo,
+          inscriptos: clases.inscriptos,
           fecha: ocurrencias.fecha,
           empiezaEn: ocurrencias.empiezaEn,
           terminaEn: ocurrencias.terminaEn,
