@@ -1,6 +1,6 @@
 // Adaptador Drizzle de las inscripciones. Corre dentro de enContexto: RLS limita al centro y a
 // las sedes visibles. El alumno se lee por la API pública de personas (regla 4).
-import { obtenerAlumno } from "@app/personas";
+import { obtenerAlumno, obtenerAlumnos } from "@app/personas";
 import type { Transaccion } from "@app/plataforma";
 import { and, asc, count, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { RepositorioInscripciones } from "../aplicacion/puertos.ts";
@@ -42,6 +42,16 @@ export function repositorioInscripciones(tx: Transaccion): RepositorioInscripcio
         .returning({ id: inscripciones.id });
       return filas.length > 0;
     },
+    async alumnos(ids) {
+      const alumnos = await obtenerAlumnos(tx, ids);
+      return new Map(
+        alumnos.map(({ id, nombre, apellido, telefono, activo }) => [
+          id,
+          { nombre, apellido, telefono, activo },
+        ]),
+      );
+    },
+    deClase: (filtro) => deClase(tx, filtro),
     deAlumno: (filtro) => deAlumno(tx, filtro),
   };
 }
@@ -58,6 +68,27 @@ const columnasDeClase = {
   activa: clases.activa,
   version: clases.version,
 };
+
+/** Las inscripciones vigentes de una clase, por orden de inscripción. */
+async function deClase(
+  tx: Transaccion,
+  { claseId, pagina, porPagina }: Parameters<RepositorioInscripciones["deClase"]>[0],
+): ReturnType<RepositorioInscripciones["deClase"]> {
+  const donde = and(eq(inscripciones.claseId, claseId), isNull(inscripciones.bajaEn));
+  const elementos = await tx
+    .select({
+      id: inscripciones.id,
+      alumnoId: inscripciones.alumnoId,
+      creadaEn: inscripciones.creadaEn,
+    })
+    .from(inscripciones)
+    .where(donde)
+    .orderBy(asc(inscripciones.creadaEn), asc(inscripciones.id))
+    .limit(porPagina)
+    .offset((pagina - 1) * porPagina);
+  const [total] = await tx.select({ total: count() }).from(inscripciones).where(donde);
+  return { pagina, porPagina, total: total?.total ?? 0, elementos };
+}
 
 /** Las inscripciones vigentes de un alumno, en las sedes pedidas, con su clase. */
 async function deAlumno(

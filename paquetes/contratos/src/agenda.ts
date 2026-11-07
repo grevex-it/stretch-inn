@@ -83,6 +83,21 @@ export const pedidoDeInscripcion = z.object({ alumnoId: z.uuid("Ese alumno no ex
 /** Respuesta de POST /agenda/clases/:id/inscriptos: con este id se da de baja. */
 export const inscripcionHecha = z.object({ id: z.uuid() });
 
+/** Un inscripto de una clase: la inscripción (con su id se da de baja) y su alumno. */
+export const inscripto = z.object({
+  id: z.uuid(),
+  alumnoId: z.uuid(),
+  nombre: z.string(),
+  apellido: z.string(),
+  telefono: z.string(),
+  /** El alumno puede estar de baja en personas aunque siga inscripto. */
+  activo: z.boolean(),
+  creadaEn: z.iso.datetime(),
+});
+
+/** Respuesta de GET /agenda/clases/:id/inscriptos, por orden de inscripción. */
+export const paginaDeInscriptos = paginaDe(inscripto);
+
 /** Una inscripción vigente de un alumno, con su clase. */
 export const claseDeAlumno = z.object({ id: z.uuid(), clase });
 
@@ -99,4 +114,6 @@ export type Ocurrencia = z.infer<typeof ocurrencia>;
 export type PaginaDeOcurrencias = z.infer<typeof paginaDeOcurrencias>;
 export type PedidoDeInscripcion = z.infer<typeof pedidoDeInscripcion>;
 export type ClaseDeAlumno = z.infer<typeof claseDeAlumno>;
+export type Inscripto = z.infer<typeof inscripto>;
+export type PaginaDeInscriptos = z.infer<typeof paginaDeInscriptos>;
 export type PaginaDeClasesDeAlumno = z.infer<typeof paginaDeClasesDeAlumno>;

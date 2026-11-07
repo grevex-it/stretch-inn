@@ -38,6 +38,8 @@ export function crearAgenda(base: Base, opciones: OpcionesAgenda = {}): Agenda {
       enContexto(base, quien, (tx) =>
         inscripciones.darDeBaja(repos(tx), quien, ahora(), inscripcion),
       ),
+    inscriptos: (quien, filtro) =>
+      enContexto(base, quien, (tx) => inscripciones.deClase(repos(tx), quien, filtro)),
     clasesDeAlumno: (quien, filtro) =>
       enContexto(base, quien, (tx) => inscripciones.deAlumno(repos(tx), quien, filtro)),
   };

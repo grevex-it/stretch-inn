@@ -21,7 +21,7 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 - `@app/nucleo`
 - `@app/plataforma`
 - `@app/centros` (zona horaria del centro)
-- `@app/personas` (si el alumno existe y está activo)
+- `@app/personas` (si el alumno existe y está activo, y los datos de los inscriptos)
 - `@app/contratos` (rutas HTTP)
 
 ## API pública
@@ -36,11 +36,14 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
     `desde`, armadas a pedido.
   - `fijarCancelada(quien, { id, cancelada })`.
   - `inscribir(quien, { claseId, alumnoId })` y `darDeBajaInscripcion(quien, { id })`.
+  - `inscriptos(quien, { claseId, pagina, porPagina })`: los vigentes por orden de inscripción,
+    con nombre, apellido, teléfono y si el alumno está activo. Una página de inscripciones y sus
+    alumnos en dos consultas (`obtenerAlumnos` de `personas`).
   - `clasesDeAlumno(quien, { alumnoId, pagina, porPagina })`: sus inscripciones vigentes en las
     sedes donde se puede ver la agenda.
 - `rutasDeAgenda(agenda)`: `GET /agenda/clases?pagina&sede`,
-  `GET /agenda/ocurrencias?sede&desde&pagina` y `GET /alumnos/:id/clases?pagina`
-  (`agenda.ver`); `POST /agenda/clases`, `PUT /agenda/clases/:id`,
+  `GET /agenda/ocurrencias?sede&desde&pagina`, `GET /agenda/clases/:id/inscriptos?pagina` y
+  `GET /alumnos/:id/clases?pagina` (`agenda.ver`); `POST /agenda/clases`, `PUT /agenda/clases/:id`,
   `PUT`/`DELETE /agenda/clases/:id/baja` y `PUT`/`DELETE /agenda/ocurrencias/:id/cancelada`
   (`agenda.gestionar`); `POST /agenda/clases/:id/inscriptos` y
   `DELETE /agenda/inscripciones/:id` (`agenda.inscribir`).
@@ -86,7 +89,8 @@ _Ninguna por ahora._ La zona horaria es del centro (`centros`).
 
 ## Pendientes
 
-- La lista de inscriptos de una clase con el nombre de cada alumno: necesita leer varios alumnos
-  a la vez por la API pública de `personas` (hoy solo hay `obtenerAlumno`, de a uno).
+- Los inscriptos salen por orden de inscripción: ordenarlos por apellido en la base exigiría
+  leer la tabla de `personas` (regla 4). Una clase rara vez pasa de una página: el panel los
+  puede ordenar.
 - Qué pasa con las inscripciones de un alumno que se da de baja: definirlo con Stretch Inn.
 - Reservas sueltas por fecha, si un centro trabaja sin horario fijo.
