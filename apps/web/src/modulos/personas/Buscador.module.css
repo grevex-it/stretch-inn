@@ -1,0 +1,39 @@
+.buscador {
+  display: grid;
+  gap: 8px;
+}
+
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: start;
+}
+
+.fila > :first-child {
+  flex: 1 1 260px;
+}
+
+/* El botón queda alineado con el campo, no con su etiqueta. */
+.fila > button {
+  margin-top: 28px;
+}
+
+.bajas {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: var(--si-alto-control-min);
+  color: var(--si-texto);
+}
+
+.casilla {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--si-oliva-700);
+}
+
+.casilla:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}

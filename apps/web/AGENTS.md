@@ -17,10 +17,11 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
   - `estructura/Navegacion.tsx`: las secciones del menú. Cada una se muestra solo con su permiso.
   - `Puerta.tsx`: según la sesión muestra login, clave temporal, elegir centro o el panel.
   - `rutas.tsx`: las rutas. Cada módulo suma las suyas como hijas de la raíz.
-  - `controles/`: campo, botón, aviso y formulario.
+  - `controles/`: campo (obligatorio salvo `opcional`), botón, aviso, formulario y paginación.
 - `src/modulos/<modulo>/`: pantallas de cada módulo. Una carpeta por módulo, como en el backend.
   - `identidad/`: pantalla Equipo (lista, alta, clave temporal, bloqueo). La clave temporal se
     muestra una sola vez y no se guarda en ninguna consulta.
+  - `personas/`: pantalla Alumnos (lista con buscador, alta, edición, baja y reactivación).
 
 ## Reglas
 
