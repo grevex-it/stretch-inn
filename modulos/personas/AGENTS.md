@@ -27,7 +27,9 @@ Las funciones de datos reciben la `Transaccion` de `enContexto` y devuelven `Res
 algo puede fallar por una regla.
 
 - `listarAlumnos(tx, { pagina, porPagina, buscar?, conBajas? })`: por apellido y nombre.
-- `obtenerAlumno(tx, id)`.
+- `obtenerAlumno(tx, id)` y `obtenerAlumnos(tx, ids)`: hasta 100 ids en una sola consulta, para
+  que otro módulo muestre una página con sus alumnos (los inscriptos de una clase) sin N+1. Los
+  ids que no son del centro no vuelven.
 - `crearAlumno(tx, ficha)` y `editarAlumno(tx, { ...ficha, id, version })`.
 - `fijarActivo(tx, { id, activo })`: baja y reactivación.
 - `rutasDeAlumnos(base)`: `GET /alumnos?pagina&buscar&bajas=si` y `GET /alumnos/:id`
