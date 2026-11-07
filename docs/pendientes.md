@@ -47,6 +47,5 @@ Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@ap
 
 ## Del repo
 
-- **Permisos nuevos y centros existentes:** el rol «Dueño» de un centro se crea con los permisos del catálogo de ese momento. Al sumar un módulo (como `personas`), los centros ya creados no reciben sus permisos y nadie queda con acceso total. Antes del primer centro real: que cada permiso nuevo llegue al Dueño de cada centro por migración. Es de estructura (`identidad`).
 - Escribir `apps/web/AGENTS.md` cuando exista la app, a partir de `docs/borradores-agents/`.
 - Verificar que la versión de Postgres de Railway sea la 18, la misma que se usa en local y en los tests.

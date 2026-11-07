@@ -46,6 +46,19 @@ describe("sembrar", () => {
     }
   });
 
+  it("el rol del admin sale de la plantilla Dueño, para recibir los permisos de módulos nuevos", async () => {
+    const cliente = new pg.Client({ connectionString: inject("urlDueno") });
+    await cliente.connect();
+    try {
+      const { rows } = await cliente.query<{ nombre: string; plantilla: string | null }>(
+        "select nombre, plantilla from roles",
+      );
+      expect(rows).toEqual([{ nombre: "Dueño", plantilla: "dueno" }]);
+    } finally {
+      await cliente.end();
+    }
+  });
+
   it("si la cuenta ya existe no vuelve a crear nada", async () => {
     const centros = await contar("centros");
     await expect(sembrar(inject("urlDueno"), cuenta)).resolves.toEqual({ creado: false });

@@ -41,6 +41,18 @@ compare contra el arreglo.
 
 - Montos: `bigint` en pesos enteros. Fechas: `timestamptz`.
 
+## Permisos de un módulo nuevo
+
+Si el módulo declara permisos, una migración `--custom` se los da al Dueño de los centros que
+ya existen (ver `modulos/identidad/AGENTS.md`):
+
+```sql
+select identidad_dar_al_dueno(array['modulo.ver', 'modulo.editar']);
+```
+
+Sumá además la sección del módulo a `herramientas/src/catalogo.ts`: su test falla si algún
+permiso del catálogo no llega al Dueño por migración.
+
 ## Rendimiento y concurrencia (ver 0013)
 
 - Índices que empiezan por `centro_id` (y `sede_id` si la tabla la tiene).

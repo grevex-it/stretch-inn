@@ -1,23 +1,15 @@
 // Datos de prueba para desarrollo local: un centro con dos sedes y un admin con acceso total.
 // Usa la conexión del dueño de la base, como las migraciones: es una herramienta, no la app.
 // Mientras no exista el alta de centros desde soporte (0008), es la forma de poder entrar.
-import {
-  crearCatalogo,
-  hashearClave,
-  PERMISOS_IDENTIDAD,
-  plantillasDelSistema,
-} from "@app/identidad";
-import { PERMISOS_PERSONAS } from "@app/personas";
+import { hashearClave, plantillasDelSistema } from "@app/identidad";
 import { randomUUID } from "node:crypto";
 import pg from "pg";
+import { CATALOGO } from "./catalogo.ts";
 
 export interface CuentaDePrueba {
   email: string;
   clave: string;
 }
-
-/** Los permisos de cada módulo: se suman al crear cada uno. */
-const catalogo = crearCatalogo([PERMISOS_IDENTIDAD, PERMISOS_PERSONAS]);
 
 async function crearCentro(cliente: pg.Client, cuenta: CuentaDePrueba): Promise<void> {
   const [centro, norte, sur, usuario, cuentaId] = Array.from({ length: 5 }, () => randomUUID());
@@ -36,13 +28,12 @@ async function crearCentro(cliente: pg.Client, cuenta: CuentaDePrueba): Promise<
     "insert into usuarios (id, centro_id, cuenta_id, nombre) values ($1, $2, $3, 'Admin de prueba')",
     [usuario, centro, cuentaId],
   );
-  for (const plantilla of plantillasDelSistema(catalogo)) {
+  for (const plantilla of plantillasDelSistema(CATALOGO)) {
     const rol = randomUUID();
-    await cliente.query("insert into roles (id, centro_id, nombre) values ($1, $2, $3)", [
-      rol,
-      centro,
-      plantilla.nombre,
-    ]);
+    await cliente.query(
+      "insert into roles (id, centro_id, nombre, plantilla) values ($1, $2, $3, $4)",
+      [rol, centro, plantilla.nombre, plantilla.plantilla],
+    );
     await cliente.query("insert into permisos_de_rol select $1, $2, unnest($3::text[])", [
       centro,
       rol,
