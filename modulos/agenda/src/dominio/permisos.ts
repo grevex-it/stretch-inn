@@ -3,8 +3,7 @@ import type { Permiso } from "@app/nucleo";
 
 export const VER: Permiso = "agenda.ver";
 export const GESTIONAR: Permiso = "agenda.gestionar";
-/** Lo usan las inscripciones, que llegan en la etapa siguiente. */
-const INSCRIBIR: Permiso = "agenda.inscribir";
+export const INSCRIBIR: Permiso = "agenda.inscribir";
 
 export const PERMISOS_AGENDA: {
   seccion: string;

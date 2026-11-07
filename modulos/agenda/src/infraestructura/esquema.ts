@@ -31,6 +31,11 @@ export const clases = pgTable(
     hora: text("hora").notNull(),
     duracionMinutos: integer("duracion_minutos").notNull(),
     cupo: integer("cupo").notNull(),
+    /**
+     * Inscripciones vigentes. Se suma y resta en la misma transacción que la inscripción, con la
+     * clase bloqueada; la restricción `clases_inscriptos` es la última barrera del cupo (0013).
+     */
+    inscriptos: integer("inscriptos").notNull().default(0),
     /** La baja no borra: deja de tener fechas nuevas y conserva las pasadas. */
     activa: boolean("activa").notNull().default(true),
     creadoEn: timestamp("creado_en", { withTimezone: true }).notNull().defaultNow(),
@@ -44,6 +49,33 @@ export const clases = pgTable(
     check("clases_hora", sql`${tabla.hora} ~ '^([01][0-9]|2[0-3]):[0-5][0-9]$'`),
     check("clases_duracion", sql`${tabla.duracionMinutos} between 15 and 240`),
     check("clases_cupo", sql`${tabla.cupo} between 1 and 500`),
+    check("clases_inscriptos", sql`${tabla.inscriptos} between 0 and ${tabla.cupo}`),
+  ],
+);
+
+/** Un alumno con lugar fijo en una clase semanal. La baja no borra: marca `baja_en`. */
+export const inscripciones = pgTable(
+  "inscripciones",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    centroId: uuid("centro_id").notNull(),
+    sedeId: uuid("sede_id").notNull(),
+    claseId: uuid("clase_id").notNull(),
+    alumnoId: uuid("alumno_id").notNull(),
+    creadaEn: timestamp("creada_en", { withTimezone: true }).notNull().defaultNow(),
+    bajaEn: timestamp("baja_en", { withTimezone: true }),
+  },
+  (tabla) => [
+    // Un alumno no tiene dos inscripciones vigentes en la misma clase.
+    uniqueIndex("inscripciones_clase_alumno_vigente")
+      .on(tabla.claseId, tabla.alumnoId)
+      .where(sql`${tabla.bajaEn} is null`),
+    index("inscripciones_centro_alumno").on(tabla.centroId, tabla.alumnoId),
+    foreignKey({
+      name: "inscripciones_clase",
+      columns: [tabla.claseId, tabla.centroId, tabla.sedeId],
+      foreignColumns: [clases.id, clases.centroId, clases.sedeId],
+    }),
   ],
 );
 

@@ -34,7 +34,14 @@ describe("clases", () => {
         ...PRIMERA,
         total: 1,
         elementos: [
-          { ...STRETCHING, id: creada.valor.id, sedeId: norte, activa: true, version: 1 },
+          {
+            ...STRETCHING,
+            id: creada.valor.id,
+            sedeId: norte,
+            activa: true,
+            inscriptos: 0,
+            version: 1,
+          },
         ],
       },
     });

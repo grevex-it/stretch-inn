@@ -1,7 +1,8 @@
 // Rutas /agenda sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // agenda. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula con una real.
 import type { ContextoCentro } from "@app/nucleo";
-import { crearBase, type Base } from "@app/plataforma";
+import { crearAlumno } from "@app/personas";
+import { crearBase, enContexto, type Base } from "@app/plataforma";
 import Fastify, { type FastifyContextConfig } from "fastify";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
@@ -64,7 +65,61 @@ describe("rutas de la agenda", () => {
       "GET /agenda/ocurrencias": "agenda.ver",
       "PUT /agenda/ocurrencias/:id/cancelada": "agenda.gestionar",
       "DELETE /agenda/ocurrencias/:id/cancelada": "agenda.gestionar",
+      "POST /agenda/clases/:id/inscriptos": "agenda.inscribir",
+      "DELETE /agenda/inscripciones/:id": "agenda.inscribir",
+      "GET /alumnos/:id/clases": "agenda.ver",
     });
+  });
+
+  it("inscribir con 201, la clase completa con 409, las clases del alumno y la baja con 204", async () => {
+    const centro = await centroConDosSedes(base, {
+      norte: [...TODO, "personas.ver", "personas.editar"],
+      sur: [],
+    });
+    const { servidor } = await app(centro.ctx);
+    const alta = await servidor.inject({
+      method: "POST",
+      url: "/agenda/clases",
+      payload: { ...STRETCHING, cupo: 1, sedeId: centro.norte },
+    });
+    const claseId = alta.json<{ id: string }>().id;
+    const alumnos = await Promise.all(
+      ["Ana", "Bea"].map(async (nombre) => {
+        const ficha = { nombre, apellido: "Pérez", telefono: "11 5555-1234" };
+        const creado = await enContexto(base, centro.ctx, (tx) =>
+          crearAlumno(tx, {
+            ...ficha,
+            documento: null,
+            email: null,
+            fechaNacimiento: null,
+            notas: "",
+          }),
+        );
+        if (!creado.ok) throw new Error(creado.error.mensaje);
+        return creado.valor.id;
+      }),
+    );
+    const inscribir = (alumnoId: string | undefined) =>
+      servidor.inject({
+        method: "POST",
+        url: `/agenda/clases/${claseId}/inscriptos`,
+        payload: { alumnoId },
+      });
+
+    const primera = await inscribir(alumnos[0]);
+    expect(primera.statusCode).toBe(201);
+    const completa = await inscribir(alumnos[1]);
+    expect(completa.statusCode).toBe(409);
+    expect(completa.json()).toMatchObject({ error: { codigo: "clase-completa" } });
+
+    const suyas = await servidor.inject({ url: `/alumnos/${alumnos[0] ?? ""}/clases` });
+    expect(suyas.json()).toMatchObject({ total: 1, elementos: [{ clase: { id: claseId } }] });
+
+    const baja = await servidor.inject({
+      method: "DELETE",
+      url: `/agenda/inscripciones/${primera.json<{ id: string }>().id}`,
+    });
+    expect(baja.statusCode).toBe(204);
   });
 
   it("alta con 201, lista paginada y edición con la versión", async () => {

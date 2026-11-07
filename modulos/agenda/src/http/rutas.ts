@@ -6,6 +6,7 @@ import type { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { z } from "zod";
 import type { Agenda } from "../aplicacion/puertos.ts";
 import { enviar, leer } from "./comun.ts";
+import { rutasDeInscripciones } from "./rutas-inscripciones.ts";
 
 const ver = { permiso: "agenda.ver" } as const;
 const gestionar = { permiso: "agenda.gestionar" } as const;
@@ -81,6 +82,7 @@ export function rutasDeAgenda(agenda: Agenda): FastifyPluginCallback {
   return (app, _opciones, listo) => {
     clases(app, agenda);
     ocurrencias(app, agenda);
+    rutasDeInscripciones(app, agenda);
     listo();
   };
 }

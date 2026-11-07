@@ -1,9 +1,11 @@
 // Arma la agenda con sus adaptadores, a mano (ver docs/decisiones/0003). Cada operación corre en
 // su transacción con el contexto de quien la pide.
-import { enContexto, type Base } from "@app/plataforma";
+import { enContexto, type Base, type Transaccion } from "@app/plataforma";
 import * as clases from "./aplicacion/clases.ts";
 import * as fechas from "./aplicacion/fechas.ts";
+import * as inscripciones from "./aplicacion/inscripciones.ts";
 import type { Agenda } from "./aplicacion/puertos.ts";
+import { repositorioInscripciones } from "./infraestructura/repositorio-inscripciones.ts";
 import { repositorioAgenda } from "./infraestructura/repositorio.ts";
 
 export interface OpcionesAgenda {
@@ -30,5 +32,18 @@ export function crearAgenda(base: Base, opciones: OpcionesAgenda = {}): Agenda {
       enContexto(base, quien, (tx) =>
         fechas.fijarCancelada(repositorioAgenda(tx), quien, ahora(), cambio),
       ),
+    inscribir: (quien, inscripcion) =>
+      enContexto(base, quien, (tx) => inscripciones.inscribir(repos(tx), quien, inscripcion)),
+    darDeBajaInscripcion: (quien, inscripcion) =>
+      enContexto(base, quien, (tx) =>
+        inscripciones.darDeBaja(repos(tx), quien, ahora(), inscripcion),
+      ),
+    clasesDeAlumno: (quien, filtro) =>
+      enContexto(base, quien, (tx) => inscripciones.deAlumno(repos(tx), quien, filtro)),
   };
 }
+
+const repos = (tx: Transaccion): inscripciones.Repositorios => ({
+  agenda: repositorioAgenda(tx),
+  inscripciones: repositorioInscripciones(tx),
+});

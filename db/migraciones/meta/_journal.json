@@ -113,6 +113,20 @@
       "when": 1794089446266,
       "tag": "20261107221046_rls-agenda",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794091130083,
+      "tag": "20261107223850_inscripciones",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794091131535,
+      "tag": "20261107223851_rls-inscripciones",
+      "breakpoints": true
     }
   ]
 }

@@ -10,6 +10,7 @@ import {
 } from "@app/nucleo";
 import type { Resultado } from "@app/nucleo";
 import { limpiarClase } from "../dominio/clase.ts";
+import { cupoPosible } from "../dominio/inscripcion.ts";
 import { cambioDeHorario } from "../dominio/ocurrencias.ts";
 import { GESTIONAR, VER } from "../dominio/permisos.ts";
 import type {
@@ -53,9 +54,12 @@ export async function crear(
   return ok(await repo.crearClase(sedeId, clase.valor));
 }
 
-/** La clase si existe y se puede gestionar en su sede. */
+/**
+ * La clase si existe y se puede gestionar en su sede. Queda bloqueada: una inscripción no se
+ * cruza con un cambio de cupo.
+ */
 async function claseGestionable(repo: RepositorioAgenda, quien: ContextoCentro, claseId: string) {
-  const clase = await repo.clase(claseId);
+  const clase = await repo.clase(claseId, true);
   if (clase === undefined) return CLASE_INEXISTENTE;
   return puedeEn(quien, GESTIONAR, clase.sedeId) ? ok(clase) : SIN_PERMISO;
 }
@@ -74,6 +78,8 @@ export async function editar(
   if (!actual.ok) return actual;
   const clase = limpiarClase(datos);
   if (!clase.ok) return clase;
+  const cupo = cupoPosible(clase.valor.cupo, actual.valor.inscriptos);
+  if (!cupo.ok) return cupo;
   const nueva = await repo.actualizarClase(claseId, version, clase.valor);
   if (nueva === undefined) {
     return falla("cambio-concurrente", "Esta clase cambió mientras la editabas. Volvé a cargarla.");
