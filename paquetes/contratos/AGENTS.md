@@ -8,6 +8,8 @@ acuerdo.
 
 - `src/sesion.ts`: login, estado de la sesión, centro y sede activa, cambio de clave (0017).
 - `src/equipo.ts`: lista del equipo y de roles, alta, clave temporal (0017).
+- `src/alumnos.ts`: lista con buscador, ficha, alta y edición de alumnos (0011).
+- `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
 ## Fuera de alcance
 
@@ -25,6 +27,8 @@ acuerdo.
   `estadoDeSesion`, con sus tipos (`PedidoDeIngreso`, `EstadoDeSesion`, …).
 - `pedidoDePagina` (query `?pagina=N`, de a 50), `pedidoDeAlta`, `paginaDeEquipo`,
   `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
+- `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,
+  `alumno` y `paginaDeAlumnos`, con sus tipos.
 
 ## Reglas de uso
 

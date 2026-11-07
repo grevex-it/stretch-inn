@@ -11,6 +11,7 @@
   "dependencies": {
     "@app/identidad": "workspace:*",
     "@app/nucleo": "workspace:*",
+    "@app/personas": "workspace:*",
     "@app/plataforma": "workspace:*",
     "fastify": "^5.12.7"
   },
