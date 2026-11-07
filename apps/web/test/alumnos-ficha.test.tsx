@@ -2,15 +2,15 @@
 import { screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { abrirAlumnos, ANA, BEA, EDITA, LISTA, UNA_SEDE } from "./alumnos-datos.ts";
+import { abrirAlumnos, alumno, ANA, BEA, EDITA, LISTA, pagina, UNA_SEDE } from "./alumnos-datos.ts";
 import { enCentro, montarPanel } from "./render.tsx";
-import { servidorFalso, type Respuesta } from "./servidor-falso.ts";
+import { servidorFalso } from "./servidor-falso.ts";
 
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function conAlumnos(extra: Record<string, Respuesta> = {}) {
+function conAlumnos(extra: Parameters<typeof servidorFalso>[0] = {}) {
   return servidorFalso({
     "GET /api/sesion": enCentro(UNA_SEDE, { permisos: EDITA }),
     "GET /api/alumnos?pagina=1": LISTA,
@@ -92,6 +92,49 @@ describe("editar", () => {
         version: 1,
       });
     });
+  });
+});
+
+describe("editar una ficha que cambió en el medio", () => {
+  it("después del aviso, volver a abrirla trae la versión nueva", async () => {
+    const servidor = conAlumnos({
+      [`PUT /api/alumnos/${ANA}`]: (pedido) =>
+        (pedido as { version: number }).version === 2
+          ? { estado: 200, cuerpo: { version: 3 } }
+          : {
+              estado: 409,
+              cuerpo: {
+                error: {
+                  codigo: "cambio-concurrente",
+                  mensaje: "Esta ficha cambió. Volvé a cargarla.",
+                },
+              },
+            },
+    });
+    const usuario = montarPanel();
+    await abrirAlumnos(usuario);
+    // Otra persona la editó: desde ahora la API la devuelve con la versión 2.
+    servidor.responder(
+      "GET /api/alumnos?pagina=1",
+      pagina([{ ...alumno(ANA, "Ana", "Pérez"), version: 2 }]),
+    );
+    const editar = async () => {
+      const ana = await screen.findByRole("row", { name: /Pérez, Ana/ });
+      await usuario.click(within(ana).getByRole("button", { name: "Editar" }));
+      await usuario.click(screen.getByRole("button", { name: "Guardar" }));
+    };
+
+    await editar();
+    expect((await screen.findByRole("alert")).textContent).toBe(
+      "Esta ficha cambió. Volvé a cargarla.",
+    );
+    await usuario.click(screen.getByRole("button", { name: "Cancelar" }));
+    await editar();
+
+    expect((await screen.findByRole("status")).textContent).toBe("Guardamos a Ana Pérez.");
+    expect(
+      servidor.pedidos.filter((p) => p.clave === `PUT /api/alumnos/${ANA}`).map((p) => p.cuerpo),
+    ).toMatchObject([{ version: 1 }, { version: 2 }]);
   });
 });
 

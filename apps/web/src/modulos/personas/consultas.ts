@@ -34,12 +34,15 @@ export function useAlumnos(filtro: Filtro) {
   });
 }
 
-/** Después de cualquier cambio se vuelve a pedir la lista. */
+/**
+ * Después de cualquier cambio se vuelve a pedir la lista, también si falló: si otra persona
+ * cambió la ficha en el medio, la lista trae la versión nueva para volver a editarla.
+ */
 function useCambioDeAlumnos<Datos, Resultado>(cambiar: (datos: Datos) => Promise<Resultado>) {
   const cliente = useQueryClient();
   return useMutation({
     mutationFn: cambiar,
-    onSuccess: () => cliente.invalidateQueries({ queryKey: ALUMNOS }),
+    onSettled: () => cliente.invalidateQueries({ queryKey: ALUMNOS }),
   });
 }
 
