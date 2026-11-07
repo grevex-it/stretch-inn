@@ -38,3 +38,23 @@ export {
   type PaginaDeAlumnos,
   type PedidoDeAlumnos,
 } from "./alumnos.ts";
+export {
+  clase,
+  claseCreada,
+  claseEditada,
+  edicionDeClase,
+  fichaDeClase,
+  ocurrencia,
+  paginaDeClases,
+  paginaDeOcurrencias,
+  pedidoDeClases,
+  pedidoDeOcurrencias,
+  type Clase,
+  type EdicionDeClase,
+  type FichaDeClase,
+  type Ocurrencia,
+  type PaginaDeClases,
+  type PaginaDeOcurrencias,
+  type PedidoDeClases,
+  type PedidoDeOcurrencias,
+} from "./agenda.ts";

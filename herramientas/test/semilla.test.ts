@@ -42,7 +42,9 @@ describe("sembrar", () => {
     expect((await acceso.sedes(sesion)).map((s) => s.nombre)).toEqual(["Norte", "Sur"]);
     // Acceso total: también los permisos de los módulos de negocio.
     for (const permisos of sesion.centro?.contexto.permisosPorSede.values() ?? []) {
-      expect([...permisos]).toEqual(expect.arrayContaining(["personas.ver", "personas.editar"]));
+      expect([...permisos]).toEqual(
+        expect.arrayContaining(["personas.ver", "personas.editar", "agenda.gestionar"]),
+      );
     }
   });
 
