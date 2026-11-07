@@ -85,6 +85,20 @@
       "when": 1793991350486,
       "tag": "20261106185550_rls-alumnos",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794088394582,
+      "tag": "20261107215314_plantilla-de-roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794088395963,
+      "tag": "20261107215315_dueno-recibe-permisos",
+      "breakpoints": true
     }
   ]
 }

@@ -19,6 +19,11 @@ export interface Catalogo {
 
 export interface Plantilla {
   nombre: string;
+  /**
+   * Marca el rol del centro que sale de esta plantilla (columna `roles.plantilla`). Sigue aunque
+   * el centro lo renombre: así las migraciones le dan al Dueño los permisos de cada módulo nuevo.
+   */
+  plantilla: "dueno";
   permisos: readonly Permiso[];
 }
 
@@ -51,5 +56,5 @@ export function crearCatalogo(secciones: readonly SeccionDePermisos[]): Catalogo
 
 /** Plantillas que vienen con el sistema: no se editan, se copian al centro en el alta. */
 export function plantillasDelSistema(catalogo: Catalogo): Plantilla[] {
-  return [{ nombre: "Dueño", permisos: catalogo.todos }];
+  return [{ nombre: "Dueño", plantilla: "dueno", permisos: catalogo.todos }];
 }
