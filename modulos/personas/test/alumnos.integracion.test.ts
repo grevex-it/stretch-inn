@@ -90,6 +90,20 @@ describe("editarAlumno", () => {
     const alumno = await enContexto(base, ctx, (tx) => obtenerAlumno(tx, id));
     expect(alumno?.telefono).toBe("11 4444-0000");
   });
+
+  it("no deja poner el documento de otro alumno del centro, y no cambia nada", async () => {
+    const ctx = await nuevoCentro();
+    await alta(ctx, { documento: "30123456" });
+    const id = await alta(ctx, { nombre: "Otra" });
+
+    const resultado = await enContexto(base, ctx, (tx) =>
+      editarAlumno(tx, { ...ANA, id, version: 1, nombre: "Otra", documento: "30.123.456" }),
+    );
+
+    expect(resultado).toMatchObject({ ok: false, error: { codigo: "documento-repetido" } });
+    const alumno = await enContexto(base, ctx, (tx) => obtenerAlumno(tx, id));
+    expect(alumno).toMatchObject({ documento: null, version: 1 });
+  });
 });
 
 describe("baja y reactivación", () => {

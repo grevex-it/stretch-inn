@@ -1,8 +1,8 @@
 // Alumnos del centro (ver docs/decisiones/0011). Toda función corre dentro de enContexto: RLS
 // limita al centro del contexto.
 import { falla, ok, type Resultado } from "@app/nucleo";
-import type { Transaccion } from "@app/plataforma";
-import { and, asc, count, eq, ne, sql, type SQL } from "drizzle-orm";
+import { conPuntoDeGuardado, type Transaccion } from "@app/plataforma";
+import { and, asc, count, eq, sql, type SQL } from "drizzle-orm";
 import { alumnos } from "./esquema.ts";
 import { limpiarFicha, terminosDeBusqueda, textoDeBusqueda } from "./ficha.ts";
 import type {
@@ -80,13 +80,38 @@ export async function crearAlumno(
   return fila === undefined ? REPETIDO : ok(fila);
 }
 
-async function documentoDeOtro(tx: Transaccion, documento: string | null, id: string) {
-  if (documento === null) return false;
-  const filas = await tx
-    .select({ id: alumnos.id })
-    .from(alumnos)
-    .where(and(eq(alumnos.documento, documento), ne(alumnos.id, id)));
-  return filas.length > 0;
+/** El error de Postgres (o el que envuelve Drizzle) es el choque con el índice del documento. */
+function chocaConElDocumento(error: unknown): boolean {
+  const causa = error instanceof Error && error.cause !== undefined ? error.cause : error;
+  return (
+    typeof causa === "object" &&
+    causa !== null &&
+    "constraint" in causa &&
+    causa.constraint === "alumnos_centro_documento"
+  );
+}
+
+/**
+ * Guarda la ficha si la versión coincide. El índice único del documento es la barrera, también
+ * si otro lo carga a la vez: el choque se deshace con un punto de guardado y se avisa.
+ */
+async function guardarFicha(
+  tx: Transaccion,
+  { id, version, ficha }: { id: string; version: number; ficha: DatosDeAlumno },
+): Promise<Resultado<{ version: number } | undefined, ErrorDeAlumno>> {
+  try {
+    return await conPuntoDeGuardado(tx, async () => {
+      const [fila] = await tx
+        .update(alumnos)
+        .set({ ...ficha, busqueda: textoDeBusqueda(ficha), version: sql`${alumnos.version} + 1` })
+        .where(and(eq(alumnos.id, id), eq(alumnos.version, version)))
+        .returning({ version: alumnos.version });
+      return ok(fila);
+    });
+  } catch (error) {
+    if (chocaConElDocumento(error)) return REPETIDO;
+    throw error;
+  }
 }
 
 /** Compara la versión que vio quien edita (0013): si cambió en el medio, no pisa nada. */
@@ -96,16 +121,9 @@ export async function editarAlumno(
 ): Promise<Resultado<{ version: number }, ErrorDeAlumno>> {
   const ficha = limpiarFicha(datos);
   if (!ficha.ok) return ficha;
-  if (await documentoDeOtro(tx, ficha.valor.documento, id)) return REPETIDO;
-  const [fila] = await tx
-    .update(alumnos)
-    .set({
-      ...ficha.valor,
-      busqueda: textoDeBusqueda(ficha.valor),
-      version: sql`${alumnos.version} + 1`,
-    })
-    .where(and(eq(alumnos.id, id), eq(alumnos.version, version)))
-    .returning({ version: alumnos.version });
+  const guardado = await guardarFicha(tx, { id, version, ficha: ficha.valor });
+  if (!guardado.ok) return guardado;
+  const fila = guardado.valor;
   if (fila !== undefined) return ok(fila);
   return (await obtenerAlumno(tx, id)) === undefined
     ? INEXISTENTE
