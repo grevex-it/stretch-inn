@@ -99,6 +99,20 @@
       "when": 1794088395963,
       "tag": "20261107215315_dueno-recibe-permisos",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794089444973,
+      "tag": "20261107221044_agenda",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794089446266,
+      "tag": "20261107221046_rls-agenda",
+      "breakpoints": true
     }
   ]
 }

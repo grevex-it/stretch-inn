@@ -9,6 +9,7 @@ acuerdo.
 - `src/sesion.ts`: login, estado de la sesión, centro y sede activa, cambio de clave (0017).
 - `src/equipo.ts`: lista del equipo y de roles, alta, clave temporal (0017).
 - `src/alumnos.ts`: lista con buscador, ficha, alta y edición de alumnos (0011).
+- `src/agenda.ts`: clases semanales de cada sede y la semana de fechas concretas.
 - `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
 ## Fuera de alcance
@@ -29,6 +30,10 @@ acuerdo.
   `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
 - `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,
   `alumno` y `paginaDeAlumnos`, con sus tipos.
+- `pedidoDeClases` (query `?pagina&sede`), `fichaDeClase`, `edicionDeClase`, `clase`,
+  `paginaDeClases`, `claseCreada`, `claseEditada`, `pedidoDeOcurrencias`
+  (query `?sede&desde&pagina`), `ocurrencia` y `paginaDeOcurrencias`, con sus tipos. Las fechas
+  viajan en UTC como texto ISO.
 
 ## Reglas de uso
 
