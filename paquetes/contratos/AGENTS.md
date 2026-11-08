@@ -51,6 +51,10 @@ acuerdo.
 - `fichaDePlan`, `edicionDePlan`, `plan`, `paginaDePlanes`, `planCreado`, `planEditado`,
   `pedidoDePrecioDeSede`, `pedidoDeCuota` (período opcional AAAA-MM), `cuotaGenerada`, `cuota`
   y `paginaDeCuotas`, con sus tipos. Los montos van en pesos enteros.
+- `pedidoDeImpagas` (query `?sede&periodo&pagina`), `cuotaImpaga` (la cuota con `alumno`:
+  nombre, apellido y activo, o null) y `paginaDeImpagas` (más `adeudado`), con sus tipos.
+- `pedidoDeCuotasDelMes` (`{ sedeId, periodo? }`) y `cuotasDelMes` (`{ periodo, generadas,
+yaTenian, alumnosDeBaja, planesDeBaja }`), con sus tipos.
 - `pedidoDeCobro` (cuota, medio y `claveIdempotencia`), `cobroHecho` (`{ id, monto, repetido }`),
   `pedidoDeAnulacion` (`{ motivo }`), `pedidoDelDia` (query `?sede&dia&pagina`), `pago` y
   `diaDeCaja` (una página de pagos más `cobrado`), con sus tipos.

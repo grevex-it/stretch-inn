@@ -1,0 +1,2 @@
+CREATE INDEX "cuotas_sede_impagas" ON "cuotas" USING btree ("centro_id","sede_id","periodo") WHERE "cuotas"."pagada_en" is null and "cuotas"."anulada_en" is null;--> statement-breakpoint
+CREATE INDEX "cuotas_sede_periodo_alumno" ON "cuotas" USING btree ("centro_id","sede_id","periodo","alumno_id");

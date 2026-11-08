@@ -14,3 +14,9 @@ export function periodoDe(instante: Date, zona: string): string {
 export function esPeriodo(texto: string): boolean {
   return /^\d{4}-(0[1-9]|1[0-2])$/.test(texto);
 }
+
+/** El mes anterior de un período válido: el de las cuotas que se renuevan. */
+export function periodoAnterior(periodo: string): string {
+  const [anio = 0, mes = 1] = periodo.split("-").map(Number);
+  return mes === 1 ? `${anio - 1}-12` : `${anio}-${String(mes - 1).padStart(2, "0")}`;
+}

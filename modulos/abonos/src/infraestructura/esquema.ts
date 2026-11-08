@@ -83,6 +83,16 @@ export const cuotas = pgTable(
       .on(tabla.alumnoId, tabla.periodo)
       .where(sql`${tabla.anuladaEn} is null`),
     index("cuotas_centro_alumno_periodo").on(tabla.centroId, tabla.alumnoId, tabla.periodo),
+    // Las impagas de una sede, la más vieja primero; y las de un mes para renovarlas.
+    index("cuotas_sede_impagas")
+      .on(tabla.centroId, tabla.sedeId, tabla.periodo)
+      .where(sql`${tabla.pagadaEn} is null and ${tabla.anuladaEn} is null`),
+    index("cuotas_sede_periodo_alumno").on(
+      tabla.centroId,
+      tabla.sedeId,
+      tabla.periodo,
+      tabla.alumnoId,
+    ),
     check("cuotas_periodo", sql`${tabla.periodo} ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'`),
     check("cuotas_monto", sql`${tabla.monto} > 0`),
     check("cuotas_pagada_o_anulada", sql`${tabla.pagadaEn} is null or ${tabla.anuladaEn} is null`),

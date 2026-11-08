@@ -32,6 +32,35 @@ export interface Cuota {
   pagadaEn: Date | null;
 }
 
+/** Una cuota sin pagar, con el alumno (null si personas no lo devuelve). */
+interface CuotaImpaga extends Omit<Cuota, "pagadaEn"> {
+  alumno: { nombre: string; apellido: string; activo: boolean } | null;
+}
+
+/** Una página de impagas y lo que suman todas (no solo la página). */
+export interface PaginaDeImpagas extends PaginaDe<CuotaImpaga> {
+  adeudado: Dinero;
+}
+
+/** Una cuota del mes anterior que se renueva, con el plan y su precio de hoy en la sede. */
+export interface CuotaARenovar {
+  alumnoId: string;
+  planId: string;
+  planActivo: boolean;
+  precio: Dinero;
+  precioDeSede: Dinero | undefined;
+}
+
+/** Lo que pasó al generar las cuotas del mes de una sede. */
+export interface CuotasDelMes {
+  periodo: string;
+  generadas: number;
+  /** Alumnos que ya tenían la cuota de ese mes. */
+  yaTenian: number;
+  alumnosDeBaja: number;
+  planesDeBaja: number;
+}
+
 /** Corre dentro de enContexto: RLS limita al centro y a las sedes visibles. */
 export interface RepositorioAbonos {
   zonaHoraria(): Promise<string>;
@@ -57,6 +86,21 @@ export interface RepositorioAbonos {
   cuotasDeAlumno(
     filtro: Pagina & { alumnoId: string; sedeIds: readonly string[] },
   ): Promise<PaginaDe<Cuota>>;
+  /** Sin pagar ni anular, la más vieja primero, con el total adeudado. */
+  cuotasImpagas(
+    filtro: Pagina & { sedeId: string; periodo?: string },
+  ): Promise<PaginaDe<Cuota> & { adeudado: Dinero }>;
+  /** Hasta 100 alumnos del centro (personas), por id. */
+  alumnos(ids: readonly string[]): Promise<Map<string, NonNullable<CuotaImpaga["alumno"]>>>;
+  /** Una tanda de cuotas vigentes de ese mes y sede, por alumno, después de `despuesDe`. */
+  cuotasARenovar(filtro: {
+    sedeId: string;
+    periodo: string;
+    despuesDe: string | undefined;
+    limite: number;
+  }): Promise<CuotaARenovar[]>;
+  /** Cuántas se generaron: las de alumnos que ya tenían cuota ese mes no se tocan. */
+  generarCuotas(cuotas: readonly Omit<Cuota, "id" | "pagadaEn">[]): Promise<number>;
 }
 
 export type ErrorDeAbonos =
@@ -107,4 +151,14 @@ export interface Abonos {
     quien: ContextoCentro,
     filtro: Pagina & { alumnoId: string },
   ): Promise<Resultado<PaginaDe<Cuota>, ErrorDeAbonos>>;
+  /** Las impagas de la sede (de un mes, si se pide), la más vieja primero. */
+  cuotasImpagas(
+    quien: ContextoCentro,
+    filtro: Pagina & { sedeId: string; periodo?: string },
+  ): Promise<Resultado<PaginaDeImpagas, ErrorDeAbonos>>;
+  /** [SUPUESTO] Renueva las cuotas del mes anterior de la sede. Sin período, el mes actual. */
+  generarCuotasDelMes(
+    quien: ContextoCentro,
+    pedido: { sedeId: string; periodo?: string },
+  ): Promise<Resultado<CuotasDelMes, ErrorDeAbonos>>;
 }

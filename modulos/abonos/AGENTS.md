@@ -35,16 +35,25 @@ Los planes del centro (nombre, clases por semana y precio general), su precio op
   - `generarCuota(quien, { alumnoId, planId, sedeId, periodo? })`: sin período, el mes actual
     del centro. Devuelve `{ id, monto, periodo }`.
   - `anularCuota(quien, { id })` y `cuotasDeAlumno(quien, { alumnoId, pagina, porPagina })`.
+  - `cuotasImpagas(quien, { sedeId, periodo?, pagina, porPagina })`: las impagas de la sede (de
+    un mes, si se pide), la más vieja primero, con el nombre del alumno y `adeudado` (lo que
+    suman todas, no solo la página).
+  - `generarCuotasDelMes(quien, { sedeId, periodo? })`: **[SUPUESTO]** renueva las cuotas
+    vigentes del mes anterior de la sede, con el mismo plan y el precio de hoy. Saltea alumnos y
+    planes de baja y no toca a quien ya tiene la cuota del mes: repetirlo no duplica. Devuelve
+    `{ periodo, generadas, yaTenian, alumnosDeBaja, planesDeBaja }`. Va de a tandas de 100
+    alumnos (el tope de `obtenerAlumnos`).
 - Para otros módulos (`caja`), con la `Transaccion` de `enContexto`:
   - `obtenerCuota(tx, id)`: la cuota vigente, o undefined.
   - `registrarPago(tx, { cuotaId, pagoId, en })`: la marca pagada una sola vez (la toma con
     `for update`). Falla con `cuota-inexistente` o `cuota-pagada`.
   - `revertirPago(tx, { cuotaId, pagoId })`: si ese pago la saldó, la cuota vuelve a estar sin
     pagar (caja anuló el pago).
-- `rutasDeAbonos(abonos)`: `GET /abonos/planes` y `GET /alumnos/:id/cuotas` (`abonos.ver`);
+- `rutasDeAbonos(abonos)`: `GET /abonos/planes`, `GET /abonos/cuotas/impagas?sede&periodo&pagina`
+  y `GET /alumnos/:id/cuotas` (`abonos.ver`);
   `POST /abonos/planes`, `PUT /abonos/planes/:id`, `PUT`/`DELETE /abonos/planes/:id/baja` y
   `PUT`/`DELETE /abonos/planes/:id/sedes/:sedeId/precio` (`abonos.gestionar`);
-  `POST /abonos/cuotas` y `DELETE /abonos/cuotas/:id` (`abonos.asignar`).
+  `POST /abonos/cuotas`, `POST /abonos/cuotas/mes` y `DELETE /abonos/cuotas/:id` (`abonos.asignar`).
 - `PERMISOS_ABONOS`: la sección «Abonos» del catálogo (`abonos.ver`, `abonos.gestionar`,
   `abonos.asignar`).
 
@@ -87,4 +96,7 @@ _Ninguna por ahora._ Los precios por sede son datos, no configuración.
 - **[SUPUESTO]** Permisos `abonos.ver`, `abonos.gestionar` y `abonos.asignar`.
 - Que asistencia consulte si el alumno está al día antes de tomar o reservar.
 - Redondeo de precios a $10 o $100, si Stretch Inn lo usa (configuración por centro, 0009).
-- Generar las cuotas del mes de todos los alumnos con una tarea del worker, cuando exista.
+- **[SUPUESTO]** Las cuotas del mes salen de las del mes anterior. Un alumno nuevo recibe su
+  primera cuota a mano (`POST /abonos/cuotas`); después se renueva sola al generar el mes.
+- Generar las cuotas del mes automáticamente con una tarea del worker: necesita el actor de
+  sistema en el `ContextoCentro` (decisión de estructura). Hoy lo dispara alguien del centro.

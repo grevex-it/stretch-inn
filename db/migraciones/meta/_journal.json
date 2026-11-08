@@ -211,6 +211,13 @@
       "when": 1794117376855,
       "tag": "20261108055616_rls-caja",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1794150574215,
+      "tag": "20261108150934_cuotas-de-sede",
+      "breakpoints": true
     }
   ]
 }

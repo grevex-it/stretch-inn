@@ -1,6 +1,13 @@
 // Rutas /abonos sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // abonos. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula.
-import { cuotaGenerada, paginaDeCuotas, paginaDePlanes, planCreado } from "@app/contratos";
+import {
+  cuotaGenerada,
+  cuotasDelMes,
+  paginaDeCuotas,
+  paginaDeImpagas,
+  paginaDePlanes,
+  planCreado,
+} from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
 import Fastify, { type FastifyContextConfig } from "fastify";
@@ -55,6 +62,8 @@ describe("rutas de los abonos", () => {
       "PUT /abonos/planes/:id/sedes/:sedeId/precio": "abonos.gestionar",
       "DELETE /abonos/planes/:id/sedes/:sedeId/precio": "abonos.gestionar",
       "POST /abonos/cuotas": "abonos.asignar",
+      "POST /abonos/cuotas/mes": "abonos.asignar",
+      "GET /abonos/cuotas/impagas": "abonos.ver",
       "DELETE /abonos/cuotas/:id": "abonos.asignar",
       "GET /alumnos/:id/cuotas": "abonos.ver",
     });
@@ -91,6 +100,38 @@ describe("rutas de los abonos", () => {
     expect(repetida.statusCode).toBe(409);
     const lista = await servidor.inject({ url: `/alumnos/${ana}/cuotas` });
     expect(paginaDeCuotas.parse(lista.json()).total).toBe(1);
+  });
+
+  it("las cuotas del mes y las impagas de la sede, con el contrato", async () => {
+    const { ctx, norte, alumno } = await centroConDosSedes(base);
+    const { servidor } = await app(ctx);
+    const alta = await servidor.inject({ method: "POST", url: "/abonos/planes", payload: PLAN });
+    const { id } = planCreado.parse(alta.json());
+    const ana = await alumno();
+    await servidor.inject({
+      method: "POST",
+      url: "/abonos/cuotas",
+      payload: { alumnoId: ana, planId: id, sedeId: norte, periodo: "2026-10" },
+    });
+    const mes = await servidor.inject({
+      method: "POST",
+      url: "/abonos/cuotas/mes",
+      payload: { sedeId: norte },
+    });
+    expect(mes.statusCode).toBe(200);
+    expect(cuotasDelMes.parse(mes.json())).toMatchObject({ periodo: "2026-11", generadas: 1 });
+
+    const impagas = await servidor.inject({ url: `/abonos/cuotas/impagas?sede=${norte}` });
+    expect(impagas.statusCode).toBe(200);
+    const lista = paginaDeImpagas.parse(impagas.json());
+    expect(lista).toMatchObject({ total: 2, adeudado: 60_000 });
+    expect(lista.elementos[0]?.alumno).toMatchObject({ nombre: "Ana" });
+    const delMes = await servidor.inject({
+      url: `/abonos/cuotas/impagas?sede=${norte}&periodo=2026-11`,
+    });
+    expect(paginaDeImpagas.parse(delMes.json()).total).toBe(1);
+    const sinSede = await servidor.inject({ url: "/abonos/cuotas/impagas" });
+    expect(sinSede.statusCode).toBe(400);
   });
 
   it("traduce las fallas: 400 mal formado, 404 sin plan", async () => {
