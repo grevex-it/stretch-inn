@@ -82,3 +82,23 @@ export {
   type PedidoDeRecuperacion,
   type PlanillaDeAsistencia,
 } from "./asistencia.ts";
+export {
+  cuota,
+  cuotaGenerada,
+  edicionDePlan,
+  fichaDePlan,
+  paginaDeCuotas,
+  paginaDePlanes,
+  pedidoDeCuota,
+  pedidoDePrecioDeSede,
+  plan,
+  planCreado,
+  planEditado,
+  type Cuota,
+  type EdicionDePlan,
+  type FichaDePlan,
+  type PaginaDeCuotas,
+  type PaginaDePlanes,
+  type PedidoDeCuota,
+  type Plan,
+} from "./abonos.ts";

@@ -11,6 +11,7 @@ acuerdo.
 - `src/alumnos.ts`: lista con buscador, ficha, alta y edición de alumnos (0011).
 - `src/agenda.ts`: clases semanales de cada sede y la semana de fechas concretas.
 - `src/asistencia.ts`: la planilla de asistencia de una fecha y las marcas que se guardan.
+- `src/abonos.ts`: planes del centro, precios por sede y cuotas mensuales de los alumnos.
 - `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
 ## Fuera de alcance
@@ -46,6 +47,9 @@ acuerdo.
   vencimiento; el que vence antes, primero.
 - `pedidoDeRecuperacion` (`{ alumnoId }`) y `recuperacionHecha` (`{ id }`), con sus tipos. La
   planilla trae también `recuperan` (la misma página de los que recuperan) y `lugares`.
+- `fichaDePlan`, `edicionDePlan`, `plan`, `paginaDePlanes`, `planCreado`, `planEditado`,
+  `pedidoDePrecioDeSede`, `pedidoDeCuota` (período opcional AAAA-MM), `cuotaGenerada`, `cuota`
+  y `paginaDeCuotas`, con sus tipos. Los montos van en pesos enteros.
 
 ## Reglas de uso
 
