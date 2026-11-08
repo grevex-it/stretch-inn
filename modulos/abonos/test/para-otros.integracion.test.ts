@@ -3,7 +3,7 @@
 import { crearBase, enContexto, type Base } from "@app/plataforma";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
-import { crearAbonos, obtenerCuota, registrarPago } from "../src/index.ts";
+import { crearAbonos, obtenerCuota, registrarPago, revertirPago } from "../src/index.ts";
 import { centroConDosSedes } from "./ayudas.ts";
 
 let base: Base;
@@ -33,6 +33,21 @@ async function conCuota() {
   if (!cuota.ok) throw new Error(cuota.error.mensaje);
   return { ...centro, alumnoId, cuotaId: cuota.valor.id };
 }
+
+describe("revertirPago", () => {
+  it("anular el pago en caja deja la cuota sin pagar; con otro pago, no hace nada", async () => {
+    const { ctx, cuotaId } = await conCuota();
+    const pagoId = randomUUID();
+    await enContexto(base, ctx, (tx) => registrarPago(tx, { cuotaId, pagoId, en: new Date() }));
+
+    await enContexto(base, ctx, (tx) => revertirPago(tx, { cuotaId, pagoId: randomUUID() }));
+    expect(
+      (await enContexto(base, ctx, (tx) => obtenerCuota(tx, cuotaId)))?.pagadaEn,
+    ).toBeInstanceOf(Date);
+    await enContexto(base, ctx, (tx) => revertirPago(tx, { cuotaId, pagoId }));
+    expect((await enContexto(base, ctx, (tx) => obtenerCuota(tx, cuotaId)))?.pagadaEn).toBeNull();
+  });
+});
 
 describe("obtenerCuota y registrarPago", () => {
   it("lee la cuota; el pago la marca pagada una sola vez", async () => {

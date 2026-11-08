@@ -39,6 +39,8 @@ Los planes del centro (nombre, clases por semana y precio general), su precio op
   - `obtenerCuota(tx, id)`: la cuota vigente, o undefined.
   - `registrarPago(tx, { cuotaId, pagoId, en })`: la marca pagada una sola vez (la toma con
     `for update`). Falla con `cuota-inexistente` o `cuota-pagada`.
+  - `revertirPago(tx, { cuotaId, pagoId })`: si ese pago la saldó, la cuota vuelve a estar sin
+    pagar (caja anuló el pago).
 - `rutasDeAbonos(abonos)`: `GET /abonos/planes` y `GET /alumnos/:id/cuotas` (`abonos.ver`);
   `POST /abonos/planes`, `PUT /abonos/planes/:id`, `PUT`/`DELETE /abonos/planes/:id/baja` y
   `PUT`/`DELETE /abonos/planes/:id/sedes/:sedeId/precio` (`abonos.gestionar`);

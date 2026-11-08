@@ -2,7 +2,9 @@
 // centro y a las sedes visibles. Abonos escribe en sus propias tablas (regla 4).
 import { falla, ok, type Resultado } from "@app/nucleo";
 import type { Transaccion } from "@app/plataforma";
+import { and, eq } from "drizzle-orm";
 import type { Cuota } from "../aplicacion/puertos.ts";
+import { cuotas } from "./esquema.ts";
 import { repositorioCuotas } from "./repositorio-cuotas.ts";
 
 /** La cuota vigente (sin anular), o undefined. */
@@ -24,4 +26,15 @@ export async function registrarPago(
   if (cuota.pagadaEn !== null) return falla("cuota-pagada", "Esa cuota ya está pagada.");
   await repo.marcarPagada(cuotaId, pagoId, en);
   return ok(null);
+}
+
+/** Cuando caja anula el pago: la cuota vuelve a estar sin pagar, si ese pago la había saldado. */
+export async function revertirPago(
+  tx: Transaccion,
+  { cuotaId, pagoId }: { cuotaId: string; pagoId: string },
+): Promise<void> {
+  await tx
+    .update(cuotas)
+    .set({ pagoId: null, pagadaEn: null })
+    .where(and(eq(cuotas.id, cuotaId), eq(cuotas.pagoId, pagoId)));
 }
