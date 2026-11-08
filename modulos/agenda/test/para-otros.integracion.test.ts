@@ -26,6 +26,7 @@ afterAll(async () => {
 const PRIMERA = { pagina: 1, porPagina: 50 };
 const ALUMNOS = ["personas.ver", "personas.editar"];
 const SEMANA = 7 * 86_400_000;
+const esperar = (ms: number) => new Promise((listo) => setTimeout(listo, ms));
 
 async function alumno(ctx: ContextoCentro, nombre: string) {
   const alta = await enContexto(base, ctx, (tx) =>
@@ -112,7 +113,11 @@ describe("inscriptos en un momento", () => {
 
   it("una baja saca al alumno de las fechas posteriores, no de las anteriores", async () => {
     const { ctx, claseId, ana, bea, inscripciones, fecha } = await claseConFecha();
+    // La base guarda microsegundos y el reloj de JS, milisegundos: con unos milisegundos entre
+    // el alta, este momento y la baja, cada uno queda claramente antes que el siguiente.
+    await esperar(5);
     const antesDeLaBaja = new Date();
+    await esperar(5);
     await agenda.darDeBajaInscripcion(ctx, { id: inscripciones[0] ?? "" });
 
     const despues = await enContexto(base, ctx, (tx) =>
