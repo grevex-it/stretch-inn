@@ -42,7 +42,22 @@ describe("sembrar", () => {
     expect((await acceso.sedes(sesion)).map((s) => s.nombre)).toEqual(["Norte", "Sur"]);
     // Acceso total: también los permisos de los módulos de negocio.
     for (const permisos of sesion.centro?.contexto.permisosPorSede.values() ?? []) {
-      expect([...permisos]).toEqual(expect.arrayContaining(["personas.ver", "personas.editar"]));
+      expect([...permisos]).toEqual(
+        expect.arrayContaining(["personas.ver", "personas.editar", "agenda.gestionar"]),
+      );
+    }
+  });
+
+  it("el rol del admin sale de la plantilla Dueño, para recibir los permisos de módulos nuevos", async () => {
+    const cliente = new pg.Client({ connectionString: inject("urlDueno") });
+    await cliente.connect();
+    try {
+      const { rows } = await cliente.query<{ nombre: string; plantilla: string | null }>(
+        "select nombre, plantilla from roles",
+      );
+      expect(rows).toEqual([{ nombre: "Dueño", plantilla: "dueno" }]);
+    } finally {
+      await cliente.end();
     }
   });
 

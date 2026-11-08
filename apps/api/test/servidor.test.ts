@@ -96,6 +96,14 @@ describe("servidor", () => {
     expect(sinCookie.status).toBe(401);
   }, 45_000);
 
+  it("expone las rutas de la agenda detrás del hook de sesión", async () => {
+    const puerto = await puertoLibre();
+    arrancar(inject("urlApp"), puerto);
+    await esperarSalud(puerto);
+    const sinCookie = await fetch(`http://localhost:${String(puerto)}/agenda/clases`);
+    expect(sinCookie.status).toBe(401);
+  }, 45_000);
+
   it("no arranca sin ORIGEN_PANEL", async () => {
     const puerto = await puertoLibre();
     let salida = "";

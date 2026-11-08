@@ -43,6 +43,6 @@ describe("plantillasDelSistema", () => {
   it("el dueño tiene todos los permisos del catálogo", () => {
     const catalogo = crearCatalogo([PERMISOS_IDENTIDAD, caja]);
     const [duenio] = plantillasDelSistema(catalogo);
-    expect(duenio).toEqual({ nombre: "Dueño", permisos: catalogo.todos });
+    expect(duenio).toEqual({ nombre: "Dueño", plantilla: "dueno", permisos: catalogo.todos });
   });
 });

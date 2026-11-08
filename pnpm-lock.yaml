@@ -50,6 +50,18 @@ importers:
 
   apps/api:
     dependencies:
+      '@app/abonos':
+        specifier: workspace:*
+        version: link:../../modulos/abonos
+      '@app/agenda':
+        specifier: workspace:*
+        version: link:../../modulos/agenda
+      '@app/asistencia':
+        specifier: workspace:*
+        version: link:../../modulos/asistencia
+      '@app/caja':
+        specifier: workspace:*
+        version: link:../../modulos/caja
       '@app/identidad':
         specifier: workspace:*
         version: link:../../modulos/identidad
@@ -116,6 +128,22 @@ importers:
         specifier: ^8.3.5
         version: 8.3.5(@types/node@22.20.5)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
 
+  apps/worker:
+    dependencies:
+      '@app/caja':
+        specifier: workspace:*
+        version: link:../../modulos/caja
+      '@app/plataforma':
+        specifier: workspace:*
+        version: link:../../paquetes/plataforma
+    devDependencies:
+      '@app/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@app/nucleo':
+        specifier: workspace:*
+        version: link:../../paquetes/nucleo
+
   db:
     dependencies:
       drizzle-orm:
@@ -140,6 +168,18 @@ importers:
 
   herramientas:
     dependencies:
+      '@app/abonos':
+        specifier: workspace:*
+        version: link:../modulos/abonos
+      '@app/agenda':
+        specifier: workspace:*
+        version: link:../modulos/agenda
+      '@app/asistencia':
+        specifier: workspace:*
+        version: link:../modulos/asistencia
+      '@app/caja':
+        specifier: workspace:*
+        version: link:../modulos/caja
       '@app/identidad':
         specifier: workspace:*
         version: link:../modulos/identidad
@@ -157,6 +197,169 @@ importers:
         specifier: workspace:*
         version: link:../paquetes/plataforma
       '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+
+  modulos/abonos:
+    dependencies:
+      '@app/centros':
+        specifier: workspace:*
+        version: link:../centros
+      '@app/contratos':
+        specifier: workspace:*
+        version: link:../../paquetes/contratos
+      '@app/nucleo':
+        specifier: workspace:*
+        version: link:../../paquetes/nucleo
+      '@app/personas':
+        specifier: workspace:*
+        version: link:../personas
+      '@app/plataforma':
+        specifier: workspace:*
+        version: link:../../paquetes/plataforma
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
+      fastify:
+        specifier: ^5.12.7
+        version: 5.12.7
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@app/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@app/identidad':
+        specifier: workspace:*
+        version: link:../identidad
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
+
+  modulos/agenda:
+    dependencies:
+      '@app/centros':
+        specifier: workspace:*
+        version: link:../centros
+      '@app/contratos':
+        specifier: workspace:*
+        version: link:../../paquetes/contratos
+      '@app/nucleo':
+        specifier: workspace:*
+        version: link:../../paquetes/nucleo
+      '@app/personas':
+        specifier: workspace:*
+        version: link:../personas
+      '@app/plataforma':
+        specifier: workspace:*
+        version: link:../../paquetes/plataforma
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
+      fastify:
+        specifier: ^5.12.7
+        version: 5.12.7
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@app/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@app/identidad':
+        specifier: workspace:*
+        version: link:../identidad
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
+
+  modulos/asistencia:
+    dependencies:
+      '@app/agenda':
+        specifier: workspace:*
+        version: link:../agenda
+      '@app/contratos':
+        specifier: workspace:*
+        version: link:../../paquetes/contratos
+      '@app/nucleo':
+        specifier: workspace:*
+        version: link:../../paquetes/nucleo
+      '@app/personas':
+        specifier: workspace:*
+        version: link:../personas
+      '@app/plataforma':
+        specifier: workspace:*
+        version: link:../../paquetes/plataforma
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
+      fastify:
+        specifier: ^5.12.7
+        version: 5.12.7
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@app/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@app/identidad':
+        specifier: workspace:*
+        version: link:../identidad
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      pg:
+        specifier: ^8.23.1
+        version: 8.23.1
+
+  modulos/caja:
+    dependencies:
+      '@app/abonos':
+        specifier: workspace:*
+        version: link:../abonos
+      '@app/centros':
+        specifier: workspace:*
+        version: link:../centros
+      '@app/contratos':
+        specifier: workspace:*
+        version: link:../../paquetes/contratos
+      '@app/nucleo':
+        specifier: workspace:*
+        version: link:../../paquetes/nucleo
+      '@app/plataforma':
+        specifier: workspace:*
+        version: link:../../paquetes/plataforma
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
+      fastify:
+        specifier: ^5.12.7
+        version: 5.12.7
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@app/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@app/identidad':
+        specifier: workspace:*
+        version: link:../identidad
+      '@app/personas':
+        specifier: workspace:*
+        version: link:../personas
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      pg:
         specifier: ^8.23.1
         version: 8.23.1
 
@@ -178,6 +381,9 @@ importers:
 
   modulos/identidad:
     dependencies:
+      '@app/centros':
+        specifier: workspace:*
+        version: link:../centros
       '@app/contratos':
         specifier: workspace:*
         version: link:../../paquetes/contratos

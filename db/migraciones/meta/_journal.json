@@ -85,6 +85,132 @@
       "when": 1793991350486,
       "tag": "20261106185550_rls-alumnos",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1794088394582,
+      "tag": "20261107215314_plantilla-de-roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1794088395963,
+      "tag": "20261107215315_dueno-recibe-permisos",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794089444973,
+      "tag": "20261107221044_agenda",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794089446266,
+      "tag": "20261107221046_rls-agenda",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794091130083,
+      "tag": "20261107223850_inscripciones",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794091131535,
+      "tag": "20261107223851_rls-inscripciones",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794113855546,
+      "tag": "20261108045735_asistencia",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794113856944,
+      "tag": "20261108045736_rls-asistencia",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794114521280,
+      "tag": "20261108050841_avisos-de-ausencia",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794114522647,
+      "tag": "20261108050842_rls-avisos-de-ausencia",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1794115385233,
+      "tag": "20261108052305_creditos",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1794115386633,
+      "tag": "20261108052306_rls-creditos",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794115916278,
+      "tag": "20261108053156_recuperaciones",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794115917693,
+      "tag": "20261108053157_rls-recuperaciones",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1794116659061,
+      "tag": "20261108054419_abonos",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1794116660459,
+      "tag": "20261108054420_rls-abonos",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794117375504,
+      "tag": "20261108055615_caja",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1794117376855,
+      "tag": "20261108055616_rls-caja",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "name": "@app/worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=../../.env --watch src/worker.ts",
+    "start": "node src/worker.ts",
+    "tipos": "tsc -p tsconfig.json",
+    "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
+  },
+  "dependencies": {
+    "@app/caja": "workspace:*",
+    "@app/plataforma": "workspace:*"
+  },
+  "devDependencies": {
+    "@app/db": "workspace:*",
+    "@app/nucleo": "workspace:*"
+  }
+}

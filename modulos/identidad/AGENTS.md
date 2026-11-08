@@ -18,6 +18,7 @@ de los permisos efectivos (0007).
 
 - `@app/nucleo`
 - `@app/plataforma`
+- `@app/centros` (la zona horaria del centro activo, para la sesión)
 - `@app/contratos` (rutas HTTP)
 
 ## API pública
@@ -29,7 +30,14 @@ Dominio (puro):
   lo que `quien` no puede dar.
 - `tieneMenosPermisos(objetivo, quien)`: para resetear contraseñas (0017).
 - `tieneAccesoTotal(efectivos, catalogo, sedes)`.
-- `crearCatalogo(secciones)`, `PERMISOS_IDENTIDAD`, `plantillasDelSistema(catalogo)`.
+- `crearCatalogo(secciones)`, `PERMISOS_IDENTIDAD`, `plantillasDelSistema(catalogo)`. Cada
+  plantilla trae su marca (`plantilla: "dueno"`), que se guarda en `roles.plantilla` al copiarla.
+
+Para migraciones (SQL, con el dueño del esquema):
+
+- `identidad_dar_al_dueno(array['modulo.accion', …])`: le da esos permisos al rol Dueño de
+  **todos** los centros. Todo módulo que declara permisos la llama en una migración `--custom`;
+  `herramientas/test/permisos-del-dueno.test.ts` falla si falta algún permiso del catálogo.
 
 Casos de uso (reciben la `Transaccion` de `enContexto`):
 
@@ -44,8 +52,8 @@ Login y sesiones (0017):
 - `crearAcceso(base, { ahora?, limite? })`: una instancia por proceso, porque el límite de
   intentos vive en su memoria. Devuelve `Acceso`: `entrar`, `resolver(token)` (la sesión con su
   `ContextoCentro` ya limitado a la sede activa), `centros`, `sedes` (las del selector, con
-  nombre), `elegirCentro`, `elegirSede`,
-  `salir` y `cambiarClave`.
+  nombre), `zonaHoraria` (la del centro activo, leída de `centros`), `elegirCentro`,
+  `elegirSede`, `salir` y `cambiarClave`.
 - `rutasDeSesion(acceso)`: plugin de Fastify con `POST/GET/DELETE /sesion` y
   `PUT /sesion/centro`, `/sesion/sede` y `/sesion/clave`. La API resuelve la sesión antes
   (`apps/api/src/base/sesion.ts`).
@@ -71,6 +79,9 @@ Equipo del centro (0017):
 - Los ajustes son por sede (0017).
 - Nadie da permisos que no tiene: en una asignación, en esa sede; en un rol, en alguna sede.
 - Siempre queda al menos un usuario con acceso total en el centro.
+- El rol Dueño de cada centro (`roles.plantilla = 'dueno'`, uno por centro) tiene todos los
+  permisos del catálogo, también los de módulos sumados después del alta. Se lo identifica por
+  la marca, no por el nombre: el centro lo puede renombrar.
 - Solo se resetea la contraseña de quien tiene menos permisos (subconjunto en cada sede y al
   menos uno menos), y nunca la de una cuenta con usuarios en otros centros (0017). Bloquear y
   reactivar siguen la misma regla de «menos permisos»; nadie se resetea ni se bloquea a sí mismo.
@@ -94,7 +105,8 @@ Equipo del centro (0017):
 
 - **Cuenta:** la persona, con email y contraseña. Es de la plataforma.
 - **Usuario:** la membresía de una cuenta en un centro.
-- **Rol:** conjunto de permisos. Las plantillas del sistema se copian al centro en el alta.
+- **Rol:** conjunto de permisos. Las plantillas del sistema se copian al centro en el alta, con
+  su marca en `roles.plantilla`.
 - **Ajuste:** permiso extra o quitado a un usuario en una sede.
 - **Acceso total:** todos los permisos del catálogo en todas las sedes del centro.
 - **Sede activa:** la sede con la que trabaja la sesión, o «Todas mis sedes».
