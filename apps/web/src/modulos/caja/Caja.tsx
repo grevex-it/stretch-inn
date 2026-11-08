@@ -1,3 +1,4 @@
+import { AnularPago } from "./AnularPago.tsx";
 import { CobrarCuota } from "./CobrarCuota.tsx";
 import { diaDeCaja } from "@app/contratos";
 import { useState } from "react";
@@ -38,11 +39,6 @@ export function Caja() {
 
 function Pagos({ sede, zona }: { sede: string; zona: string }) {
   const [dia, cambiarDia] = useState(() => fechaLocal(zona));
-  const hora = new Intl.DateTimeFormat("es-AR", {
-    timeZone: zona,
-    hour: "2-digit",
-    minute: "2-digit",
-  });
   const ruta = `/caja/pagos?sede=${sede}&dia=${dia}`;
   return (
     <>
@@ -71,8 +67,12 @@ function Pagos({ sede, zona }: { sede: string; zona: string }) {
                 fila={(pago) => (
                   <li key={pago.id}>
                     <strong>{pesos.format(pago.monto)}</strong> · {medios[pago.medio]} ·{" "}
-                    {hora.format(new Date(pago.registradoEn))}
-                    {pago.anuladoEn && <p>Anulado · {pago.motivoAnulacion}</p>}
+                    {horaLocal(pago.registradoEn, zona)}
+                    {pago.anuladoEn ? (
+                      <p>Anulado · {pago.motivoAnulacion}</p>
+                    ) : (
+                      <AnularPago id={pago.id} />
+                    )}
                   </li>
                 )}
               />
@@ -82,4 +82,13 @@ function Pagos({ sede, zona }: { sede: string; zona: string }) {
       )}
     </>
   );
+}
+
+function horaLocal(instante: string, zona: string) {
+  const hora = new Intl.DateTimeFormat("es-AR", {
+    timeZone: zona,
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return hora.format(new Date(instante));
 }

@@ -1,3 +1,4 @@
+import { AnularRecuperacion, AvisoDeAusencia, ReservarRecuperacion } from "./AccionesDeFecha.tsx";
 import { MarcarAsistencia } from "./MarcarAsistencia.tsx";
 import { paginaDeOcurrencias, planillaDeAsistencia } from "@app/contratos";
 import { useState } from "react";
@@ -99,6 +100,7 @@ function Planilla({ fecha }: { fecha: string }) {
             {datos.fecha.nombre} · {datos.fecha.fecha}
           </h2>
           <p>Lugares para recuperar: {datos.lugares}</p>
+          {!datos.fecha.cancelada && datos.lugares > 0 && <ReservarRecuperacion fecha={fecha} />}
           <Resultados
             datos={{
               ...datos.alumnos,
@@ -107,9 +109,13 @@ function Planilla({ fecha }: { fecha: string }) {
             }}
             alIrA={alIrA}
             fila={(item) => (
-              <li key={item.alumnoId}>
+              <li key={item.recuperacionId ?? item.alumnoId}>
                 {item.nombre} {item.apellido} · {item.estado ?? "Sin marcar"}
                 {item.avisoId && " · Avisó ausencia"}
+                {item.recuperacionId && <AnularRecuperacion id={item.recuperacionId} />}
+                {!datos.fecha.cancelada && (
+                  <AvisoDeAusencia fecha={fecha} alumnoId={item.alumnoId} avisoId={item.avisoId} />
+                )}
                 {!datos.fecha.cancelada && (
                   <MarcarAsistencia fecha={fecha} alumnoId={item.alumnoId} estado={item.estado} />
                 )}

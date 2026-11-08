@@ -44,6 +44,9 @@ describe("recuperar", () => {
     if (!planilla.ok) throw new Error(planilla.error.mensaje);
     expect(planilla.valor.lugares).toBe(1);
     expect(planilla.valor.recuperan.elementos.map((r) => r.alumnoId)).toEqual([ana]);
+    expect(planilla.valor.recuperan.elementos[0]?.recuperacionId).toBe(
+      reserva.ok && reserva.valor.id,
+    );
     const creditos = await asistencia.creditos(ctx, { ...PRIMERA, alumnoId: ana });
     expect(creditos.ok && creditos.valor.total).toBe(0);
 

@@ -1,5 +1,6 @@
+import { AccionDeAlumno } from "../../base/controles/AccionDeAlumno.tsx";
 import type { Clase } from "@app/contratos";
-import { FormularioDesplegable } from "../../base/controles/FormularioRemoto.tsx";
+import { FormularioDesplegable, FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
 import { EditarClase } from "./EditarClase.tsx";
 import { paginaDeClases, paginaDeInscriptos } from "@app/contratos";
 import { useState } from "react";
@@ -25,7 +26,7 @@ function AgendaDeSede({
   sedes: readonly { id: string; nombre: string }[];
 }) {
   const gestionar = usePermiso("agenda.gestionar");
-  const [clase, elegir] = useState<{ id: string; nombre: string }>();
+  const [clase, elegir] = useState<Clase>();
   const ruta = sede === "todas" ? "/agenda/clases" : "/agenda/clases?sede=" + sede;
   return (
     <section>
@@ -68,10 +69,19 @@ function AgendaDeSede({
   );
 }
 
-function Inscriptos({ clase }: { clase: { id: string; nombre: string } }) {
+function Inscriptos({ clase }: { clase: Clase }) {
+  const inscribir = usePermiso("agenda.inscribir");
+  const buscar = usePermiso("personas.ver");
   return (
     <section>
       <h2>Inscriptos en {clase.nombre}</h2>
+      {inscribir && buscar && clase.activa && (
+        <AccionDeAlumno
+          key={clase.id}
+          ruta={`/agenda/clases/${clase.id}/inscriptos`}
+          etiqueta="Inscribir alumno"
+        />
+      )}
       <ListaRemota
         key={clase.id}
         ruta={`/agenda/clases/${clase.id}/inscriptos`}
@@ -83,6 +93,7 @@ function Inscriptos({ clase }: { clase: { id: string; nombre: string } }) {
             fila={(item) => (
               <li key={item.id}>
                 {item.nombre} {item.apellido}
+                {inscribir && <BajaInscripcion id={item.id} />}
               </li>
             )}
           />
@@ -109,6 +120,19 @@ function Edicion({ item }: { item: Clase }) {
   return (
     <FormularioDesplegable titulo="Editar clase">
       <EditarClase clase={item} sede={item.sedeId} />
+    </FormularioDesplegable>
+  );
+}
+
+function BajaInscripcion({ id }: { id: string }) {
+  return (
+    <FormularioDesplegable titulo="Dar de baja inscripción">
+      <FormularioRemoto
+        ruta={`/agenda/inscripciones/${id}`}
+        metodo="DELETE"
+        etiqueta="Confirmar baja"
+        cuerpo={() => undefined}
+      />
     </FormularioDesplegable>
   );
 }

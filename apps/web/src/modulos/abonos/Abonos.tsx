@@ -1,3 +1,4 @@
+import { GenerarCuota } from "./GenerarCuota.tsx";
 import type { Plan } from "@app/contratos";
 import { FormularioDesplegable } from "../../base/controles/FormularioRemoto.tsx";
 import { EditarPlan } from "./EditarPlan.tsx";
@@ -31,6 +32,7 @@ export function Abonos() {
                 <li key={plan.id}>
                   <strong>{plan.nombre}</strong>
                   {gestionar && <Edicion plan={plan} />}
+                  <GenerarCuota plan={plan} />
                   <p>
                     {plan.clasesPorSemana} clases por semana · {pesos.format(plan.precio)} de precio
                     general · {plan.activo ? "Activo" : "De baja"}

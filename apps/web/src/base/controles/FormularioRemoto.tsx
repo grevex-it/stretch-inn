@@ -13,9 +13,9 @@ export function FormularioRemoto({
   etiqueta = "Guardar",
 }: {
   ruta: string;
-  metodo: "POST" | "PUT";
+  metodo: "POST" | "PUT" | "DELETE";
   cuerpo: (datos: FormData) => unknown;
-  children: ReactNode;
+  children?: ReactNode;
   etiqueta?: string;
 }) {
   const cliente = useQueryClient();
@@ -33,7 +33,7 @@ export function FormularioRemoto({
         if (!guardar.isPending) guardar.mutate(new FormData(evento.currentTarget));
       }}
     >
-      <fieldset disabled={guardar.isPending}>{children}</fieldset>
+      {children && <fieldset disabled={guardar.isPending}>{children}</fieldset>}
       {guardar.isError && <Aviso tono="error">{mensajeDe(guardar.error)}</Aviso>}
       {guardar.isSuccess && <Aviso tono="ok">Cambios guardados.</Aviso>}
       <Boton tipo="submit" deshabilitado={guardar.isPending}>
@@ -48,7 +48,7 @@ export function FormularioDesplegable({
   children,
 }: {
   titulo: string;
-  children: ReactNode;
+  children?: ReactNode;
 }) {
   return (
     <details>

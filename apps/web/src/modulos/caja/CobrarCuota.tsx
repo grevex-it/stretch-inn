@@ -1,4 +1,5 @@
-import { paginaDeAlumnos, paginaDeCuotas, pedidoDeCobro, type Cuota } from "@app/contratos";
+import { BuscarAlumno } from "../../base/controles/BuscarAlumno.tsx";
+import { paginaDeCuotas, pedidoDeCobro, type Cuota } from "@app/contratos";
 import { useRef, useState } from "react";
 import { FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
 import { ListaRemota, pesos, Resultados } from "../../base/controles/ListaRemota.tsx";
@@ -7,49 +8,12 @@ import { usePermiso } from "../../base/sesion.ts";
 export function CobrarCuota({ sede }: { sede: string }) {
   const permitido = usePuedeCobrar();
 
-  const [buscar, cambiarBusqueda] = useState("");
   const [alumno, elegir] = useState<{ id: string; nombre: string }>();
   if (!permitido) return null;
-  const ruta = "/alumnos?buscar=" + encodeURIComponent(buscar.trim());
   return (
     <details>
       <summary>Cobrar cuota</summary>
-      <label>
-        Buscar alumno{" "}
-        <input
-          value={buscar}
-          maxLength={100}
-          onChange={(evento) => {
-            cambiarBusqueda(evento.target.value);
-            elegir(undefined);
-          }}
-        />
-      </label>
-      {buscar.trim() && (
-        <ListaRemota
-          key={ruta}
-          ruta={ruta}
-          esquema={paginaDeAlumnos}
-          mostrar={(datos, alIrA) => (
-            <Resultados
-              datos={datos}
-              alIrA={alIrA}
-              fila={(item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      elegir({ id: item.id, nombre: item.nombre + " " + item.apellido });
-                    }}
-                  >
-                    {item.nombre} {item.apellido}
-                  </button>
-                </li>
-              )}
-            />
-          )}
-        />
-      )}
+      <BuscarAlumno alElegir={elegir} />
       {alumno && <Cuotas key={alumno.id} alumno={alumno} sede={sede} />}
     </details>
   );
