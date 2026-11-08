@@ -54,11 +54,25 @@ describe("estadoDeSesion", () => {
         sedes: [{ id: UUID, nombre: "Norte" }],
         sedeCambiada: false,
         permisos: ["usuarios.ver"],
+        zonaHoraria: "America/Argentina/Buenos_Aires",
       },
     };
     expect(estadoDeSesion.parse(estado)).toEqual(estado);
     const sinNombres = { ...estado, centroActivo: { ...estado.centroActivo, sedes: [UUID] } };
     expect(estadoDeSesion.safeParse(sinNombres).success).toBe(false);
+  });
+
+  it("el centro activo trae su zona horaria: las fechas se muestran en esa zona", () => {
+    const centroActivo = {
+      id: UUID,
+      nombre: "Centro",
+      sedeActiva: "todas",
+      sedes: [],
+      sedeCambiada: false,
+      permisos: [],
+    };
+    const estado = { debeCambiarClave: false, centros: [], centroActivo };
+    expect(estadoDeSesion.safeParse(estado).success).toBe(false);
   });
 });
 

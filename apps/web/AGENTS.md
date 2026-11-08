@@ -13,7 +13,8 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
     `enviarYLeer(metodo, ruta, esquema, cuerpo)` cuando hace falta la respuesta.
   - `consultas.ts`: cliente de TanStack Query. Un 401 en cualquier pedido vuelve al login.
   - `sesion.ts`: `useSesion`, `usePermiso(permiso)` y las acciones de la sesión (entrar, salir,
-    centro, sede, clave).
+    centro, sede, clave). El centro activo trae su `zonaHoraria`: toda fecha de la API viene en
+    UTC y se muestra en esa zona, nunca en la del navegador.
   - `estructura/Navegacion.tsx`: las secciones del menú. Cada una se muestra solo con su permiso.
   - `Puerta.tsx`: según la sesión muestra login, clave temporal, elegir centro o el panel.
   - `rutas.tsx`: las rutas. Cada módulo suma las suyas como hijas de la raíz.
