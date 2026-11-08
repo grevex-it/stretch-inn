@@ -1,42 +1,12 @@
 // Casos de uso de la planilla de asistencia. El permiso se controla en la sede de la fecha (0007).
 // Figuran quienes tenían inscripción vigente al empezar la fecha (agenda).
-import {
-  falla,
-  id,
-  ok,
-  puede,
-  type ContextoCentro,
-  type Permiso,
-  type Resultado,
-} from "@app/nucleo";
+import { falla, ok, type ContextoCentro, type Resultado } from "@app/nucleo";
 import { TOMAR, VER } from "../dominio/permisos.ts";
 import { limpiarMarcas, puedeTomar, type Marca } from "../dominio/planilla.ts";
-import type {
-  ErrorDeAsistencia,
-  Fecha,
-  Pagina,
-  Planilla,
-  Registro,
-  RepositorioAsistencia,
-} from "./puertos.ts";
+import { fechaCon, registroDe } from "./comun.ts";
+import type { ErrorDeAsistencia, Pagina, Planilla, RepositorioAsistencia } from "./puertos.ts";
 
-const SIN_PERMISO = falla("sin-permiso", "No tenés permiso para hacer esto en esa sede.");
-const INEXISTENTE = falla("fecha-inexistente", "Esa fecha no existe.");
-
-/** La fecha, si existe y quien pide tiene el permiso en su sede. */
-async function fechaCon(
-  repo: RepositorioAsistencia,
-  quien: ContextoCentro,
-  permiso: Permiso,
-  fechaId: string,
-): Promise<Resultado<Fecha, ErrorDeAsistencia>> {
-  const fecha = await repo.fecha(fechaId);
-  if (fecha === undefined) return INEXISTENTE;
-  if (!puede(quien, permiso, id<"Sede">(fecha.sedeId))) return SIN_PERMISO;
-  return ok(fecha);
-}
-
-/** Una página de inscriptos con sus alumnos y sus marcas, en tres consultas (regla 8). */
+/** Una página de inscriptos con sus alumnos, marcas y avisos, en cuatro consultas (regla 8). */
 export async function planilla(
   repo: RepositorioAsistencia,
   quien: ContextoCentro,
@@ -47,7 +17,9 @@ export async function planilla(
   const { claseId, empiezaEn } = fecha.valor;
   const inscriptos = await repo.inscriptos({ ...pagina, claseId, momento: empiezaEn });
   const ids = inscriptos.elementos.map((i) => i.alumnoId);
-  const [alumnos, marcas] = [await repo.alumnos(ids), await repo.marcas(fechaId, ids)];
+  const alumnos = await repo.alumnos(ids);
+  const marcas = await repo.marcas(fechaId, ids);
+  const avisos = await repo.avisos(fechaId, ids);
   return ok({
     fecha: fecha.valor,
     alumnos: {
@@ -55,17 +27,11 @@ export async function planilla(
       elementos: ids.flatMap((alumnoId) => {
         const alumno = alumnos.get(alumnoId);
         if (alumno === undefined) return [];
-        return [{ alumnoId, ...alumno, estado: marcas.get(alumnoId) ?? null }];
+        const estado = marcas.get(alumnoId) ?? null;
+        return [{ alumnoId, ...alumno, estado, avisoId: avisos.get(alumnoId) ?? null }];
       }),
     },
   });
-}
-
-function registroDe(quien: ContextoCentro, en: Date): Registro {
-  const { actor } = quien;
-  return actor.tipo === "usuario"
-    ? { tipo: "usuario", id: actor.usuarioId, en }
-    : { tipo: "soporte", id: actor.operadorId, en };
 }
 
 /** Guarda o corrige las marcas: todas o ninguna, y solo de quienes estaban inscriptos. */

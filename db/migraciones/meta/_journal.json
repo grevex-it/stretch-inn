@@ -141,6 +141,20 @@
       "when": 1794113856944,
       "tag": "20261108045736_rls-asistencia",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794114521280,
+      "tag": "20261108050841_avisos-de-ausencia",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794114522647,
+      "tag": "20261108050842_rls-avisos-de-ausencia",
+      "breakpoints": true
     }
   ]
 }

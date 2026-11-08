@@ -27,3 +27,27 @@ export const asistencias = pgTable(
     check("asistencias_registrada_por", sql`${tabla.registradaPorTipo} in ('usuario', 'soporte')`),
   ],
 );
+
+/** El aviso de que un alumno no va a una fecha. Anularlo no lo borra: marca `anulado_en`. */
+export const avisosDeAusencia = pgTable(
+  "avisos_de_ausencia",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    centroId: uuid("centro_id").notNull(),
+    sedeId: uuid("sede_id").notNull(),
+    ocurrenciaId: uuid("ocurrencia_id").notNull(),
+    alumnoId: uuid("alumno_id").notNull(),
+    avisadoPorTipo: text("avisado_por_tipo").$type<"usuario" | "soporte">().notNull(),
+    avisadoPorId: uuid("avisado_por_id").notNull(),
+    avisadoEn: timestamp("avisado_en", { withTimezone: true }).notNull(),
+    anuladoEn: timestamp("anulado_en", { withTimezone: true }),
+  },
+  (tabla) => [
+    // Un aviso vigente por alumno y fecha.
+    uniqueIndex("avisos_ocurrencia_alumno_vigente")
+      .on(tabla.ocurrenciaId, tabla.alumnoId)
+      .where(sql`${tabla.anuladoEn} is null`),
+    index("avisos_centro_alumno").on(tabla.centroId, tabla.alumnoId),
+    check("avisos_avisado_por", sql`${tabla.avisadoPorTipo} in ('usuario', 'soporte')`),
+  ],
+);

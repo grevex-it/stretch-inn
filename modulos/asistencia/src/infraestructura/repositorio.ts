@@ -7,9 +7,11 @@ import type { Transaccion } from "@app/plataforma";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { RepositorioAsistencia } from "../aplicacion/puertos.ts";
 import { asistencias } from "./esquema.ts";
+import { repositorioAvisos } from "./repositorio-avisos.ts";
 
 export function repositorioAsistencia(tx: Transaccion): RepositorioAsistencia {
   return {
+    ...repositorioAvisos(tx),
     fecha: (id) => obtenerFecha(tx, id),
     inscriptos: (filtro) => inscriptosEnFecha(tx, filtro),
     estabanInscriptos: (filtro) => estabanInscriptos(tx, filtro),

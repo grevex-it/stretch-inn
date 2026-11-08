@@ -21,7 +21,15 @@ const renglon = z.object({
   activo: z.boolean(),
   /** null mientras no se marcó. */
   estado: estado.nullable(),
+  /** El aviso de ausencia vigente (con este id se anula), o null si no avisó. */
+  avisoId: z.uuid().nullable(),
 });
+
+/** Cuerpo de POST /asistencia/fechas/:id/avisos. */
+export const pedidoDeAviso = z.object({ alumnoId: z.uuid("Ese alumno no existe.") });
+
+/** Respuesta de POST /asistencia/fechas/:id/avisos: con este id se anula. */
+export const avisoHecho = z.object({ id: z.uuid() });
 
 /** Respuesta de GET /asistencia/fechas/:id: la fecha y una página de sus inscriptos. */
 export const planillaDeAsistencia = z.object({
@@ -42,3 +50,4 @@ export const planillaDeAsistencia = z.object({
 
 export type PedidoDeAsistencia = z.infer<typeof pedidoDeAsistencia>;
 export type PlanillaDeAsistencia = z.infer<typeof planillaDeAsistencia>;
+export type PedidoDeAviso = z.infer<typeof pedidoDeAviso>;
