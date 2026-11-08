@@ -2,6 +2,7 @@
 // en su transacción con el contexto de quien la pide.
 import { enContexto, type Base } from "@app/plataforma";
 import * as avisos from "./aplicacion/avisos.ts";
+import * as creditos from "./aplicacion/creditos.ts";
 import * as planillas from "./aplicacion/planilla.ts";
 import type { Asistencia } from "./aplicacion/puertos.ts";
 import { repositorioAsistencia } from "./infraestructura/repositorio.ts";
@@ -23,6 +24,10 @@ export function crearAsistencia(base: Base, opciones: OpcionesAsistencia = {}): 
     avisar: (quien, aviso) =>
       enContexto(base, quien, (tx) =>
         avisos.avisar(repositorioAsistencia(tx), quien, ahora(), aviso),
+      ),
+    creditos: (quien, filtro) =>
+      enContexto(base, quien, (tx) =>
+        creditos.deAlumno(repositorioAsistencia(tx), quien, ahora(), filtro),
       ),
     anularAviso: (quien, aviso) =>
       enContexto(base, quien, (tx) =>

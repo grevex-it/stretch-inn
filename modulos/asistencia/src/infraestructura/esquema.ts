@@ -28,6 +28,29 @@ export const asistencias = pgTable(
   ],
 );
 
+/**
+ * El derecho a recuperar que genera un aviso a tiempo, uno por aviso. Anularlo no lo borra.
+ * Se usa en la sede de la fecha a la que se faltó.
+ */
+export const creditos = pgTable(
+  "creditos",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    centroId: uuid("centro_id").notNull(),
+    sedeId: uuid("sede_id").notNull(),
+    alumnoId: uuid("alumno_id").notNull(),
+    avisoId: uuid("aviso_id").notNull(),
+    /** La fecha a la que se faltó. */
+    ocurrenciaId: uuid("ocurrencia_id").notNull(),
+    venceEn: timestamp("vence_en", { withTimezone: true }).notNull(),
+    anuladoEn: timestamp("anulado_en", { withTimezone: true }),
+  },
+  (tabla) => [
+    uniqueIndex("creditos_aviso").on(tabla.avisoId),
+    index("creditos_centro_alumno_vence").on(tabla.centroId, tabla.alumnoId, tabla.venceEn),
+  ],
+);
+
 /** El aviso de que un alumno no va a una fecha. Anularlo no lo borra: marca `anulado_en`. */
 export const avisosDeAusencia = pgTable(
   "avisos_de_ausencia",

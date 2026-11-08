@@ -1,7 +1,8 @@
 // Casos de uso de los avisos de ausencia. El permiso se controla en la sede de la fecha (0007).
-// Avisar no decide si hay crédito para recuperar: eso lo resuelven los créditos.
+// El aviso a tiempo genera un crédito para recuperar en la misma transacción (ver credito.ts).
 import { falla, ok, type ContextoCentro, type Resultado } from "@app/nucleo";
 import { puedeAvisar } from "../dominio/aviso.ts";
+import { daCredito, venceEl } from "../dominio/credito.ts";
 import { AVISAR } from "../dominio/permisos.ts";
 import { fechaCon, registroDe } from "./comun.ts";
 import type { ErrorDeAsistencia, RepositorioAsistencia } from "./puertos.ts";
@@ -14,7 +15,7 @@ export async function avisar(
   quien: ContextoCentro,
   ahora: Date,
   { fechaId, alumnoId }: { fechaId: string; alumnoId: string },
-): Promise<Resultado<{ id: string }, ErrorDeAsistencia>> {
+): Promise<Resultado<{ id: string; conCredito: boolean }, ErrorDeAsistencia>> {
   const fecha = await fechaCon(repo, quien, AVISAR, fechaId);
   if (!fecha.ok) return fecha;
   const regla = puedeAvisar(fecha.valor, ahora);
@@ -30,7 +31,17 @@ export async function avisar(
   }
   const id = await repo.avisar(fecha.valor, alumnoId, registroDe(quien, ahora));
   if (id === undefined) return falla("ya-avisado", "Ese alumno ya avisó que no viene.");
-  return ok({ id });
+  const conCredito = daCredito(empiezaEn, ahora);
+  if (conCredito) {
+    await repo.crearCredito({
+      avisoId: id,
+      alumnoId,
+      sedeId: fecha.valor.sedeId,
+      ocurrenciaId: fechaId,
+      venceEn: venceEl(empiezaEn),
+    });
+  }
+  return ok({ id, conCredito });
 }
 
 /** Anular no borra el aviso: lo marca. También solo antes del inicio. */
@@ -47,5 +58,6 @@ export async function anular(
   const regla = puedeAvisar(fecha.valor, ahora);
   if (!regla.ok) return regla;
   if (!(await repo.anularAviso(id, ahora))) return INEXISTENTE;
+  await repo.anularCreditoDeAviso(id, ahora);
   return ok(null);
 }

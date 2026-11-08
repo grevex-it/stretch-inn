@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   avisoHecho,
   pedidoDeAsistencia,
+  paginaDeCreditos,
   pedidoDeAviso,
   planillaDeAsistencia,
 } from "../src/index.ts";
@@ -15,7 +16,22 @@ describe("avisos de ausencia", () => {
     expect(pedidoDeAviso.safeParse({ alumnoId: "ana" }).error?.issues[0]?.message).toBe(
       "Ese alumno no existe.",
     );
-    expect(avisoHecho.parse({ id: UUID })).toEqual({ id: UUID });
+    expect(avisoHecho.parse({ id: UUID, conCredito: true })).toEqual({
+      id: UUID,
+      conCredito: true,
+    });
+  });
+
+  it("los créditos del alumno son una página con su sede, su fecha y su vencimiento", () => {
+    const pagina = {
+      pagina: 1,
+      porPagina: 50,
+      total: 1,
+      elementos: [
+        { id: UUID, sedeId: UUID, ocurrenciaId: UUID, venceEn: "2026-12-09T21:30:00.000Z" },
+      ],
+    };
+    expect(paginaDeCreditos.parse(pagina)).toEqual(pagina);
   });
 });
 

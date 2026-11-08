@@ -71,6 +71,7 @@ export {
 } from "./agenda.ts";
 export {
   avisoHecho,
+  paginaDeCreditos,
   pedidoDeAsistencia,
   pedidoDeAviso,
   planillaDeAsistencia,

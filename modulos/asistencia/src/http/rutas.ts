@@ -11,6 +11,7 @@ const tomar = { permiso: "asistencia.tomar" } as const;
 const avisar = { permiso: "asistencia.avisar" } as const;
 const conId = z.object({ id: z.uuid("Esa fecha no existe.") });
 const avisoConId = z.object({ id: z.uuid("Ese aviso no existe.") });
+const alumnoConId = z.object({ id: z.uuid("Ese alumno no existe.") });
 
 export function rutasDeAsistencia(asistencia: Asistencia): FastifyPluginCallback {
   return (app, _opciones, listo) => {
@@ -61,5 +62,17 @@ function rutasDeAvisos(app: FastifyInstance, asistencia: Asistencia): void {
     if (aviso === undefined) return respuesta;
     const resultado = await asistencia.anularAviso(contextoDe(pedido), aviso);
     return enviar(respuesta, resultado, 204);
+  });
+
+  // Para la ficha del alumno. Vive en asistencia: personas no sabe de créditos.
+  app.get("/alumnos/:id/creditos", { config: ver }, async (pedido, respuesta) => {
+    const alumno = leer(alumnoConId, pedido.params, respuesta);
+    const pagina = alumno && leer(pedidoDePagina, pedido.query, respuesta);
+    if (alumno === undefined || pagina === undefined) return respuesta;
+    const resultado = await asistencia.creditos(contextoDe(pedido), {
+      ...pagina,
+      alumnoId: alumno.id,
+    });
+    return enviar(respuesta, resultado, 200);
   });
 }
