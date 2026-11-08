@@ -71,6 +71,16 @@ export async function cobrarCuota(
     if (!(await repo.registrarPagoDeCuota({ cuotaId, pagoId, en: ahora }))) {
       return falla("cuota-pagada", "Esa cuota ya está pagada.");
     }
+    await repo.publicarPagoRegistrado({
+      pagoId,
+      centroId: quien.centroId,
+      sedeId,
+      alumnoId,
+      cuotaId,
+      monto,
+      medio,
+      registradoEn: ahora.toISOString(),
+    });
     return ok({ id: pagoId, monto, repetido: false });
   });
 }

@@ -23,7 +23,7 @@ el día de caja de cada sede con lo cobrado.
 
 ## API pública
 
-- `crearCaja(base, { ahora? })`: devuelve `Caja`. Cada operación recibe el `ContextoCentro` de
+- `crearCaja(base, { ahora?, cola? })`: devuelve `Caja`. Cada operación recibe el `ContextoCentro` de
   quien la pide y corre en su propia transacción:
   - `cobrarCuota(quien, { cuotaId, medio, claveIdempotencia })`: cobra la cuota completa y la
     marca pagada. Devuelve `{ id, monto, repetido }`: con la misma clave, el mismo pago.
@@ -38,7 +38,10 @@ el día de caja de cada sede con lo cobrado.
 
 ## Eventos
 
-- Emite: _ninguno por ahora_ (ver Pendientes: `PagoRegistrado`).
+- Emite: `PagoRegistrado` (`EVENTO_PAGO_REGISTRADO = "caja.pago-registrado"`), con el pago,
+  el centro, la sede, el alumno, la cuota, el monto, el medio y `registradoEn` (ISO). Se encola
+  en la misma transacción del cobro (outbox, 0003) con el id del pago como clave de
+  idempotencia: un pago, un evento. Lo procesa `apps/worker`.
 - Escucha: _ninguno_.
 
 ## Invariantes
@@ -74,6 +77,8 @@ _Ninguna por ahora._
 - **[SUPUESTO]** Se cobra la cuota completa; sin pagos parciales, recargos ni descuentos.
 - **[SUPUESTO]** Un pago se puede anular en cualquier momento, con motivo. Si Stretch Inn
   quiere cerrar la caja del día, va como regla nueva.
-- Emitir `PagoRegistrado` por la cola (outbox, 0003) cuando haya quien lo escuche (mensajería,
-  reportes) y exista `apps/worker`. Hoy la cuota se marca en la misma transacción.
+- La cuota se marca pagada en la misma transacción del cobro (por el `index.ts` de abonos), no
+  por el evento: así el pago y la cuota quedan juntos o ninguno. El evento queda para los que
+  escuchen después (mensajería, reportes). **[REVISAR]** con Pedro.
+- Sin `cola` en `crearCaja` no se publica el evento: solo para tests. La API siempre la pasa.
 - Cierre de caja y arqueo por medio de pago.

@@ -1,6 +1,7 @@
 // Lo que la caja necesita de afuera (ver docs/decisiones/0003): la base, abonos y centros.
 import type { ContextoCentro, Dinero, Resultado } from "@app/nucleo";
 import type { ErrorDeCobro, Medio } from "../dominio/cobro.ts";
+import type { PagoRegistrado } from "../dominio/eventos.ts";
 
 export interface Pagina {
   pagina: number;
@@ -51,6 +52,8 @@ export interface RepositorioCaja {
   /** Marca la cuota pagada en abonos, en esta misma transacción. */
   registrarPagoDeCuota(pago: { cuotaId: string; pagoId: string; en: Date }): Promise<boolean>;
   revertirPagoDeCuota(pago: { cuotaId: string; pagoId: string }): Promise<void>;
+  /** Encola el evento en esta transacción (outbox): si no confirma, el evento tampoco queda. */
+  publicarPagoRegistrado(evento: PagoRegistrado): Promise<void>;
   /** El pago de esa clave, si ya se registró (o se está registrando en otra transacción). */
   pagoPorClave(clave: string): Promise<Pago | undefined>;
   /** El id del pago nuevo, o undefined si la clave ya se usó. */

@@ -1,11 +1,18 @@
 // Punto de entrada de la API: conecta la base, el logger y la app, y escucha en PUERTO.
-import { comprobarBase, crearBase, crearLogger, verificarRolSeguro } from "@app/plataforma";
+import {
+  comprobarBase,
+  crearBase,
+  crearCola,
+  crearLogger,
+  declararTarea,
+  verificarRolSeguro,
+} from "@app/plataforma";
 import { crearAcceso, crearEquipo, rutasDeEquipo, rutasDeSesion } from "@app/identidad";
 import { rutasDeAlumnos } from "@app/personas";
 import { crearAbonos, rutasDeAbonos } from "@app/abonos";
 import { crearAgenda, rutasDeAgenda } from "@app/agenda";
 import { crearAsistencia, rutasDeAsistencia } from "@app/asistencia";
-import { crearCaja, rutasDeCaja } from "@app/caja";
+import { crearCaja, EVENTO_PAGO_REGISTRADO, rutasDeCaja } from "@app/caja";
 import { construirApp } from "./app.ts";
 
 const logger = crearLogger({ nivel: "info" });
@@ -34,6 +41,11 @@ if (origenPanel === undefined) {
 const base = crearBase(urlBase);
 await verificarRolSeguro(base);
 
+// La API solo publica en la cola (outbox, 0003); los trabajos los procesa apps/worker.
+const cola = crearCola({ url: urlBase, logger });
+await cola.iniciar();
+await declararTarea(cola, EVENTO_PAGO_REGISTRADO);
+
 // Una sola instancia por proceso: el límite de intentos de login vive en su memoria (0017).
 const acceso = crearAcceso(base);
 const app = construirApp({
@@ -49,12 +61,13 @@ await app.register(rutasDeAlumnos(base));
 await app.register(rutasDeAgenda(crearAgenda(base)));
 await app.register(rutasDeAsistencia(crearAsistencia(base)));
 await app.register(rutasDeAbonos(crearAbonos(base)));
-await app.register(rutasDeCaja(crearCaja(base)));
+await app.register(rutasDeCaja(crearCaja(base, { cola })));
 
 // Railway manda SIGTERM antes de cambiar al deploy nuevo: se terminan los pedidos en curso.
 process.on("SIGTERM", () => {
   void app
     .close()
+    .then(() => cola.detener())
     .then(() => base.cerrar())
     .then(() => process.exit(0));
 });

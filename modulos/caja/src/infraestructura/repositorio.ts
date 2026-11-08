@@ -3,7 +3,8 @@
 import { obtenerCuota, registrarPago, revertirPago } from "@app/abonos";
 import { obtenerCentro } from "@app/centros";
 import { pesos } from "@app/nucleo";
-import { conPuntoDeGuardado, type Transaccion } from "@app/plataforma";
+import { conPuntoDeGuardado, publicar, type Cola, type Transaccion } from "@app/plataforma";
+import { EVENTO_PAGO_REGISTRADO } from "../dominio/eventos.ts";
 import { and, count, desc, eq, gte, isNull, lt, sql, sum } from "drizzle-orm";
 import type { RepositorioCaja } from "../aplicacion/puertos.ts";
 import { pagos } from "./esquema.ts";
@@ -22,8 +23,15 @@ const columnas = {
   motivoAnulacion: pagos.motivoAnulacion,
 };
 
-export function repositorioCaja(tx: Transaccion): RepositorioCaja {
+/** Sin cola (tests que no miran eventos) no se publica nada; la API y el worker siempre la pasan. */
+export function repositorioCaja(tx: Transaccion, cola?: Cola): RepositorioCaja {
   return {
+    async publicarPagoRegistrado(evento) {
+      if (cola === undefined) return;
+      await publicar(cola, tx, EVENTO_PAGO_REGISTRADO, evento, {
+        claveIdempotencia: evento.pagoId,
+      });
+    },
     todoONada: (trabajo) => conPuntoDeGuardado(tx, trabajo),
     async zonaHoraria() {
       return (await obtenerCentro(tx))?.zonaHoraria ?? ZONA_POR_DEFECTO;
