@@ -5,6 +5,7 @@ import { puedeAvisar } from "../dominio/aviso.ts";
 import { daCredito, venceEl } from "../dominio/credito.ts";
 import { AVISAR } from "../dominio/permisos.ts";
 import { fechaCon, registroDe } from "./comun.ts";
+import { lugaresDe } from "./recuperaciones.ts";
 import type { ErrorDeAsistencia, RepositorioAsistencia } from "./puertos.ts";
 
 const INEXISTENTE = falla("aviso-inexistente", "Ese aviso no existe o ya se anuló.");
@@ -57,6 +58,20 @@ export async function anular(
   if (!fecha.ok) return fecha.error.codigo === "fecha-inexistente" ? INEXISTENTE : fecha;
   const regla = puedeAvisar(fecha.valor, ahora);
   if (!regla.ok) return regla;
+  if (await repo.creditoUsado(id)) {
+    return falla(
+      "credito-usado",
+      "El crédito de ese aviso ya se usó: anulá antes la recuperación.",
+    );
+  }
+  // Volver ocupa un lugar: si una recuperación ya lo tomó, no hay dónde volver.
+  await repo.bloquearFecha(fecha.valor.id);
+  if ((await lugaresDe(repo, fecha.valor)) < 1) {
+    return falla(
+      "sin-lugar",
+      "Ese lugar ya lo ocupó una recuperación: no se puede anular el aviso.",
+    );
+  }
   if (!(await repo.anularAviso(id, ahora))) return INEXISTENTE;
   await repo.anularCreditoDeAviso(id, ahora);
   return ok(null);

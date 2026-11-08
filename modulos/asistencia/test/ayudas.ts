@@ -21,7 +21,13 @@ export const ARMAR = [
   "personas.ver",
   "personas.editar",
 ];
-const TODO = [...ARMAR, "asistencia.ver", "asistencia.tomar", "asistencia.avisar"];
+const TODO = [
+  ...ARMAR,
+  "asistencia.ver",
+  "asistencia.tomar",
+  "asistencia.avisar",
+  "asistencia.recuperar",
+];
 
 /** Como dueño del esquema: sin RLS. Para armar datos y para contar lo que quedó guardado. */
 export async function comoDueno<Fila extends pg.QueryResultRow = pg.QueryResultRow>(
@@ -145,6 +151,36 @@ export async function claseConFecha(base: Base) {
   });
   const fecha = semana.ok ? semana.valor.elementos[0] : undefined;
   if (fecha === undefined) throw new Error("La clase no tiene fecha la semana que viene.");
+  /** Otra clase de Norte (miércoles), con ese cupo e inscriptos nuevos, y su fecha. */
+  const otraClase = async (cupo: number, inscriptos: number) => {
+    const nueva = await agenda.crearClase(ctx, {
+      nombre: "Yoga",
+      dia: 3,
+      hora: "10:00",
+      duracionMinutos: 60,
+      cupo,
+      sedeId: norte,
+    });
+    if (!nueva.ok) throw new Error(nueva.error.mensaje);
+    const alumnos: string[] = [];
+    for (let i = 0; i < inscriptos; i++) {
+      const alumnoId = await alumno(base, ctx, `Fijo ${String(i)}`);
+      const alta = await agenda.inscribir(ctx, { claseId: nueva.valor.id, alumnoId });
+      if (!alta.ok) throw new Error(alta.error.mensaje);
+      alumnos.push(alumnoId);
+    }
+    const otraSemana = await agenda.semana(ctx, {
+      pagina: 1,
+      porPagina: 50,
+      sedeId: norte,
+      desde: proximoLunes(),
+    });
+    const suya = otraSemana.ok
+      ? otraSemana.valor.elementos.find((f) => f.claseId === nueva.valor.id)
+      : undefined;
+    if (suya === undefined) throw new Error("La otra clase no tiene fecha la semana que viene.");
+    return { fecha: suya, alumnos };
+  };
   return {
     ctx,
     agenda,
@@ -153,6 +189,7 @@ export async function claseConFecha(base: Base) {
     ana,
     bea,
     fecha,
+    otraClase,
     nuevoAlumno: (nombre: string) => alumno(base, ctx, nombre),
     otra: (permisos: readonly string[]) => persona(base, centro, [[norte, permisos]]),
   };

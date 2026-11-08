@@ -4,6 +4,7 @@ import { enContexto, type Base } from "@app/plataforma";
 import * as avisos from "./aplicacion/avisos.ts";
 import * as creditos from "./aplicacion/creditos.ts";
 import * as planillas from "./aplicacion/planilla.ts";
+import * as recuperaciones from "./aplicacion/recuperaciones.ts";
 import type { Asistencia } from "./aplicacion/puertos.ts";
 import { repositorioAsistencia } from "./infraestructura/repositorio.ts";
 
@@ -28,6 +29,14 @@ export function crearAsistencia(base: Base, opciones: OpcionesAsistencia = {}): 
     creditos: (quien, filtro) =>
       enContexto(base, quien, (tx) =>
         creditos.deAlumno(repositorioAsistencia(tx), quien, ahora(), filtro),
+      ),
+    recuperar: (quien, reserva) =>
+      enContexto(base, quien, (tx) =>
+        recuperaciones.recuperar(repositorioAsistencia(tx), quien, ahora(), reserva),
+      ),
+    anularRecuperacion: (quien, reserva) =>
+      enContexto(base, quien, (tx) =>
+        recuperaciones.anular(repositorioAsistencia(tx), quien, ahora(), reserva),
       ),
     anularAviso: (quien, aviso) =>
       enContexto(base, quien, (tx) =>

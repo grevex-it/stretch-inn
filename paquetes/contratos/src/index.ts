@@ -74,8 +74,11 @@ export {
   paginaDeCreditos,
   pedidoDeAsistencia,
   pedidoDeAviso,
+  pedidoDeRecuperacion,
   planillaDeAsistencia,
+  recuperacionHecha,
   type PedidoDeAsistencia,
   type PedidoDeAviso,
+  type PedidoDeRecuperacion,
   type PlanillaDeAsistencia,
 } from "./asistencia.ts";

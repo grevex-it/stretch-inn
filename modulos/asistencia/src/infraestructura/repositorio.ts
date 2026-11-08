@@ -9,11 +9,13 @@ import type { RepositorioAsistencia } from "../aplicacion/puertos.ts";
 import { asistencias } from "./esquema.ts";
 import { repositorioAvisos } from "./repositorio-avisos.ts";
 import { repositorioCreditos } from "./repositorio-creditos.ts";
+import { repositorioRecuperaciones } from "./repositorio-recuperaciones.ts";
 
 export function repositorioAsistencia(tx: Transaccion): RepositorioAsistencia {
   return {
     ...repositorioAvisos(tx),
     ...repositorioCreditos(tx),
+    ...repositorioRecuperaciones(tx),
     fecha: (id) => obtenerFecha(tx, id),
     inscriptos: (filtro) => inscriptosEnFecha(tx, filtro),
     estabanInscriptos: (filtro) => estabanInscriptos(tx, filtro),

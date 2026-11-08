@@ -5,7 +5,9 @@ import {
   pedidoDeAsistencia,
   paginaDeCreditos,
   pedidoDeAviso,
+  pedidoDeRecuperacion,
   planillaDeAsistencia,
+  recuperacionHecha,
 } from "../src/index.ts";
 
 const UUID = "7b0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f67";
@@ -56,6 +58,7 @@ describe("planillaDeAsistencia", () => {
         claseId: UUID,
         sedeId: UUID,
         nombre: "Stretching",
+        cupo: 12,
         fecha: "2026-11-09",
         empiezaEn: "2026-11-09T21:30:00.000Z",
         terminaEn: "2026-11-09T22:30:00.000Z",
@@ -76,7 +79,17 @@ describe("planillaDeAsistencia", () => {
           },
         ],
       },
+      recuperan: { pagina: 1, porPagina: 50, total: 0, elementos: [] },
+      lugares: 1,
     };
     expect(planillaDeAsistencia.parse(planilla)).toEqual(planilla);
+  });
+});
+
+describe("recuperaciones", () => {
+  it("la reserva lleva el alumno; la respuesta, el id con que se anula", () => {
+    expect(pedidoDeRecuperacion.parse({ alumnoId: UUID })).toEqual({ alumnoId: UUID });
+    expect(pedidoDeRecuperacion.safeParse({}).success).toBe(false);
+    expect(recuperacionHecha.parse({ id: UUID })).toEqual({ id: UUID });
   });
 });

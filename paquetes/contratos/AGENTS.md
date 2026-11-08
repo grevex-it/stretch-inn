@@ -44,6 +44,8 @@ acuerdo.
   con sus tipos.
 - `paginaDeCreditos`: los créditos vigentes de un alumno, con su sede, su fecha de origen y su
   vencimiento; el que vence antes, primero.
+- `pedidoDeRecuperacion` (`{ alumnoId }`) y `recuperacionHecha` (`{ id }`), con sus tipos. La
+  planilla trae también `recuperan` (la misma página de los que recuperan) y `lugares`.
 
 ## Reglas de uso
 

@@ -169,6 +169,20 @@
       "when": 1794115386633,
       "tag": "20261108052306_rls-creditos",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794115916278,
+      "tag": "20261108053156_recuperaciones",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794115917693,
+      "tag": "20261108053157_rls-recuperaciones",
+      "breakpoints": true
     }
   ]
 }
