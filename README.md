@@ -1,4 +1,6 @@
-﻿# Notas de trabajo
+# Notas de trabajo
+
+**Para retomar en otra PC, empezá por [RETOMAR.md](RETOMAR.md).**
 
 Archivos sueltos de `C:\Users\Administrator\code\` en la PC original, fuera del repo:
 
