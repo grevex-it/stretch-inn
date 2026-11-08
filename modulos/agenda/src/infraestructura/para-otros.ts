@@ -13,6 +13,8 @@ export interface FechaParaOtros {
   claseId: string;
   sedeId: string;
   nombre: string;
+  /** Lugares por fecha de la clase. */
+  cupo: number;
   /** La fecha local del centro, AAAA-MM-DD. */
   fecha: string;
   empiezaEn: Date;
@@ -30,6 +32,7 @@ export async function obtenerFecha(
       claseId: ocurrencias.claseId,
       sedeId: ocurrencias.sedeId,
       nombre: clases.nombre,
+      cupo: clases.cupo,
       fecha: ocurrencias.fecha,
       empiezaEn: ocurrencias.empiezaEn,
       terminaEn: ocurrencias.terminaEn,

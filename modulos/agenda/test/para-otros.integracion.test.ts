@@ -77,6 +77,7 @@ describe("obtenerFecha", () => {
       claseId,
       sedeId: norte,
       nombre: "Stretching",
+      cupo: 12,
       fecha: fecha.fecha,
       empiezaEn: fecha.empiezaEn,
       terminaEn: fecha.terminaEn,

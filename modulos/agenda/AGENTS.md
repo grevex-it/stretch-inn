@@ -52,8 +52,8 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 
 Para otros módulos (asistencia). Reciben la `Transaccion` de `enContexto` y solo leen:
 
-- `obtenerFecha(tx, id)`: una fecha con su clase (`claseId`, `sedeId`, `nombre`, `fecha`,
-  `empiezaEn`, `terminaEn`, `cancelada`), o undefined.
+- `obtenerFecha(tx, id)`: una fecha con su clase (`claseId`, `sedeId`, `nombre`, `cupo`,
+  `fecha`, `empiezaEn`, `terminaEn`, `cancelada`), o undefined.
 - `inscriptosEnFecha(tx, { claseId, momento, pagina, porPagina })`: los alumnos con inscripción
   vigente **en ese momento**, por orden de inscripción.
 - `estabanInscriptos(tx, { claseId, momento, alumnoIds })`: cuáles de esos alumnos (hasta 100)
