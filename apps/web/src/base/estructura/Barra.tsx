@@ -16,14 +16,13 @@ interface Props {
 
 function SelectorDeSede({ centros, centro }: Props) {
   const elegir = useElegirSede();
-  const texto = (sede: string) => (centros.length <= 1 ? `${centro.nombre} · ${sede}` : sede);
   const [unica] = centro.sedes;
   if (centro.sedes.length === 1 && unica !== undefined) {
-    return <span className={estilos.nombre}>{texto(unica.nombre)}</span>;
+    return <span className={estilos.nombre}>{unica.nombre}</span>;
   }
   const opciones = [
-    { valor: "todas", texto: texto("Todas mis sedes") },
-    ...centro.sedes.map((sede) => ({ valor: sede.id, texto: texto(sede.nombre) })),
+    { valor: "todas", texto: "Todas mis sedes" },
+    ...centro.sedes.map((sede) => ({ valor: sede.id, texto: sede.nombre })),
   ];
   return (
     <Selector
@@ -71,7 +70,9 @@ export function Barra({ centros, centro }: Props) {
         aria-label="Salir"
         title="Salir"
         disabled={salir.isPending}
-        onClick={() => salir.mutate()}
+        onClick={() => {
+          salir.mutate();
+        }}
       >
         <svg
           width="22"

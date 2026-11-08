@@ -11,6 +11,8 @@
 }
 
 .lista {
+  field-sizing: content;
+  justify-self: start;
   min-height: var(--si-alto-control-min);
   padding: 0 6px;
   font: inherit;
@@ -43,5 +45,54 @@
     padding-inline: 4px;
     font-size: 0.8125rem;
     text-overflow: ellipsis;
+  }
+}
+
+.lista option {
+  color: var(--si-texto-sobre-oliva);
+  background: var(--si-oliva-800);
+}
+
+@supports (appearance: base-select) {
+  .lista,
+  .lista::picker(select) {
+    appearance: base-select;
+  }
+
+  .lista {
+    align-items: center;
+  }
+
+  .lista::picker(select) {
+    margin-block: 4px;
+    padding: 4px;
+    font: inherit;
+    color: var(--si-texto-sobre-oliva);
+    background: var(--si-oliva-900);
+    border: 1px solid var(--si-oliva-400);
+    border-radius: var(--si-radio-md);
+    box-shadow: var(--si-sombra-flotante);
+  }
+
+  .lista option {
+    padding: 8px 12px;
+    background: transparent;
+    border-radius: var(--si-radio-sm);
+  }
+
+  .lista option + option {
+    margin-block-start: 4px;
+  }
+
+  .lista option:checked {
+    color: var(--si-ok-texto);
+    background: var(--si-ok-fondo);
+    font-weight: var(--si-peso-medio);
+  }
+
+  .lista option:not(:checked):is(:hover, :focus-visible) {
+    background: var(--si-oliva-600);
+    outline: 1px solid var(--si-oliva-400);
+    outline-offset: -1px;
   }
 }

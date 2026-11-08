@@ -11,7 +11,6 @@ import estilos from "./Login.module.css";
 export function Login() {
   const [email, setEmail] = useState("");
   const [clave, setClave] = useState("");
-  const [claveVisible, setClaveVisible] = useState(false);
   const entrar = useEntrar();
   const error = mensajeDe(entrar.error);
 
@@ -26,7 +25,11 @@ export function Login() {
             <h1 id="titulo-acceso">Bienvenido de nuevo</h1>
             <p>Ingresá al panel de tu centro.</p>
           </header>
-          <Formulario alEnviar={() => entrar.mutate({ email, clave })}>
+          <Formulario
+            alEnviar={() => {
+              entrar.mutate({ email, clave });
+            }}
+          >
             <Campo
               etiqueta="Email"
               tipo="email"
@@ -34,35 +37,7 @@ export function Login() {
               alCambiar={setEmail}
               autoComplete="username"
             />
-            <div className={estilos.clave}>
-              <Campo
-                etiqueta="Contraseña"
-                tipo={claveVisible ? "text" : "password"}
-                valor={clave}
-                alCambiar={setClave}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                aria-label="Mostrar contraseña"
-                aria-pressed={claveVisible}
-                onClick={() => setClaveVisible(!claveVisible)}
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  aria-hidden="true"
-                >
-                  <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-                  <circle cx="12" cy="12" r="3" />
-                  {claveVisible && <path d="m3 3 18 18" />}
-                </svg>
-              </button>
-            </div>
+            <CampoDeClave clave={clave} setClave={setClave} />
             {error !== undefined && <Aviso tono="error">{error}</Aviso>}
             <Boton tipo="submit" deshabilitado={entrar.isPending}>
               {entrar.isPending ? "Entrando…" : "Entrar"}
@@ -78,5 +53,42 @@ export function Login() {
         </footer>
       </div>
     </main>
+  );
+}
+
+function CampoDeClave({ clave, setClave }: { clave: string; setClave: (clave: string) => void }) {
+  const [claveVisible, setClaveVisible] = useState(false);
+  return (
+    <div className={estilos.clave}>
+      <Campo
+        etiqueta="Contraseña"
+        tipo={claveVisible ? "text" : "password"}
+        valor={clave}
+        alCambiar={setClave}
+        autoComplete="current-password"
+      />
+      <button
+        type="button"
+        aria-label="Mostrar contraseña"
+        aria-pressed={claveVisible}
+        onClick={() => {
+          setClaveVisible(!claveVisible);
+        }}
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          aria-hidden="true"
+        >
+          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+          <circle cx="12" cy="12" r="3" />
+          {claveVisible && <path d="m3 3 18 18" />}
+        </svg>
+      </button>
+    </div>
   );
 }

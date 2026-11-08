@@ -1,0 +1,14 @@
+.lista {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.lista > li {
+  padding: 12px 16px;
+  border: 1px solid var(--si-borde);
+  border-radius: var(--si-radio-sm);
+  background: var(--si-superficie);
+  overflow-wrap: anywhere;
+}
