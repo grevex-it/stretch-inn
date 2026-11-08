@@ -5,6 +5,7 @@ import { rutasDeAlumnos } from "@app/personas";
 import { crearAbonos, rutasDeAbonos } from "@app/abonos";
 import { crearAgenda, rutasDeAgenda } from "@app/agenda";
 import { crearAsistencia, rutasDeAsistencia } from "@app/asistencia";
+import { crearCaja, rutasDeCaja } from "@app/caja";
 import { construirApp } from "./app.ts";
 
 const logger = crearLogger({ nivel: "info" });
@@ -48,6 +49,7 @@ await app.register(rutasDeAlumnos(base));
 await app.register(rutasDeAgenda(crearAgenda(base)));
 await app.register(rutasDeAsistencia(crearAsistencia(base)));
 await app.register(rutasDeAbonos(crearAbonos(base)));
+await app.register(rutasDeCaja(crearCaja(base)));
 
 // Railway manda SIGTERM antes de cambiar al deploy nuevo: se terminan los pedidos en curso.
 process.on("SIGTERM", () => {

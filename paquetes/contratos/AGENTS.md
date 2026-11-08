@@ -12,6 +12,7 @@ acuerdo.
 - `src/agenda.ts`: clases semanales de cada sede y la semana de fechas concretas.
 - `src/asistencia.ts`: la planilla de asistencia de una fecha y las marcas que se guardan.
 - `src/abonos.ts`: planes del centro, precios por sede y cuotas mensuales de los alumnos.
+- `src/caja.ts`: cobros con clave de idempotencia, anulaciones y el día de caja.
 - `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
 ## Fuera de alcance
@@ -50,6 +51,9 @@ acuerdo.
 - `fichaDePlan`, `edicionDePlan`, `plan`, `paginaDePlanes`, `planCreado`, `planEditado`,
   `pedidoDePrecioDeSede`, `pedidoDeCuota` (período opcional AAAA-MM), `cuotaGenerada`, `cuota`
   y `paginaDeCuotas`, con sus tipos. Los montos van en pesos enteros.
+- `pedidoDeCobro` (cuota, medio y `claveIdempotencia`), `cobroHecho` (`{ id, monto, repetido }`),
+  `pedidoDeAnulacion` (`{ motivo }`), `pedidoDelDia` (query `?sede&dia&pagina`), `pago` y
+  `diaDeCaja` (una página de pagos más `cobrado`), con sus tipos.
 
 ## Reglas de uso
 
