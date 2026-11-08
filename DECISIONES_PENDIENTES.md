@@ -25,6 +25,7 @@ primero contra Postgres real, en ramas locales apiladas y sin push:
 | 7   | `abonos`                        | Módulo `abonos`: planes, precios por sede, cuotas mensuales y `registrarPago`/`revertirPago`     |
 | 8   | `caja`                          | Módulo `caja`: cobrar con clave de idempotencia, anular, día de caja y `PagoRegistrado` (outbox) |
 | 9   | `worker`                        | `apps/worker`: procesa la cola; hoy `PagoRegistrado` queda en el log                             |
+| 10  | `abonos-cuotas-del-mes`         | Cuotas impagas de una sede y generar las cuotas del mes de una sede                              |
 
 ## Decisiones tomadas sin el usuario (revisar)
 
@@ -83,6 +84,16 @@ revisar. Las reglas de negocio están en un solo lugar del dominio para que camb
     - Revisar: el valor.
 13. **Sin descuentos, recargos por mora, prorrateo ni redondeo a $10/$100** todavía (0011: no
     se suma configuración «por si acaso»).
+14. **[SUPUESTO] Las cuotas del mes son la renovación de las del mes anterior.**
+    - Decisión: `POST /abonos/cuotas/mes` toma las cuotas vigentes (pagas o no) del mes anterior
+      en la sede y genera la del mes con el mismo plan y el precio de hoy. Saltea alumnos y planes
+      de baja y no toca a quien ya la tiene, así que repetirlo no duplica.
+    - Alternativas: guardar el plan de cada alumno (una «suscripción») o derivarlo de las
+      inscripciones de `agenda`.
+    - Por qué: no hay todavía dónde está el plan de cada alumno, y la cuota del mes anterior lo
+      dice sin tabla nueva. Un alumno nuevo recibe su primera cuota a mano.
+    - Revisar: si Stretch Inn prefiere una suscripción explícita o que el worker lo dispare solo
+      el día 1 (eso necesita el actor de sistema, decisión 21).
 
 ### Caja
 
