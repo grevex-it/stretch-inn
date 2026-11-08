@@ -77,3 +77,28 @@ it.each(["Asistencia", "Caja"])(
     expect(servidor.pedidos.every((pedido) => pedido.clave === "GET /api/sesion")).toBe(true);
   },
 );
+
+it("da de alta un plan de abono y vuelve a consultar la lista", async () => {
+  const servidor = servidorFalso({
+    "GET /api/sesion": enCentro(sedes, { permisos: ["abonos.ver", "abonos.gestionar"] }),
+    "GET /api/abonos/planes?pagina=1": {
+      estado: 200,
+      cuerpo: { pagina: 1, porPagina: 50, total: 0, elementos: [] },
+    },
+    "POST /api/abonos/planes": { estado: 201, cuerpo: { id: SUR } },
+  });
+  const usuario = montarPanel();
+  await usuario.click(await screen.findByRole("link", { name: "Abonos" }));
+  await usuario.click(screen.getByText("Nuevo plan"));
+  await usuario.type(screen.getByLabelText("Nombre del plan"), "Mensual");
+  await usuario.type(screen.getByLabelText("Clases por semana"), "2");
+  await usuario.type(screen.getByLabelText("Precio general en pesos"), "12000");
+  await usuario.click(screen.getByRole("button", { name: "Guardar" }));
+  expect(await screen.findByText("Cambios guardados.")).toBeDefined();
+  expect(
+    servidor.pedidos.find((pedido) => pedido.clave === "POST /api/abonos/planes")?.cuerpo,
+  ).toEqual({ nombre: "Mensual", clasesPorSemana: 2, precio: 12000 });
+  expect(
+    servidor.pedidos.filter((pedido) => pedido.clave === "GET /api/abonos/planes?pagina=1"),
+  ).toHaveLength(2);
+});

@@ -1,3 +1,4 @@
+import { CobrarCuota } from "./CobrarCuota.tsx";
 import { diaDeCaja } from "@app/contratos";
 import { useState } from "react";
 import { fechaLocal, ListaRemota, pesos, Resultados } from "../../base/controles/ListaRemota.tsx";
@@ -45,6 +46,7 @@ function Pagos({ sede, zona }: { sede: string; zona: string }) {
   const ruta = `/caja/pagos?sede=${sede}&dia=${dia}`;
   return (
     <>
+      <CobrarCuota sede={sede} />
       <label>
         Día de caja{" "}
         <input

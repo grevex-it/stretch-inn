@@ -1,3 +1,4 @@
+import { MarcarAsistencia } from "./MarcarAsistencia.tsx";
 import { paginaDeOcurrencias, planillaDeAsistencia } from "@app/contratos";
 import { useState } from "react";
 import { fechaLocal, ListaRemota, Resultados } from "../../base/controles/ListaRemota.tsx";
@@ -109,6 +110,9 @@ function Planilla({ fecha }: { fecha: string }) {
               <li key={item.alumnoId}>
                 {item.nombre} {item.apellido} · {item.estado ?? "Sin marcar"}
                 {item.avisoId && " · Avisó ausencia"}
+                {!datos.fecha.cancelada && (
+                  <MarcarAsistencia fecha={fecha} alumnoId={item.alumnoId} estado={item.estado} />
+                )}
               </li>
             )}
           />

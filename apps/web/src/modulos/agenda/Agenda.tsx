@@ -1,3 +1,6 @@
+import type { Clase } from "@app/contratos";
+import { FormularioDesplegable } from "../../base/controles/FormularioRemoto.tsx";
+import { EditarClase } from "./EditarClase.tsx";
 import { paginaDeClases, paginaDeInscriptos } from "@app/contratos";
 import { useState } from "react";
 import { ListaRemota, Resultados } from "../../base/controles/ListaRemota.tsx";
@@ -21,11 +24,12 @@ function AgendaDeSede({
   sede: string;
   sedes: readonly { id: string; nombre: string }[];
 }) {
+  const gestionar = usePermiso("agenda.gestionar");
   const [clase, elegir] = useState<{ id: string; nombre: string }>();
   const ruta = sede === "todas" ? "/agenda/clases" : "/agenda/clases?sede=" + sede;
   return (
     <section>
-      <h1>Agenda</h1>
+      <Encabezado sede={sede} gestionar={gestionar} />
       <ListaRemota
         ruta={ruta}
         esquema={paginaDeClases}
@@ -36,6 +40,7 @@ function AgendaDeSede({
             fila={(item) => (
               <li key={item.id}>
                 <strong>{item.nombre}</strong>
+                {gestionar && <Edicion item={item} />}
                 <p>
                   {dias[item.dia - 1]} · {item.hora} · {item.duracionMinutos} min ·{" "}
                   {sedes.find((s) => s.id === item.sedeId)?.nombre}
@@ -84,5 +89,26 @@ function Inscriptos({ clase }: { clase: { id: string; nombre: string } }) {
         )}
       />
     </section>
+  );
+}
+
+function Encabezado({ sede, gestionar }: { sede: string; gestionar: boolean }) {
+  return (
+    <>
+      <h1>Agenda</h1>{" "}
+      {gestionar && sede !== "todas" && (
+        <FormularioDesplegable titulo="Nueva clase">
+          <EditarClase sede={sede} />
+        </FormularioDesplegable>
+      )}
+    </>
+  );
+}
+
+function Edicion({ item }: { item: Clase }) {
+  return (
+    <FormularioDesplegable titulo="Editar clase">
+      <EditarClase clase={item} sede={item.sedeId} />
+    </FormularioDesplegable>
   );
 }
