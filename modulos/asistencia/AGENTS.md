@@ -31,7 +31,8 @@ recuperar que generan y las reservas de recuperación en otras fechas, con sus l
   `ContextoCentro` de quien la pide y corre en su propia transacción:
   - `planilla(quien, { fechaId, pagina, porPagina })`: la fecha (con su cupo), la misma página
     de sus inscriptos y de los que recuperan (nombre, apellido, si el alumno está activo, su
-    `estado` y su `avisoId`, `null` si no se marcó o no avisó) y los `lugares` libres.
+    `estado` y su `avisoId`, `null` si no se marcó o no avisó; los que recuperan traen además su
+    `recuperacionId`, para anularla) y los `lugares` libres.
   - `tomar(quien, { fechaId, marcas })`: guarda o corrige de 1 a 100 marcas
     (`{ alumnoId, estado }`) de inscriptos o de los que recuperan, todas o ninguna.
   - `avisar(quien, { fechaId, alumnoId })`: registra que no va; devuelve el `id` del aviso y

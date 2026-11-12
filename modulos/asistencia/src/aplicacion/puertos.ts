@@ -38,6 +38,7 @@ export interface Renglon {
   estado: Estado | null;
   /** El aviso de ausencia vigente (con este id se anula), o null si no avisó. */
   avisoId: string | null;
+  recuperacionId?: string;
 }
 
 export interface Planilla {
@@ -127,7 +128,9 @@ export interface RepositorioAsistencia {
   /** false si ya estaba anulada. Anular libera el crédito. */
   anularRecuperacion(id: string, ahora: Date): Promise<boolean>;
   /** Los que recuperan en la fecha, por orden de reserva. */
-  recuperan(filtro: Pagina & { ocurrenciaId: string }): Promise<PaginaDe<{ alumnoId: string }>>;
+  recuperan(
+    filtro: Pagina & { ocurrenciaId: string },
+  ): Promise<PaginaDe<{ alumnoId: string; recuperacionId: string }>>;
   /** Cuáles de esos alumnos recuperan en la fecha (hasta 100). */
   recuperanEntre(ocurrenciaId: string, alumnoIds: readonly string[]): Promise<Set<string>>;
   /** Si el crédito de ese aviso ya se usó en una recuperación vigente. */

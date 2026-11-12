@@ -43,7 +43,7 @@ export async function planilla(
 }
 
 function renglones(
-  pagina: PaginaDe<{ alumnoId: string }>,
+  pagina: PaginaDe<{ alumnoId: string; recuperacionId?: string }>,
   {
     alumnos,
     marcas,
@@ -56,11 +56,19 @@ function renglones(
 ): PaginaDe<Renglon> {
   return {
     ...pagina,
-    elementos: pagina.elementos.flatMap(({ alumnoId }) => {
+    elementos: pagina.elementos.flatMap(({ alumnoId, recuperacionId }) => {
       const alumno = alumnos.get(alumnoId);
       if (alumno === undefined) return [];
       const estado = marcas.get(alumnoId) ?? null;
-      return [{ alumnoId, ...alumno, estado, avisoId: avisos.get(alumnoId) ?? null }];
+      return [
+        {
+          alumnoId,
+          ...alumno,
+          estado,
+          avisoId: avisos.get(alumnoId) ?? null,
+          ...(recuperacionId === undefined ? {} : { recuperacionId }),
+        },
+      ];
     }),
   };
 }
