@@ -20,14 +20,16 @@ export interface Plan extends DatosDePlan {
   preciosDeSede: { sedeId: string; precio: Dinero }[];
 }
 
-/** La cuota de un alumno en un mes. El monto se congela al generarla. */
+/** La cuota de un ciclo de 4 semanas de un alumno (0019). El monto se congela al generarla. */
 export interface Cuota {
   id: string;
   alumnoId: string;
   planId: string;
   sedeId: string;
-  /** AAAA-MM. */
-  periodo: string;
+  /** El primer día del ciclo, AAAA-MM-DD en la zona del centro. */
+  desde: string;
+  /** El día en que termina y empieza el siguiente: desde + 28 días. */
+  hasta: string;
   monto: Dinero;
   pagadaEn: Date | null;
 }
@@ -48,7 +50,7 @@ export interface RepositorioAbonos {
   precioDeSede(planId: string, sedeId: string): Promise<Dinero | undefined>;
   /** El alumno del centro (por la API pública de personas), o undefined. */
   alumno(id: string): Promise<{ activo: boolean } | undefined>;
-  /** El id de la cuota nueva, o undefined si ya tenía una vigente en ese mes. */
+  /** El id de la cuota nueva, o undefined si pisa otro ciclo vigente del alumno. */
   generarCuota(cuota: Omit<Cuota, "id" | "pagadaEn">): Promise<string | undefined>;
   /** La cuota vigente (sin anular), tomada hasta el fin de la transacción si `bloquear`. */
   cuota(id: string, bloquear?: boolean): Promise<Cuota | undefined>;
@@ -67,7 +69,7 @@ export type ErrorDeAbonos =
   | "cambio-concurrente"
   | "alumno-inexistente"
   | "alumno-de-baja"
-  | "periodo-invalido"
+  | "dia-invalido"
   | "ya-tiene-cuota"
   | "cuota-inexistente"
   | "cuota-pagada";
@@ -93,11 +95,14 @@ export interface Abonos {
     quien: ContextoCentro,
     cambio: { planId: string; sedeId: string; precio: number | null },
   ): Promise<Resultado<null, ErrorDeAbonos>>;
-  /** La cuota del alumno en ese mes (por defecto, el actual), con el precio de la sede. */
+  /**
+   * La cuota de un ciclo de 4 semanas que empieza `desde` (por defecto, hoy en el centro), con el
+   * precio de la sede. No puede pisar otro ciclo vigente del alumno.
+   */
   generarCuota(
     quien: ContextoCentro,
-    pedido: { alumnoId: string; planId: string; sedeId: string; periodo?: string },
-  ): Promise<Resultado<{ id: string; monto: Dinero; periodo: string }, ErrorDeAbonos>>;
+    pedido: { alumnoId: string; planId: string; sedeId: string; desde?: string },
+  ): Promise<Resultado<{ id: string; monto: Dinero; desde: string; hasta: string }, ErrorDeAbonos>>;
   /** Solo una cuota sin pagar. No la borra. */
   anularCuota(
     quien: ContextoCentro,

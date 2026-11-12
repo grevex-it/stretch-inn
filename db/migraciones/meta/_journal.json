@@ -187,29 +187,29 @@
     {
       "idx": 26,
       "version": "7",
-      "when": 1794116659061,
-      "tag": "20261108054419_abonos",
+      "when": 1794485501294,
+      "tag": "20261112121141_abonos",
       "breakpoints": true
     },
     {
       "idx": 27,
       "version": "7",
-      "when": 1794116660459,
-      "tag": "20261108054420_rls-abonos",
+      "when": 1794485502935,
+      "tag": "20261112121142_rls-abonos",
       "breakpoints": true
     },
     {
       "idx": 28,
       "version": "7",
-      "when": 1794117375504,
-      "tag": "20261108055615_caja",
+      "when": 1794485998946,
+      "tag": "20261112121958_caja",
       "breakpoints": true
     },
     {
       "idx": 29,
       "version": "7",
-      "when": 1794117376855,
-      "tag": "20261108055616_rls-caja",
+      "when": 1794486000537,
+      "tag": "20261112122000_rls-caja",
       "breakpoints": true
     }
   ]

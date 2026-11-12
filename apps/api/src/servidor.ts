@@ -9,7 +9,7 @@ import {
 } from "@app/plataforma";
 import { crearAcceso, crearEquipo, rutasDeEquipo, rutasDeSesion } from "@app/identidad";
 import { rutasDeAlumnos } from "@app/personas";
-import { crearAbonos, rutasDeAbonos } from "@app/abonos";
+import { crearAbonos, finDelAbono, rutasDeAbonos } from "@app/abonos";
 import { crearAgenda, rutasDeAgenda } from "@app/agenda";
 import { crearAsistencia, rutasDeAsistencia } from "@app/asistencia";
 import { crearCaja, EVENTO_PAGO_REGISTRADO, rutasDeCaja } from "@app/caja";
@@ -59,7 +59,8 @@ await app.register(rutasDeSesion(acceso));
 await app.register(rutasDeEquipo(crearEquipo(base)));
 await app.register(rutasDeAlumnos(base));
 await app.register(rutasDeAgenda(crearAgenda(base)));
-await app.register(rutasDeAsistencia(crearAsistencia(base)));
+// El crédito de una ausencia vence con el abono del alumno (0019): abonos se lo dice a asistencia.
+await app.register(rutasDeAsistencia(crearAsistencia(base, { finDelAbono })));
 await app.register(rutasDeAbonos(crearAbonos(base)));
 await app.register(rutasDeCaja(crearCaja(base, { cola })));
 

@@ -1,5 +1,5 @@
-// Créditos de recuperación sobre Postgres real: el aviso a tiempo da crédito, el tardío no,
-// anular el aviso anula el crédito, el vencimiento y las sedes donde se ven.
+// Créditos de recuperación sobre Postgres real: todo aviso antes del inicio da crédito, que vence
+// con el abono (0019); anular el aviso anula el crédito, el vencimiento y las sedes donde se ven.
 import { crearBase, type Base } from "@app/plataforma";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
 import { crearAsistencia } from "../src/index.ts";
@@ -17,13 +17,17 @@ const PRIMERA = { pagina: 1, porPagina: 50 };
 const HORA = 60 * 60_000;
 const DIA = 24 * HORA;
 
-const aLas = (empiezaEn: Date, corrimiento: number) =>
-  crearAsistencia(base, { ahora: () => new Date(empiezaEn.getTime() + corrimiento) });
+const aLas = (empiezaEn: Date, corrimiento: number, finDelAbono?: Date) =>
+  crearAsistencia(base, {
+    ahora: () => new Date(empiezaEn.getTime() + corrimiento),
+    ...(finDelAbono && { finDelAbono: () => Promise.resolve(finDelAbono) }),
+  });
 
 describe("créditos", () => {
-  it("[SUPUESTO] el aviso con 2 horas o más da crédito, que vence a los 30 días de la fecha", async () => {
+  it("el aviso da crédito, que vence cuando termina el abono del alumno", async () => {
     const { ctx, ana, norte, fecha } = await claseConFecha(base);
-    const antes = aLas(fecha.empiezaEn, -3 * HORA);
+    const finDelAbono = new Date(fecha.empiezaEn.getTime() + 10 * DIA);
+    const antes = aLas(fecha.empiezaEn, -3 * HORA, finDelAbono);
 
     expect(await antes.avisar(ctx, { fechaId: fecha.id, alumnoId: ana })).toMatchObject({
       ok: true,
@@ -35,19 +39,22 @@ describe("créditos", () => {
     expect(lista.valor.elementos[0]).toMatchObject({
       sedeId: norte,
       ocurrenciaId: fecha.id,
-      venceEn: new Date(fecha.empiezaEn.getTime() + 30 * DIA),
+      venceEn: finDelAbono,
     });
   });
 
-  it("el aviso tardío no da crédito", async () => {
+  it("el aviso un minuto antes del inicio también da crédito (sin anticipación mínima)", async () => {
     const { ctx, bea, fecha } = await claseConFecha(base);
-    const tarde = aLas(fecha.empiezaEn, -HORA);
-    expect(await tarde.avisar(ctx, { fechaId: fecha.id, alumnoId: bea })).toMatchObject({
+    const justo = aLas(fecha.empiezaEn, -60_000);
+    expect(await justo.avisar(ctx, { fechaId: fecha.id, alumnoId: bea })).toMatchObject({
       ok: true,
-      valor: { conCredito: false },
+      valor: { conCredito: true },
     });
-    const lista = await tarde.creditos(ctx, { ...PRIMERA, alumnoId: bea });
-    expect(lista.ok && lista.valor.total).toBe(0);
+    const lista = await justo.creditos(ctx, { ...PRIMERA, alumnoId: bea });
+    if (!lista.ok) throw new Error(lista.error.mensaje);
+    expect(lista.valor.elementos[0]?.venceEn).toEqual(
+      new Date(fecha.empiezaEn.getTime() + 28 * DIA),
+    );
   });
 
   it("anular el aviso anula su crédito; un crédito vencido no figura", async () => {
@@ -60,7 +67,7 @@ describe("créditos", () => {
     expect(deAna.ok && deAna.valor.total).toBe(0);
 
     await antes.avisar(ctx, { fechaId: fecha.id, alumnoId: bea });
-    const vencido = aLas(fecha.empiezaEn, 31 * DIA);
+    const vencido = aLas(fecha.empiezaEn, 29 * DIA);
     const deBea = await vencido.creditos(ctx, { ...PRIMERA, alumnoId: bea });
     expect(deBea.ok && deBea.valor.total).toBe(0);
   });

@@ -1,6 +1,6 @@
 {
-  "id": "13114f32-46b4-4ff8-af37-2ba3c74d7844",
-  "prevId": "cd03329d-5b89-433b-b436-6050082d2b71",
+  "id": "aff15bd0-5f4b-4c89-aa97-cc83cb84d8fd",
+  "prevId": "906ef67c-cb2c-41a9-b626-3903cf186407",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -39,9 +39,15 @@
           "primaryKey": false,
           "notNull": true
         },
-        "periodo": {
-          "name": "periodo",
-          "type": "text",
+        "desde": {
+          "name": "desde",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hasta": {
+          "name": "hasta",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
@@ -78,8 +84,8 @@
         }
       },
       "indexes": {
-        "cuotas_alumno_periodo_vigente": {
-          "name": "cuotas_alumno_periodo_vigente",
+        "cuotas_alumno_desde_vigente": {
+          "name": "cuotas_alumno_desde_vigente",
           "columns": [
             {
               "expression": "alumno_id",
@@ -88,7 +94,7 @@
               "nulls": "last"
             },
             {
-              "expression": "periodo",
+              "expression": "desde",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -100,8 +106,8 @@
           "method": "btree",
           "with": {}
         },
-        "cuotas_centro_alumno_periodo": {
-          "name": "cuotas_centro_alumno_periodo",
+        "cuotas_centro_alumno_desde": {
+          "name": "cuotas_centro_alumno_desde",
           "columns": [
             {
               "expression": "centro_id",
@@ -116,7 +122,7 @@
               "nulls": "last"
             },
             {
-              "expression": "periodo",
+              "expression": "desde",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -147,9 +153,9 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "cuotas_periodo": {
-          "name": "cuotas_periodo",
-          "value": "\"cuotas\".\"periodo\" ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'"
+        "cuotas_ciclo": {
+          "name": "cuotas_ciclo",
+          "value": "\"cuotas\".\"hasta\" = \"cuotas\".\"desde\" + 28"
         },
         "cuotas_monto": {
           "name": "cuotas_monto",
@@ -1415,7 +1421,7 @@
         },
         "pagos_medio": {
           "name": "pagos_medio",
-          "value": "\"pagos\".\"medio\" in ('efectivo', 'transferencia', 'debito', 'credito', 'mercadopago')"
+          "value": "\"pagos\".\"medio\" in ('efectivo', 'transferencia')"
         },
         "pagos_registrado_por": {
           "name": "pagos_registrado_por",

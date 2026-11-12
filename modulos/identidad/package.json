@@ -10,6 +10,7 @@
     "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
   },
   "dependencies": {
+    "@app/centros": "workspace:*",
     "@app/contratos": "workspace:*",
     "@app/nucleo": "workspace:*",
     "@app/plataforma": "workspace:*",

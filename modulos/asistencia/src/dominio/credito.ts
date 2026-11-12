@@ -1,15 +1,11 @@
-// Cuándo un aviso de ausencia da crédito para recuperar y hasta cuándo vale. Puro.
-// [SUPUESTO] Hasta que Stretch Inn defina sus reglas (ver AGENTS.md, Pendientes).
+// Hasta cuándo vale el crédito de un aviso de ausencia (0019). Puro. Todo aviso antes del inicio
+// da crédito: no hay anticipación mínima.
 
-/** [SUPUESTO] El aviso tiene que llegar con 2 horas de anticipación o más. */
-const ANTICIPACION_MS = 2 * 60 * 60_000;
-/** [SUPUESTO] El crédito vale 30 días desde la fecha a la que se faltó. */
-const VIGENCIA_MS = 30 * 24 * 60 * 60_000;
+/** [SUPUESTO] Sin abono vigente, el crédito vale 4 semanas desde la fecha a la que se faltó. */
+const SIN_ABONO_MS = 28 * 24 * 60 * 60_000;
 
-export function daCredito(empiezaEn: Date, avisadoEn: Date): boolean {
-  return empiezaEn.getTime() - avisadoEn.getTime() >= ANTICIPACION_MS;
-}
-
-export function venceEl(empiezaEn: Date): Date {
-  return new Date(empiezaEn.getTime() + VIGENCIA_MS);
+/** El crédito vence cuando termina el abono del alumno en el que se faltó. */
+export function venceEl(empiezaEn: Date, finDelAbono: Date | undefined): Date {
+  if (finDelAbono !== undefined && finDelAbono > empiezaEn) return finDelAbono;
+  return new Date(empiezaEn.getTime() + SIN_ABONO_MS);
 }

@@ -2,7 +2,6 @@
 import { pesos } from "@app/nucleo";
 import { describe, expect, it } from "vitest";
 import { limpiarPlan, precioEnSede } from "../../src/dominio/plan.ts";
-import { esPeriodo, periodoDe } from "../../src/dominio/periodo.ts";
 
 const PLAN = { nombre: " Dos por semana ", clasesPorSemana: 2, precio: 30_000 };
 
@@ -32,23 +31,5 @@ describe("precioEnSede", () => {
   it("la sede usa su precio si lo tiene; si no, el general (0011)", () => {
     expect(precioEnSede(pesos(30_000), pesos(28_000))).toBe(28_000);
     expect(precioEnSede(pesos(30_000), undefined)).toBe(30_000);
-  });
-});
-
-describe("períodos", () => {
-  it("[SUPUESTO] el período es el mes calendario en la zona del centro", () => {
-    // A las 02:00 UTC del 1 de diciembre, en Buenos Aires (UTC−3) todavía es 30 de noviembre.
-    expect(periodoDe(new Date("2026-12-01T02:00:00Z"), "America/Argentina/Buenos_Aires")).toBe(
-      "2026-11",
-    );
-    expect(periodoDe(new Date("2026-12-01T04:00:00Z"), "America/Argentina/Buenos_Aires")).toBe(
-      "2026-12",
-    );
-  });
-
-  it("un período es AAAA-MM con un mes válido", () => {
-    expect(esPeriodo("2026-11")).toBe(true);
-    expect(esPeriodo("2026-13")).toBe(false);
-    expect(esPeriodo("2026-1")).toBe(false);
   });
 });

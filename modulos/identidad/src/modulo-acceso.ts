@@ -1,5 +1,6 @@
 // Arma el login y las sesiones con sus adaptadores, a mano (ver docs/decisiones/0003 y 0017).
-import type { Base } from "@app/plataforma";
+import { obtenerCentro } from "@app/centros";
+import { enContexto, type Base } from "@app/plataforma";
 import * as casos from "./aplicacion/acceso.ts";
 import type { Acceso, Claves } from "./aplicacion/puertos-acceso.ts";
 import { crearLimiteDeIntentos, type OpcionesLimite } from "./dominio/intentos.ts";
@@ -43,6 +44,10 @@ export function crearAcceso(base: Base, opciones: OpcionesAcceso = {}): Acceso {
       centro === null
         ? []
         : deps.repo.nombresDeSedes(cuentaId, centro.contexto.centroId, centro.sedes),
+    zonaHoraria: async ({ centro }) =>
+      centro === null
+        ? null
+        : ((await enContexto(base, centro.contexto, obtenerCentro))?.zonaHoraria ?? null),
     elegirCentro: (sesion, centroId) => casos.elegirCentro(deps, sesion, centroId),
     elegirSede: (sesion, sede) => casos.elegirSede(deps, sesion, sede),
     salir: (sesion) => deps.repo.revocar(sesion.sesionId, deps.ahora()),
