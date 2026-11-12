@@ -1,0 +1,32 @@
+.formulario {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  padding-block: 12px;
+}
+
+.formulario fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.formulario label {
+  display: grid;
+  gap: 4px;
+}
+
+.formulario :is(input, select) {
+  min-height: var(--si-alto-control-min);
+  max-width: 100%;
+  padding-inline: 8px;
+  font: inherit;
+  color: var(--si-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-sm);
+}

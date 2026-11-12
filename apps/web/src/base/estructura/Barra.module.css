@@ -10,8 +10,8 @@
 }
 
 .logo {
-  width: 36px;
-  height: 36px;
+  width: clamp(120px, 18vw, 160px);
+  height: auto;
 }
 
 .nombre {
@@ -19,5 +19,46 @@
 }
 
 .salir {
+  display: grid;
+  place-items: center;
+  width: var(--si-alto-control-min);
+  height: var(--si-alto-control-min);
   margin-left: auto;
+  padding: 0;
+  color: inherit;
+  background: var(--si-oliva-800);
+  border: 1px solid var(--si-oliva-400);
+  border-radius: var(--si-radio-sm);
+  cursor: pointer;
+}
+
+.salir:hover:not(:disabled) {
+  background: var(--si-oliva-700);
+}
+
+.salir:focus-visible {
+  outline: 2px solid var(--si-foco-sobre-oliva);
+  outline-offset: 2px;
+}
+
+.salir:disabled {
+  cursor: progress;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flecha {
+    transition: transform 220ms ease-out;
+  }
+
+  .salir:hover:not(:disabled) .flecha,
+  .salir:focus-visible:not(:disabled) .flecha {
+    transform: translateX(5px);
+  }
+}
+
+@media (max-width: 600px) {
+  .logo {
+    display: block;
+    width: 36px;
+  }
 }

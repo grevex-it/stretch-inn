@@ -23,6 +23,7 @@ const renglon = z.object({
   estado: estado.nullable(),
   /** El aviso de ausencia vigente (con este id se anula), o null si no avisó. */
   avisoId: z.uuid().nullable(),
+  recuperacionId: z.uuid().optional(),
 });
 
 /** Cuerpo de POST /asistencia/fechas/:id/avisos. */

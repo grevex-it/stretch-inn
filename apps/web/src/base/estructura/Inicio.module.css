@@ -1,17 +1,53 @@
 .inicio {
   display: grid;
+  gap: 24px;
+}
+
+.bienvenida {
+  display: grid;
   gap: 8px;
+  padding: clamp(24px, 5vw, 56px);
+  border-radius: var(--si-radio-lg);
+  background: var(--si-degrade-marca);
+  color: var(--si-texto-sobre-oliva);
 }
 
-.titulo {
+.bienvenida h1 {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: var(--si-peso-medio);
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  line-height: 1.1;
+}
+
+.bienvenida p {
+  margin: 0;
+}
+
+.accesos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+
+.tarjeta {
+  display: grid;
+  gap: 8px;
+  padding: 24px;
+  border: 1px solid var(--si-borde);
+  border-radius: var(--si-radio-lg);
+  background: var(--si-superficie);
   color: var(--si-texto);
+  text-decoration: none;
 }
 
-.texto {
-  margin: 0;
-  font-weight: var(--si-peso-liviano);
+.tarjeta:hover {
+  border-color: var(--si-borde-control);
+  background: var(--si-crema-50);
+}
+
+.tarjeta strong {
+  font-size: 1.25rem;
+}
+
+.tarjeta span {
   color: var(--si-texto-suave);
 }
