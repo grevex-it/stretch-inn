@@ -45,10 +45,10 @@ Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@ap
 
 ## A relevar con Stretch Inn
 
-Casi todo quedó respondido en 0019. Falta:
+Casi todo quedó respondido en 0019 y 0020. Falta:
 
-- **Pago tarde:** ¿las 4 semanas nuevas cuentan desde el pago o desde la fecha que le tocaba? Está en un audio que falta pasar a texto.
-- **Falta sin avisar:** ¿da derecho a recuperar, igual que una falta avisada?
+- **Falta sin avisar:** ¿gasta una clase del abono? ¿Da derecho a recuperar, igual que una falta avisada?
+- **Viaje:** ¿las semanas de viaje gastan clases del abono, y la media cuota es para guardar el lugar del mes siguiente? Mientras tanto, otro alumno puede ocupar ese lugar.
 - **Momentos pico, alumnos activos y horarios por semana:** para la prueba de carga (0013).
 
 ## Trámites y comercial
@@ -72,6 +72,9 @@ Casi todo quedó respondido en 0019. Falta:
 Lo que quedó abierto de la pila de asistencia, abonos, caja y worker. Lo que ya respondió Stretch
 Inn está en 0019; los supuestos menores de cada módulo, en su `AGENTS.md`.
 
+- **Rehacer `abonos` según 0020:** el abono pasa de ciclo de 28 días a paquete de clases, con la
+  clase suelta y el cambio entre las dos formas de pago. Afecta también el vencimiento del crédito
+  en `asistencia` y el panel.
 - **Actor de sistema en el `ContextoCentro`** (estructura): lo necesitan las tareas programadas
   del worker, como renovar los ciclos que terminan y avisar el pago ese día (0019). Hoy el
   contexto solo admite usuario y soporte.

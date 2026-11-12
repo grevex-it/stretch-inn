@@ -1,6 +1,7 @@
 # 0019 — Abonos, recuperaciones, sedes y permisos según Stretch Inn
 
-**Fecha:** 12/11/2026 · **Estado:** propuesta
+**Fecha:** 12/11/2026 · **Estado:** propuesta · La parte de abonos (cómo se gasta el abono y
+cuándo vence el crédito) la reemplaza 0020.
 
 ## Contexto
 
@@ -21,6 +22,8 @@ propio de Stretch Inn.
 ## Decisión
 
 ### Abonos
+
+_Reemplazado por 0020: el abono es un paquete de 4 clases, no un período de 4 semanas._
 
 - **El abono es de 4 clases y dura 4 semanas desde el pago**, no un mes calendario. A las 4
   semanas se avisa que hay que volver a pagar, haya venido o no. El aviso sale ese mismo día, no
