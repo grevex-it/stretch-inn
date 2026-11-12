@@ -18,6 +18,7 @@ de los permisos efectivos (0007).
 
 - `@app/nucleo`
 - `@app/plataforma`
+- `@app/centros` (la zona horaria del centro activo, para la sesión)
 - `@app/contratos` (rutas HTTP)
 
 ## API pública
@@ -51,8 +52,8 @@ Login y sesiones (0017):
 - `crearAcceso(base, { ahora?, limite? })`: una instancia por proceso, porque el límite de
   intentos vive en su memoria. Devuelve `Acceso`: `entrar`, `resolver(token)` (la sesión con su
   `ContextoCentro` ya limitado a la sede activa), `centros`, `sedes` (las del selector, con
-  nombre), `elegirCentro`, `elegirSede`,
-  `salir` y `cambiarClave`.
+  nombre), `zonaHoraria` (la del centro activo, leída de `centros`), `elegirCentro`,
+  `elegirSede`, `salir` y `cambiarClave`.
 - `rutasDeSesion(acceso)`: plugin de Fastify con `POST/GET/DELETE /sesion` y
   `PUT /sesion/centro`, `/sesion/sede` y `/sesion/clave`. La API resuelve la sesión antes
   (`apps/api/src/base/sesion.ts`).
