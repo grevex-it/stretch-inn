@@ -4,6 +4,8 @@ _Última actualización: 12/11/2026._
 
 Orden en que se construye el sistema. El porqué de cada pieza está en `docs/decisiones/`; los temas abiertos, en `docs/pendientes.md`. Cada fase indica su frente (ver 0006).
 
+El documento de [alcance y reglas compartidas](alcance-y-reglas-compartidas.md) define cómo se conectan los módulos y qué recorridos validar en cada entrega.
+
 ## Primer lanzamiento para Stretch Inn
 
 Fases 0 a 3 con el panel (`apps/web`). El sistema central incluye alumnos y profesores, agenda y cupos, asistencia y recuperaciones, abonos, pagos y gastos, reportes y administración de Río Tercero y Mendoza con permisos por sede. El portal de alumnos (Fase 4) y WhatsApp (Fase 5) quedan para una segunda entrega.
