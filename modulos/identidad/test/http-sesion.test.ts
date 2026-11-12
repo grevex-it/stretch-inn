@@ -35,6 +35,7 @@ function accesoDoble() {
     resolver: vi.fn<Acceso["resolver"]>(() => Promise.resolve(sesion)),
     centros: vi.fn<Acceso["centros"]>(() => Promise.resolve([{ id: SEDE, nombre: "Centro" }])),
     sedes: vi.fn<Acceso["sedes"]>(() => Promise.resolve([{ id: SEDE, nombre: "Norte" }])),
+    zonaHoraria: vi.fn<Acceso["zonaHoraria"]>(() => Promise.resolve("America/Montevideo")),
     elegirCentro: vi.fn<Acceso["elegirCentro"]>(() => Promise.resolve(ok(null))),
     elegirSede: vi.fn<Acceso["elegirSede"]>(() => Promise.resolve(ok(null))),
     salir: vi.fn<Acceso["salir"]>(() => Promise.resolve()),
@@ -123,6 +124,7 @@ describe("estado, centro, sede, clave y salida", () => {
         sedes: [{ id: SEDE, nombre: "Norte" }],
         sedeCambiada: false,
         permisos: ["caja.ver", "usuarios.ver"],
+        zonaHoraria: "America/Montevideo",
       },
     });
   });
