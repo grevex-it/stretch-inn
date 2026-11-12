@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@app/agenda": "workspace:*",
+    "@app/asistencia": "workspace:*",
     "@app/identidad": "workspace:*",
     "@app/personas": "workspace:*",
     "pg": "^8.23.1"

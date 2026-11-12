@@ -69,3 +69,9 @@ export {
   type PedidoDeClases,
   type PedidoDeOcurrencias,
 } from "./agenda.ts";
+export {
+  pedidoDeAsistencia,
+  planillaDeAsistencia,
+  type PedidoDeAsistencia,
+  type PlanillaDeAsistencia,
+} from "./asistencia.ts";

@@ -127,6 +127,20 @@
       "when": 1794091131535,
       "tag": "20261107223851_rls-inscripciones",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794113855546,
+      "tag": "20261108045735_asistencia",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794113856944,
+      "tag": "20261108045736_rls-asistencia",
+      "breakpoints": true
     }
   ]
 }

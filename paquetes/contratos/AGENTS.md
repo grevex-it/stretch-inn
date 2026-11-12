@@ -10,6 +10,7 @@ acuerdo.
 - `src/equipo.ts`: lista del equipo y de roles, alta, clave temporal (0017).
 - `src/alumnos.ts`: lista con buscador, ficha, alta y edición de alumnos (0011).
 - `src/agenda.ts`: clases semanales de cada sede y la semana de fechas concretas.
+- `src/asistencia.ts`: la planilla de asistencia de una fecha y las marcas que se guardan.
 - `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
 ## Fuera de alcance
@@ -37,6 +38,9 @@ acuerdo.
   viajan en UTC como texto ISO.
 - `pedidoDeInscripcion`, `inscripcionHecha`, `inscripto`, `paginaDeInscriptos`, `claseDeAlumno`
   y `paginaDeClasesDeAlumno`, con sus tipos.
+- `pedidoDeAsistencia` (de 1 a 100 marcas `{ alumnoId, estado }`, presente o ausente) y
+  `planillaDeAsistencia` (la fecha y una página de sus inscriptos con su `estado`, `null` si no
+  se marcó), con sus tipos.
 
 ## Reglas de uso
 

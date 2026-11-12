@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@app/agenda": "workspace:*",
+    "@app/asistencia": "workspace:*",
     "@app/identidad": "workspace:*",
     "@app/nucleo": "workspace:*",
     "@app/personas": "workspace:*",
