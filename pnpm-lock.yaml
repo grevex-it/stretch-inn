@@ -50,6 +50,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@app/abonos':
+        specifier: workspace:*
+        version: link:../../modulos/abonos
       '@app/agenda':
         specifier: workspace:*
         version: link:../../modulos/agenda
@@ -146,6 +149,9 @@ importers:
 
   herramientas:
     dependencies:
+      '@app/abonos':
+        specifier: workspace:*
+        version: link:../modulos/abonos
       '@app/agenda':
         specifier: workspace:*
         version: link:../modulos/agenda
@@ -169,6 +175,46 @@ importers:
         specifier: workspace:*
         version: link:../paquetes/plataforma
       '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+
+  modulos/abonos:
+    dependencies:
+      '@app/centros':
+        specifier: workspace:*
+        version: link:../centros
+      '@app/contratos':
+        specifier: workspace:*
+        version: link:../../paquetes/contratos
+      '@app/nucleo':
+        specifier: workspace:*
+        version: link:../../paquetes/nucleo
+      '@app/personas':
+        specifier: workspace:*
+        version: link:../personas
+      '@app/plataforma':
+        specifier: workspace:*
+        version: link:../../paquetes/plataforma
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(@opentelemetry/api@1.10.0)(@types/pg@8.23.1)(pg@8.23.1)
+      fastify:
+        specifier: ^5.12.7
+        version: 5.12.7
+      zod:
+        specifier: ^4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@app/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@app/identidad':
+        specifier: workspace:*
+        version: link:../identidad
+      '@types/pg':
+        specifier: ^8.23.1
+        version: 8.23.1
+      pg:
         specifier: ^8.23.1
         version: 8.23.1
 
