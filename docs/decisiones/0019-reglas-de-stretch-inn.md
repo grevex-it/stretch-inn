@@ -5,11 +5,13 @@
 ## Contexto
 
 Stretch Inn respondió el documento «Sistema de gestión — Puntos a definir» (07/10/2026) y un
-formulario con los últimos puntos (12/11/2026). Las respuestas cierran casi todo lo que estaba en
+formulario con los últimos puntos (12/11/2026). Las sedes se corrigieron con la cotización de
+GREVEX del 12/11/2026. Las respuestas cierran casi todo lo que estaba en
 `docs/pendientes.md`, en «A relevar con Stretch Inn», y contradicen varios supuestos de los
 módulos `asistencia`, `abonos` y `caja` que están en revisión.
 
-Cómo trabaja hoy el centro: una sede en Mendoza, con dos sedes más previstas para el año que viene.
+Cómo trabaja hoy el centro: una sede en **Río Tercero**. **Mendoza** se suma en la primera entrega
+del sistema, con su propio encargado, y después pueden venir más sedes.
 Hay una sola actividad (hamacas): 5 por horario hoy, y se suman a medida que hay demanda. Llevan la
 operación en una planilla.
 
@@ -65,7 +67,9 @@ propio de Stretch Inn.
 ### Equipo y permisos
 
 - **Hoy:** Lore y Lucas ven todo, y la contadora también. No hay encargados ni recepción. Cada
-  sede nueva va a tener su encargado.
+  sede nueva va a tener su encargado; Mendoza, la primera.
+- **Administración:** quien tiene permisos en Río Tercero y Mendoza ve las dos y el consolidado.
+  El encargado de una sede opera y ve los reportes solo de la suya.
 - **Encargados y profes de varias sedes** se resuelven con roles personalizados y roles por
   sede (0007). No se agregan reglas fijas.
 - **Profes:**
