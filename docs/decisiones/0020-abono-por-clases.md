@@ -32,37 +32,31 @@ semana:
 ### Cómo se gasta el abono
 
 - Cada **fecha del horario fijo** del alumno gasta una clase del abono, venga o falte.
-- **La falta avisada gasta la clase, pero da un crédito** para recuperarla.
-- **Recuperar no gasta una clase nueva:** usa el crédito.
-- **El abono termina con su última clase.** El crédito de una falta vence ahí: si no lo usó, lo
-  pierde.
+- **La falta gasta la clase**, avise o no, y el alumno la puede recuperar (ver más abajo).
+- **Recuperar no gasta una clase nueva.**
+- **El abono termina con su última clase.** Las recuperaciones que no hizo hasta ahí, las pierde.
 - **El aviso de pago sale cuando el alumno usa la última clase del abono**, no a las 4 semanas.
 
 ### Recuperaciones: reglas de cada sede, configurables desde el panel
 
-Cada sede trabaja distinto, y la regla tiene que poder cambiarse desde el sistema, sin tocar
-código (0011). Quien tenga el permiso de configuración de la sede ajusta estos valores en el
-panel:
+En las dos sedes el alumno **siempre puede recuperar si hay lugar**, haya avisado la falta o no
+(12/11/2026). No toman lista. Lo que cambia entre sedes se ajusta desde el panel, sin tocar
+código (0011), con el permiso de configuración de la sede:
 
-- **¿Hace falta avisar la falta para recuperar?**
-  - **No:** el alumno, o el equipo por él, reserva la recuperación directamente si hay lugar.
-  - **Sí:** el aviso de falta da el crédito para recuperar. El alumno avisa desde el portal
-    (Fase 4; hasta entonces, el equipo desde el panel), con la **anticipación** que fije la sede.
-    Si se olvidó, el equipo le habilita el crédito con un permiso propio, y queda registrado quién
-    lo dio y por qué.
-- **Máximo de recuperaciones por abono.** Vale también para los créditos que habilita el equipo.
-- En todos los casos se recupera dentro del abono y con lugar disponible, y recuperar no gasta una
-  clase nueva.
+- **Anticipación para reservar la recuperación:** cuánto antes de la clase en la que recupera
+  tiene que anotarse, para que la sede pueda ubicarlo. **Río Tercero:** hasta que empieza la
+  clase. **Mendoza:** hasta **una hora antes**.
+- **Máximo de recuperaciones por abono:** arranca en las clases del abono (4) en las dos sedes,
+  para que alguien que vino a todas no sume recuperaciones sin tope. Mendoza hoy usa 2; cada sede
+  lo ajusta desde el panel.
 
-**Río Tercero** (12/11/2026): el alumno siempre puede recuperar si hay lugar, avise o no y con
-cualquier anticipación. No toman lista. Máximo por abono: arranca en las clases del abono (4),
-para que alguien que vino a todas no sume recuperaciones sin tope; el centro lo ajusta desde el
-panel, como el resto de estas reglas.
+Además:
 
-**Mendoza:** hoy pide aviso una hora antes y permite hasta 2 recuperaciones por abono. Falta
-confirmar cómo queda.
-
-Una sede nueva arranca con los valores de Río Tercero.
+- Se recupera dentro del abono y con lugar disponible, y recuperar no gasta una clase nueva.
+- **El aviso de falta no es condición para recuperar**, pero sirve: libera el lugar de esa fecha
+  para que otro recupere. El alumno avisa desde el portal (Fase 4) y, hasta entonces, el equipo
+  desde el panel.
+- Una sede nueva arranca con los valores de Río Tercero.
 
 ### Desde cuándo cuenta el abono nuevo
 
@@ -78,9 +72,9 @@ Una sede nueva arranca con los valores de Río Tercero.
 - **`abonos`:** la cuota deja de ser un ciclo de 28 días por calendario (`desde`/`hasta`). Pasa a
   ser un paquete de N clases o una clase suelta, y hay que saber qué clases ya se gastaron. Las
   clases las dan `agenda` (las fechas del horario fijo) y `asistencia` (si vino, faltó o recuperó).
-- **`asistencia`:** el crédito vence con la última clase del abono, que ya no es una fecha de
-  calendario. Recuperar sigue la regla de la sede: con o sin aviso previo, con la anticipación y
-  el máximo que fije. El equipo puede habilitar un crédito con un permiso nuevo (con motivo).
+- **`asistencia`:** recuperar ya no depende de un crédito por aviso. Alcanza con estar dentro del
+  abono, que haya lugar y respetar la anticipación y el máximo de la sede. El aviso sigue
+  liberando el lugar de la fecha. Los créditos por aviso que hoy tiene el módulo se reemplazan.
 - **Configuración por sede editable desde el panel:** las reglas de recuperación y el tamaño del
   abono.
 - **Renovación y aviso de pago:** se disparan cuando se gasta la última clase, no por fecha.

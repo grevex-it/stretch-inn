@@ -47,7 +47,6 @@ Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@ap
 
 Casi todo quedó respondido en 0019 y 0020. Falta:
 
-- **Recuperaciones en Mendoza:** ¿sigue pidiendo aviso una hora antes y hasta 2 recuperaciones por abono? Se configura desde el panel (0020).
 - **Viaje:** ¿las semanas de viaje gastan clases del abono, y la media cuota es para guardar el lugar del mes siguiente? Mientras tanto, otro alumno puede ocupar ese lugar.
 - **Momentos pico, alumnos activos y horarios por semana:** para la prueba de carga (0013).
 
