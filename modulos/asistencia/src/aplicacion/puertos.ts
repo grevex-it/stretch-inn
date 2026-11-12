@@ -2,6 +2,7 @@
 import type { ContextoCentro, Resultado } from "@app/nucleo";
 import type { ErrorDeAviso } from "../dominio/aviso.ts";
 import type { ErrorDePlanilla, Estado, Marca } from "../dominio/planilla.ts";
+import type { ErrorDeRecuperacion } from "../dominio/recuperacion.ts";
 
 export interface Pagina {
   pagina: number;
@@ -19,6 +20,8 @@ export interface Fecha {
   claseId: string;
   sedeId: string;
   nombre: string;
+  /** Lugares por fecha de la clase. */
+  cupo: number;
   fecha: string;
   empiezaEn: Date;
   terminaEn: Date;
@@ -39,7 +42,12 @@ export interface Renglon {
 
 export interface Planilla {
   fecha: Fecha;
+  /** Los inscriptos de la fecha (una página). */
   alumnos: PaginaDe<Renglon>;
+  /** Los que recuperan en la fecha (la misma página). */
+  recuperan: PaginaDe<Renglon>;
+  /** Lugares libres para recuperar. */
+  lugares: number;
 }
 
 /** Quien registra la marca: un usuario del centro o soporte (0008). */
@@ -95,6 +103,35 @@ export interface RepositorioAsistencia {
   creditos(
     filtro: Pagina & { alumnoId: string; sedeIds: readonly string[]; ahora: Date },
   ): Promise<PaginaDe<Credito>>;
+  /** Toma la fecha hasta el fin de la transacción: lo que mueve sus lugares va de a uno. */
+  bloquearFecha(id: string): Promise<void>;
+  /** Lo que mueve los lugares de la fecha: inscriptos (agenda), avisos y recuperaciones. */
+  cuentaDeLugares(
+    fecha: Pick<Fecha, "id" | "claseId" | "empiezaEn">,
+  ): Promise<{ inscriptos: number; avisos: number; recuperaciones: number }>;
+  /** El crédito sin usar de esa sede que vence antes, vigente al empezar la fecha. */
+  creditoParaUsar(filtro: {
+    alumnoId: string;
+    sedeId: string;
+    empiezaEn: Date;
+    ahora: Date;
+  }): Promise<{ id: string } | undefined>;
+  /** El id de la recuperación nueva, o undefined si ya recupera en esa fecha. */
+  recuperar(
+    fecha: Pick<Fecha, "id" | "sedeId">,
+    reserva: { alumnoId: string; creditoId: string },
+    registro: Registro,
+  ): Promise<string | undefined>;
+  /** La recuperación vigente, o undefined si no existe o ya se anuló. */
+  recuperacion(id: string): Promise<{ ocurrenciaId: string } | undefined>;
+  /** false si ya estaba anulada. Anular libera el crédito. */
+  anularRecuperacion(id: string, ahora: Date): Promise<boolean>;
+  /** Los que recuperan en la fecha, por orden de reserva. */
+  recuperan(filtro: Pagina & { ocurrenciaId: string }): Promise<PaginaDe<{ alumnoId: string }>>;
+  /** Cuáles de esos alumnos recuperan en la fecha (hasta 100). */
+  recuperanEntre(ocurrenciaId: string, alumnoIds: readonly string[]): Promise<Set<string>>;
+  /** Si el crédito de ese aviso ya se usó en una recuperación vigente. */
+  creditoUsado(avisoId: string): Promise<boolean>;
 }
 
 /**
@@ -124,7 +161,13 @@ export type ErrorDeAsistencia =
   | "sin-permiso"
   | "no-inscripto"
   | "ya-avisado"
-  | "aviso-inexistente";
+  | "aviso-inexistente"
+  | ErrorDeRecuperacion
+  | "sin-creditos"
+  | "ya-recupera"
+  | "ya-inscripto"
+  | "recuperacion-inexistente"
+  | "credito-usado";
 
 export interface Asistencia {
   /** La fecha y una página de sus inscriptos, con la marca de cada uno. */
@@ -151,5 +194,15 @@ export interface Asistencia {
   anularAviso(
     quien: ContextoCentro,
     aviso: { id: string },
+  ): Promise<Resultado<null, ErrorDeAsistencia>>;
+  /** Reserva un lugar en la fecha con el crédito que vence antes. */
+  recuperar(
+    quien: ContextoCentro,
+    reserva: { fechaId: string; alumnoId: string },
+  ): Promise<Resultado<{ id: string }, ErrorDeAsistencia>>;
+  /** Anula la reserva antes de que empiece la fecha: el crédito vuelve a estar libre. */
+  anularRecuperacion(
+    quien: ContextoCentro,
+    reserva: { id: string },
   ): Promise<Resultado<null, ErrorDeAsistencia>>;
 }

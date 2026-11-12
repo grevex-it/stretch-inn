@@ -4,13 +4,14 @@ import type { Transaccion } from "@app/plataforma";
 import { and, asc, count, eq, gt, inArray, isNull, sql, type SQL } from "drizzle-orm";
 import type { RepositorioAsistencia } from "../aplicacion/puertos.ts";
 import { creditos } from "./esquema.ts";
+import { sinUsar } from "./repositorio-recuperaciones.ts";
 
 type RepositorioCreditos = Pick<
   RepositorioAsistencia,
   "crearCredito" | "anularCreditoDeAviso" | "creditos"
 >;
 
-/** Vigente: no anulado y sin vencer. */
+/** Vigente: no anulado y sin vencer (y, en la lista, sin usar). */
 const vigente = (ahora: Date): SQL | undefined =>
   and(isNull(creditos.anuladoEn), gt(creditos.venceEn, ahora));
 
@@ -41,6 +42,7 @@ export function repositorioCreditos(tx: Transaccion): RepositorioCreditos {
         eq(creditos.alumnoId, alumnoId),
         inArray(creditos.sedeId, [...sedeIds]),
         vigente(ahora),
+        sinUsar(tx),
       );
       const elementos = await tx
         .select({

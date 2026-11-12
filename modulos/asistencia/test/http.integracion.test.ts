@@ -1,6 +1,11 @@
 // Rutas /asistencia sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // asistencia. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula.
-import { avisoHecho, paginaDeCreditos, planillaDeAsistencia } from "@app/contratos";
+import {
+  avisoHecho,
+  paginaDeCreditos,
+  planillaDeAsistencia,
+  recuperacionHecha,
+} from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
 import Fastify, { type FastifyContextConfig } from "fastify";
@@ -50,7 +55,30 @@ describe("rutas de la asistencia", () => {
       "POST /asistencia/fechas/:id/avisos": "asistencia.avisar",
       "DELETE /asistencia/avisos/:id": "asistencia.avisar",
       "GET /alumnos/:id/creditos": "asistencia.ver",
+      "POST /asistencia/fechas/:id/recuperaciones": "asistencia.recuperar",
+      "DELETE /asistencia/recuperaciones/:id": "asistencia.recuperar",
     });
+  });
+
+  it("POST recupera (201 con el id), DELETE lo anula (204) y sin crédito da 409", async () => {
+    const { ctx, ana, bea, fecha, otraClase } = await claseConFecha(base);
+    const { servidor } = await app(ctx, new Date(fecha.empiezaEn.getTime() - 3 * 60 * 60_000));
+    await servidor.inject({
+      method: "POST",
+      url: `/asistencia/fechas/${fecha.id}/avisos`,
+      payload: { alumnoId: ana },
+    });
+    const yoga = await otraClase(2, 0);
+    const url = `/asistencia/fechas/${yoga.fecha.id}/recuperaciones`;
+
+    const reserva = await servidor.inject({ method: "POST", url, payload: { alumnoId: ana } });
+    expect(reserva.statusCode).toBe(201);
+    const { id } = recuperacionHecha.parse(reserva.json());
+    const sinCredito = await servidor.inject({ method: "POST", url, payload: { alumnoId: bea } });
+    expect(sinCredito.statusCode).toBe(409);
+    const anular = { method: "DELETE" as const, url: `/asistencia/recuperaciones/${id}` };
+    expect((await servidor.inject(anular)).statusCode).toBe(204);
+    expect((await servidor.inject(anular)).statusCode).toBe(404);
   });
 
   it("GET /alumnos/:id/creditos devuelve los créditos vigentes con el contrato", async () => {

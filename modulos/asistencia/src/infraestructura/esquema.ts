@@ -51,6 +51,35 @@ export const creditos = pgTable(
   ],
 );
 
+/** Un lugar reservado para recuperar en una fecha, con un crédito. Anular no borra. */
+export const recuperaciones = pgTable(
+  "recuperaciones",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    centroId: uuid("centro_id").notNull(),
+    sedeId: uuid("sede_id").notNull(),
+    /** La fecha en la que recupera. */
+    ocurrenciaId: uuid("ocurrencia_id").notNull(),
+    alumnoId: uuid("alumno_id").notNull(),
+    creditoId: uuid("credito_id").notNull(),
+    reservadaPorTipo: text("reservada_por_tipo").$type<"usuario" | "soporte">().notNull(),
+    reservadaPorId: uuid("reservada_por_id").notNull(),
+    reservadaEn: timestamp("reservada_en", { withTimezone: true }).notNull(),
+    anuladaEn: timestamp("anulada_en", { withTimezone: true }),
+  },
+  (tabla) => [
+    // Un crédito se usa una sola vez; un alumno recupera a lo sumo una vez por fecha.
+    uniqueIndex("recuperaciones_credito_vigente")
+      .on(tabla.creditoId)
+      .where(sql`${tabla.anuladaEn} is null`),
+    uniqueIndex("recuperaciones_ocurrencia_alumno_vigente")
+      .on(tabla.ocurrenciaId, tabla.alumnoId)
+      .where(sql`${tabla.anuladaEn} is null`),
+    index("recuperaciones_centro_alumno").on(tabla.centroId, tabla.alumnoId),
+    check("recuperaciones_reservada_por", sql`${tabla.reservadaPorTipo} in ('usuario', 'soporte')`),
+  ],
+);
+
 /** El aviso de que un alumno no va a una fecha. Anularlo no lo borra: marca `anulado_en`. */
 export const avisosDeAusencia = pgTable(
   "avisos_de_ausencia",

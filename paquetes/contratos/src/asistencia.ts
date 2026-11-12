@@ -48,13 +48,23 @@ const credito = z.object({
 /** Respuesta de GET /alumnos/:id/creditos: los vigentes, el que vence antes primero. */
 export const paginaDeCreditos = paginaDe(credito);
 
-/** Respuesta de GET /asistencia/fechas/:id: la fecha y una página de sus inscriptos. */
+/** Cuerpo de POST /asistencia/fechas/:id/recuperaciones: usa el crédito que vence antes. */
+export const pedidoDeRecuperacion = z.object({ alumnoId: z.uuid("Ese alumno no existe.") });
+
+/** Respuesta de POST /asistencia/fechas/:id/recuperaciones: con este id se anula. */
+export const recuperacionHecha = z.object({ id: z.uuid() });
+
+/**
+ * Respuesta de GET /asistencia/fechas/:id: la fecha, la misma página de sus inscriptos y de los
+ * que recuperan, y los lugares libres para recuperar.
+ */
 export const planillaDeAsistencia = z.object({
   fecha: z.object({
     id: z.uuid(),
     claseId: z.uuid(),
     sedeId: z.uuid(),
     nombre: z.string(),
+    cupo: z.number().int(),
     /** La fecha local del centro. */
     fecha: z.iso.date(),
     /** En UTC: se pasa a la zona del centro solo al mostrarla. */
@@ -63,8 +73,11 @@ export const planillaDeAsistencia = z.object({
     cancelada: z.boolean(),
   }),
   alumnos: paginaDe(renglon),
+  recuperan: paginaDe(renglon),
+  lugares: z.number().int(),
 });
 
 export type PedidoDeAsistencia = z.infer<typeof pedidoDeAsistencia>;
 export type PlanillaDeAsistencia = z.infer<typeof planillaDeAsistencia>;
 export type PedidoDeAviso = z.infer<typeof pedidoDeAviso>;
+export type PedidoDeRecuperacion = z.infer<typeof pedidoDeRecuperacion>;
