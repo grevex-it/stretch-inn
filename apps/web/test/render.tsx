@@ -53,6 +53,7 @@ export function enCentro(sedes: { id: string; nombre: string }[], cambios: Cambi
         sedes,
         sedeCambiada: cambios.sedeCambiada ?? false,
         permisos: cambios.permisos ?? [],
+        zonaHoraria: "America/Argentina/Buenos_Aires",
       },
     },
   };

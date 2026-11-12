@@ -31,7 +31,7 @@ export const pedidoDeAviso = z.object({ alumnoId: z.uuid("Ese alumno no existe."
 /** Respuesta de POST /asistencia/fechas/:id/avisos: con este id se anula. */
 export const avisoHecho = z.object({
   id: z.uuid(),
-  /** Si llegó a tiempo y le dio un crédito para recuperar. */
+  /** Si le dio un crédito para recuperar. Hoy siempre: todo aviso da crédito (0019). */
   conCredito: z.boolean(),
 });
 

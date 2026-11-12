@@ -27,7 +27,8 @@ acuerdo.
 ## API pública
 
 - `pedidoDeIngreso`, `pedidoDeCentro`, `pedidoDeSede`, `pedidoDeCambioDeClave` y
-  `estadoDeSesion`, con sus tipos (`PedidoDeIngreso`, `EstadoDeSesion`, …).
+  `estadoDeSesion`, con sus tipos (`PedidoDeIngreso`, `EstadoDeSesion`, …). El centro activo
+  trae su `zonaHoraria`: el panel muestra las fechas en esa zona (regla 3).
 - `pedidoDePagina` (query `?pagina=N`, de a 50), `pedidoDeAlta`, `paginaDeEquipo`,
   `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
 - `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,

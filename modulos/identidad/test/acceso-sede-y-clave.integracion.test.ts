@@ -101,6 +101,25 @@ describe("nombres de las sedes", () => {
   });
 });
 
+describe("zona horaria", () => {
+  it("devuelve la zona horaria del centro activo", async () => {
+    const { centro, email } = await enDosSedes();
+    await comoDueno("update centros set zona_horaria = 'America/Montevideo' where id = $1", [
+      centro.centroId,
+    ]);
+    const acceso = crearAcceso(base);
+    const { sesion } = await entrarYResolver(acceso, email);
+    await expect(acceso.zonaHoraria(sesion)).resolves.toBe("America/Montevideo");
+  });
+
+  it("sin centro elegido no hay zona", async () => {
+    const { email } = await cuenta();
+    const acceso = crearAcceso(base);
+    const { sesion } = await entrarYResolver(acceso, email);
+    await expect(acceso.zonaHoraria(sesion)).resolves.toBeNull();
+  });
+});
+
 describe("cambiar la clave", () => {
   it("exige la clave actual y una nueva de 10 caracteres o más", async () => {
     const { email } = await cuenta();

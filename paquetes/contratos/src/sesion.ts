@@ -48,6 +48,8 @@ export const estadoDeSesion = z.object({
        * seguridad la aplica la API en cada pedido.
        */
       permisos: z.array(z.string()),
+      /** Zona horaria IANA del centro: las fechas viajan en UTC y se muestran en esta zona. */
+      zonaHoraria: z.string(),
     })
     .nullable(),
 });
