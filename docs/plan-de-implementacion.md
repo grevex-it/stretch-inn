@@ -1,12 +1,12 @@
 # Plan de implementación
 
-_Última actualización: 03/11/2026._
+_Última actualización: 12/11/2026._
 
 Orden en que se construye el sistema. El porqué de cada pieza está en `docs/decisiones/`; los temas abiertos, en `docs/pendientes.md`. Cada fase indica su frente (ver 0006).
 
 ## Primer lanzamiento para Stretch Inn
 
-Fases 0 a 3 con el panel (`apps/web`). El portal de alumnos (Fase 4) y WhatsApp (Fase 5) quedan para una segunda entrega.
+Fases 0 a 3 con el panel (`apps/web`). El sistema central incluye alumnos y profesores, agenda y cupos, asistencia y recuperaciones, abonos, pagos y gastos, reportes y administración de Río Tercero y Mendoza con permisos por sede. El portal de alumnos (Fase 4) y WhatsApp (Fase 5) quedan para una segunda entrega.
 
 ## Arrancar ya, en paralelo al código
 
@@ -40,7 +40,7 @@ Sin esto no se puede construir ningún módulo.
 
 Puede empezar en paralelo con la Fase 1 en cuanto exista `plataforma` (Fase 0, punto 5).
 
-- `personas` (liviano): alumnos, que pertenecen al centro (0011).
+- `personas`: gestión de alumnos y profesores. Los alumnos pertenecen al centro (0011).
 - `agenda` (completo): clases semanales, ocurrencias, cupos con bloqueo de fila y restricción en la base (0013), e **inscripciones**.
 - **Cada sede gestiona lo suyo:** inscripciones, clases y la operación diaria llevan `sede_id`; cada usuario opera solo en las sedes donde tiene permiso (0002, 0007).
 
@@ -51,16 +51,26 @@ Depende del relevamiento con Stretch Inn.
 - `abonos`: planes y precios del centro con precio opcional por sede (0011).
 - `caja`: cobros con clave de idempotencia; emite `PagoRegistrado` (0003, 0013).
 - `asistencia`: toma de asistencia, ausencias avisadas, créditos y reservas de recuperación.
+- **Gastos:** registrar gastos por sede.
+- **Reportes:** alumnos activos y bajas, clases asignadas por profesor, ocupación y cupos, asistencias y recuperaciones, estado de abonos, cobros, anulaciones, gastos y saldo del período. Filtrar por período y sede y permitir una vista consolidada según los permisos de cada usuario.
+- **Sedes:** configurar Río Tercero y Mendoza y validar que el equipo pueda operar ambas desde el panel con los permisos asignados.
 - Antes de salir a producción: prueba de carga con k6 sobre cobrar, tomar asistencia y reservar recuperación (0013), y backups con restauración probada.
+
+### Integración con el portal de alumnos
+
+- El panel y el portal usan los mismos datos y reglas de negocio. La cuenta del alumno se vincula a su ficha y permite consultar sus propios abonos y asistencias y los cupos disponibles de las clases que le corresponden. La consulta de cupos muestra la disponibilidad sin exponer datos de otros alumnos.
+- Cuando el alumno avisa una ausencia, el equipo ve el aviso en la planilla y el reporte de asistencia, con el crédito generado cuando corresponda. Cuando reserva o cancela una recuperación, se actualizan la agenda, los cupos y los reportes. Los cambios que registra el equipo también se reflejan en las consultas del alumno.
+- Si el alumno y el equipo intentan reservar a la vez el último cupo de una recuperación, se confirma una sola reserva. Ambos canales muestran la disponibilidad actualizada.
 
 ## Fase 4 — Portal de alumnos (segunda entrega)
 
+Portal web para celular para consultar abonos, asistencias y cupos, avisar ausencias y gestionar reservas de recuperación. Usa la integración definida en la Fase 3.
+
 PWA con funcionamiento limitado sin conexión y cola de avisos con idempotencia (0014).
 
-## Fase 5 — Mensajería, reportes y licencias (segunda entrega)
+## Fase 5 — Mensajería y licencias (segunda entrega)
 
 - `mensajeria`: WhatsApp Cloud API con registro integrado por centro (0012).
-- `reportes`.
 - `licencias`: en USD con cotización guardada (0009).
 
 ## Transversal: logs y alertas
