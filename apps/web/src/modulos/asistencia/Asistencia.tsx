@@ -1,5 +1,6 @@
 import { AnularRecuperacion, AvisoDeAusencia, ReservarRecuperacion } from "./AccionesDeFecha.tsx";
 import { MarcarAsistencia } from "./MarcarAsistencia.tsx";
+import { ReglasDeLaSede } from "./ReglasDeLaSede.tsx";
 import { paginaDeOcurrencias, planillaDeAsistencia } from "@app/contratos";
 import { useState } from "react";
 import { fechaLocal, ListaRemota, Resultados } from "../../base/controles/ListaRemota.tsx";
@@ -17,11 +18,14 @@ export function Asistencia() {
         centro.sedeActiva === "todas" ? (
           <p>Elegí una sede en la barra para ver sus clases.</p>
         ) : (
-          <Fechas
-            key={centro.id + centro.sedeActiva}
-            sede={centro.sedeActiva}
-            zona={centro.zonaHoraria}
-          />
+          <>
+            <ReglasDeLaSede key={centro.id + centro.sedeActiva} sede={centro.sedeActiva} />
+            <Fechas
+              key={centro.id + centro.sedeActiva}
+              sede={centro.sedeActiva}
+              zona={centro.zonaHoraria}
+            />
+          </>
         )
       ) : (
         <p>Necesitás acceso a Asistencia y Agenda para consultar las planillas.</p>
