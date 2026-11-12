@@ -47,7 +47,6 @@ Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@ap
 
 Casi todo quedó respondido en 0019 y 0020. Falta:
 
-- **Falta sin avisar:** ¿gasta una clase del abono? ¿Da derecho a recuperar, igual que una falta avisada?
 - **Viaje:** ¿las semanas de viaje gastan clases del abono, y la media cuota es para guardar el lugar del mes siguiente? Mientras tanto, otro alumno puede ocupar ese lugar.
 - **Momentos pico, alumnos activos y horarios por semana:** para la prueba de carga (0013).
 
