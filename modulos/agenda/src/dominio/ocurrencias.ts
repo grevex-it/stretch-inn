@@ -29,7 +29,7 @@ export function diaDe(fecha: string): number {
   return new Date(Date.UTC(anio, mes - 1, dia)).getUTCDay() || 7;
 }
 
-function sumarDias(fecha: string, dias: number): string {
+export function sumarDias(fecha: string, dias: number): string {
   const [anio, mes, dia] = partes(fecha);
   return new Date(Date.UTC(anio, mes - 1, dia) + dias * DIA).toISOString().slice(0, 10);
 }

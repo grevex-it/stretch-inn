@@ -16,4 +16,5 @@ export {
   obtenerFecha,
   type FechaParaOtros,
 } from "./infraestructura/para-otros.ts";
+export { fechasDeAlumno, type FechaDeAlumno } from "./infraestructura/fechas-de-alumno.ts";
 export { rutasDeAgenda } from "./http/rutas.ts";
