@@ -8,9 +8,6 @@ import { usePermiso, useSesion } from "../../base/sesion.ts";
 const medios = {
   efectivo: "Efectivo",
   transferencia: "Transferencia",
-  debito: "Débito",
-  credito: "Crédito",
-  mercadopago: "Mercado Pago",
 };
 
 export function Caja() {

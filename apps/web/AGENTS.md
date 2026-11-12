@@ -18,11 +18,18 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
   - `estructura/Navegacion.tsx`: las secciones del menú. Cada una se muestra solo con su permiso.
   - `Puerta.tsx`: según la sesión muestra login, clave temporal, elegir centro o el panel.
   - `rutas.tsx`: las rutas. Cada módulo suma las suyas como hijas de la raíz.
-  - `controles/`: campo (obligatorio salvo `opcional`), botón, aviso, formulario y paginación.
+  - `controles/`: campo (obligatorio salvo `opcional`), botón, aviso, formulario y paginación;
+    `ListaRemota` y `FormularioRemoto` para listas y formularios contra la API, y
+    `BuscarAlumno` para elegir un alumno.
 - `src/modulos/<modulo>/`: pantallas de cada módulo. Una carpeta por módulo, como en el backend.
   - `identidad/`: pantalla Equipo (lista, alta, clave temporal, bloqueo). La clave temporal se
     muestra una sola vez y no se guarda en ninguna consulta.
   - `personas/`: pantalla Alumnos (lista con buscador, alta, edición, baja y reactivación).
+  - `agenda/`: clases de cada sede, alta y edición, e inscriptos.
+  - `asistencia/`: planilla de una fecha, marcar, avisos y recuperaciones.
+  - `abonos/`: planes, precio por sede y generar la cuota de un ciclo de 4 semanas (0019).
+    `ciclo.ts` muestra el ciclo con su último día («Del 30/11/2026 al 27/12/2026»).
+  - `caja/`: el día de caja de una sede, cobrar una cuota (efectivo o transferencia) y anular.
 
 ## Reglas
 

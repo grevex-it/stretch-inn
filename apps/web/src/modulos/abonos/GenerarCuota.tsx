@@ -32,7 +32,7 @@ function CuotaDePlan({ plan, sede }: { plan: Plan; sede: string }) {
               alumnoId: alumno.id,
               planId: plan.id,
               sedeId: sede,
-              periodo: datos.get("periodo") || undefined,
+              desde: datos.get("desde") || undefined,
             })
           }
         >
@@ -40,8 +40,8 @@ function CuotaDePlan({ plan, sede }: { plan: Plan; sede: string }) {
             {alumno.nombre} · {pesos.format(precio)}
           </p>
           <label>
-            Mes (opcional, por defecto el actual)
-            <input type="month" name="periodo" />
+            Empieza el (opcional, por defecto hoy; dura 4 semanas)
+            <input type="date" name="desde" />
           </label>
         </FormularioRemoto>
       )}

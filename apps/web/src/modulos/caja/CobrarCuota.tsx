@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
 import { ListaRemota, pesos, Resultados } from "../../base/controles/ListaRemota.tsx";
 import { usePermiso } from "../../base/sesion.ts";
+import { textoDelCiclo } from "../abonos/ciclo.ts";
 
 export function CobrarCuota({ sede }: { sede: string }) {
   const permitido = usePuedeCobrar();
@@ -32,7 +33,7 @@ function Cuotas({ alumno, sede }: { alumno: { id: string; nombre: string }; sede
             alIrA={alIrA}
             fila={(cuota) => (
               <li key={cuota.id}>
-                {cuota.periodo} · {pesos.format(cuota.monto)} ·{" "}
+                {textoDelCiclo(cuota)} · {pesos.format(cuota.monto)} ·{" "}
                 {cuota.pagadaEn ? "Pagada" : "Impaga"}
                 {!cuota.pagadaEn && cuota.sedeId === sede && <Cobro cuota={cuota} />}
               </li>
@@ -67,9 +68,6 @@ function Cobro({ cuota }: { cuota: Cuota }) {
           </option>
           <option value="efectivo">Efectivo</option>
           <option value="transferencia">Transferencia</option>
-          <option value="debito">Débito</option>
-          <option value="credito">Crédito</option>
-          <option value="mercadopago">Mercado Pago</option>
         </select>
       </label>
     </FormularioRemoto>
