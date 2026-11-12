@@ -116,11 +116,29 @@ export interface Agenda {
     quien: ContextoCentro,
     inscripcion: { id: string },
   ): Promise<Resultado<null, ErrorDeAgenda>>;
+  /** Los inscriptos vigentes de una clase, por orden de inscripción, con su alumno. */
+  inscriptos(
+    quien: ContextoCentro,
+    filtro: Pagina & { claseId: string },
+  ): Promise<Resultado<PaginaDe<Inscripto>, ErrorDeAgenda>>;
   /** Las inscripciones vigentes del alumno, en las sedes donde se puede ver la agenda. */
   clasesDeAlumno(
     quien: ContextoCentro,
     filtro: Pagina & { alumnoId: string },
   ): Promise<Resultado<PaginaDe<InscripcionDeAlumno>, ErrorDeAgenda>>;
+}
+
+/** Una inscripción vigente de una clase, con los datos del alumno que hacen falta en la lista. */
+export interface Inscripto {
+  /** La inscripción: con este id se da de baja. */
+  id: string;
+  alumnoId: string;
+  nombre: string;
+  apellido: string;
+  telefono: string;
+  /** El alumno puede estar de baja en personas aunque siga inscripto. */
+  activo: boolean;
+  creadaEn: Date;
 }
 
 export interface InscripcionDeAlumno {
@@ -133,6 +151,13 @@ export interface InscripcionDeAlumno {
 export interface RepositorioInscripciones {
   /** El alumno del centro (por la API pública de personas), o undefined. */
   alumno(id: string): Promise<{ activo: boolean } | undefined>;
+  /** Los alumnos de una página, en una sola consulta (por la API pública de personas). */
+  alumnos(
+    ids: readonly string[],
+  ): Promise<Map<string, Pick<Inscripto, "nombre" | "apellido" | "telefono" | "activo">>>;
+  deClase(
+    filtro: Pagina & { claseId: string },
+  ): Promise<PaginaDe<{ id: string; alumnoId: string; creadaEn: Date }>>;
   /** El id de la inscripción nueva, o undefined si ya tenía una vigente en esa clase. */
   inscribir(inscripcion: {
     claseId: string;

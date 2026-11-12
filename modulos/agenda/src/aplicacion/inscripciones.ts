@@ -7,6 +7,7 @@ import { puedeEn, SIN_PERMISO } from "./clases.ts";
 import type {
   ErrorDeAgenda,
   InscripcionDeAlumno,
+  Inscripto,
   Pagina,
   PaginaDe,
   RepositorioAgenda,
@@ -55,6 +56,26 @@ export async function darDeBaja(
   if (!(await repos.inscripciones.darDeBaja(id, ahora))) return INEXISTENTE;
   await repos.inscripciones.sumarInscriptos(inscripcion.claseId, -1);
   return ok(null);
+}
+
+/** Una página de inscripciones y sus alumnos en dos consultas, sin N+1 (regla 8). */
+export async function deClase(
+  repos: Repositorios,
+  quien: ContextoCentro,
+  { claseId, ...pagina }: Pagina & { claseId: string },
+): Promise<Resultado<PaginaDe<Inscripto>, ErrorDeAgenda>> {
+  const clase = await repos.agenda.clase(claseId);
+  if (clase === undefined) return falla("clase-inexistente", "Esa clase no existe.");
+  if (!puedeEn(quien, VER, clase.sedeId)) return SIN_PERMISO;
+  const inscripciones = await repos.inscripciones.deClase({ ...pagina, claseId });
+  const alumnos = await repos.inscripciones.alumnos(inscripciones.elementos.map((i) => i.alumnoId));
+  return ok({
+    ...inscripciones,
+    elementos: inscripciones.elementos.flatMap((inscripcion) => {
+      const alumno = alumnos.get(inscripcion.alumnoId);
+      return alumno === undefined ? [] : [{ ...inscripcion, ...alumno }];
+    }),
+  });
 }
 
 export async function deAlumno(

@@ -19,6 +19,14 @@ export function rutasDeInscripciones(app: FastifyInstance, agenda: Agenda): void
     return enviar(respuesta, resultado, 201);
   });
 
+  app.get("/agenda/clases/:id/inscriptos", { config: ver }, async (pedido, respuesta) => {
+    const clase = leer(conId, pedido.params, respuesta);
+    const pagina = clase && leer(pedidoDePagina, pedido.query, respuesta);
+    if (clase === undefined || pagina === undefined) return respuesta;
+    const resultado = await agenda.inscriptos(contextoDe(pedido), { ...pagina, claseId: clase.id });
+    return enviar(respuesta, resultado, 200);
+  });
+
   app.delete("/agenda/inscripciones/:id", { config: inscribir }, async (pedido, respuesta) => {
     const inscripcion = leer(conId, pedido.params, respuesta);
     if (inscripcion === undefined) return respuesta;

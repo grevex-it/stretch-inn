@@ -34,8 +34,8 @@ acuerdo.
   `paginaDeClases`, `claseCreada`, `claseEditada`, `pedidoDeOcurrencias`
   (query `?sede&desde&pagina`), `ocurrencia` y `paginaDeOcurrencias`, con sus tipos. Las fechas
   viajan en UTC como texto ISO.
-- `pedidoDeInscripcion`, `inscripcionHecha`, `claseDeAlumno` y `paginaDeClasesDeAlumno`, con sus
-  tipos.
+- `pedidoDeInscripcion`, `inscripcionHecha`, `inscripto`, `paginaDeInscriptos`, `claseDeAlumno`
+  y `paginaDeClasesDeAlumno`, con sus tipos.
 
 ## Reglas de uso
 

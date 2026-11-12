@@ -4,6 +4,7 @@ import {
   edicionDeClase,
   fichaDeClase,
   paginaDeClasesDeAlumno,
+  paginaDeInscriptos,
   paginaDeOcurrencias,
   pedidoDeClases,
   pedidoDeInscripcion,
@@ -49,6 +50,26 @@ describe("pedidos de la agenda", () => {
     const clase = { ...CLASE, id: SEDE, sedeId: SEDE, activa: true, inscriptos: 3, version: 1 };
     const pagina = { pagina: 1, porPagina: 50, total: 1, elementos: [{ id: SEDE, clase }] };
     expect(paginaDeClasesDeAlumno.parse(pagina)).toEqual(pagina);
+  });
+
+  it("los inscriptos de una clase llevan su alumno y la fecha de alta en UTC", () => {
+    const pagina = {
+      pagina: 1,
+      porPagina: 50,
+      total: 1,
+      elementos: [
+        {
+          id: SEDE,
+          alumnoId: SEDE,
+          nombre: "Ana",
+          apellido: "Pérez",
+          telefono: "11 5555-1234",
+          activo: true,
+          creadaEn: "2026-11-07T21:30:00.000Z",
+        },
+      ],
+    };
+    expect(paginaDeInscriptos.parse(pagina)).toEqual(pagina);
   });
 
   it("las fechas viajan en UTC, como texto ISO", () => {

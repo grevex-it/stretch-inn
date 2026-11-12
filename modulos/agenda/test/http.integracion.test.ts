@@ -66,6 +66,7 @@ describe("rutas de la agenda", () => {
       "PUT /agenda/ocurrencias/:id/cancelada": "agenda.gestionar",
       "DELETE /agenda/ocurrencias/:id/cancelada": "agenda.gestionar",
       "POST /agenda/clases/:id/inscriptos": "agenda.inscribir",
+      "GET /agenda/clases/:id/inscriptos": "agenda.ver",
       "DELETE /agenda/inscripciones/:id": "agenda.inscribir",
       "GET /alumnos/:id/clases": "agenda.ver",
     });
@@ -111,6 +112,13 @@ describe("rutas de la agenda", () => {
     const completa = await inscribir(alumnos[1]);
     expect(completa.statusCode).toBe(409);
     expect(completa.json()).toMatchObject({ error: { codigo: "clase-completa" } });
+
+    const lista = await servidor.inject({ url: `/agenda/clases/${claseId}/inscriptos` });
+    expect(lista.statusCode).toBe(200);
+    expect(lista.json()).toMatchObject({
+      total: 1,
+      elementos: [{ alumnoId: alumnos[0], nombre: "Ana", apellido: "Pérez", activo: true }],
+    });
 
     const suyas = await servidor.inject({ url: `/alumnos/${alumnos[0] ?? ""}/clases` });
     expect(suyas.json()).toMatchObject({ total: 1, elementos: [{ clase: { id: claseId } }] });

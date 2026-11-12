@@ -6,6 +6,7 @@ export type {
   EdicionDeClase,
   ErrorDeAgenda,
   FechaDeClase,
+  Inscripto,
   NuevaClase,
 } from "./aplicacion/puertos.ts";
 export { PERMISOS_AGENDA } from "./dominio/permisos.ts";
