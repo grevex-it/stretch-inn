@@ -50,7 +50,7 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 - `PERMISOS_AGENDA`: la sección «Agenda» del catálogo (`agenda.ver`, `agenda.gestionar`,
   `agenda.inscribir`).
 
-Para otros módulos (asistencia). Reciben la `Transaccion` de `enContexto` y solo leen:
+Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContexto`:
 
 - `obtenerFecha(tx, id)`: una fecha con su clase (`claseId`, `sedeId`, `nombre`, `cupo`,
   `fecha`, `empiezaEn`, `terminaEn`, `cancelada`), o undefined.
@@ -58,6 +58,11 @@ Para otros módulos (asistencia). Reciben la `Transaccion` de `enContexto` y sol
   vigente **en ese momento**, por orden de inscripción.
 - `estabanInscriptos(tx, { claseId, momento, alumnoIds })`: cuáles de esos alumnos (hasta 100)
   la tenían vigente en ese momento.
+- `fechasDeAlumno(tx, { alumnoId, sedeId, desde, cantidad })`: las primeras `cantidad` (1 a 100)
+  fechas de su horario fijo en la sede desde el día `desde`, en orden (`id`, `claseId`, `fecha`,
+  `empiezaEn`, `terminaEn`). No cuentan las canceladas ni las de clases en las que no estaba
+  inscripto en ese momento. Arma a pedido las fechas que falten, como `semana`. Para abonos:
+  cada una gasta una clase del abono (0020).
 
 ## Eventos
 
