@@ -3,7 +3,7 @@
 import { falla, ok, type Resultado } from "@app/nucleo";
 import type { Transaccion } from "@app/plataforma";
 import { fechasDeAlumno } from "@app/agenda";
-import { and, desc, eq, isNull, lte } from "drizzle-orm";
+import { and, desc, eq, isNull, lte, sql } from "drizzle-orm";
 import { diaDe } from "../dominio/ciclo.ts";
 import type { Cuota } from "../aplicacion/puertos.ts";
 import { cuotas } from "./esquema.ts";
@@ -42,33 +42,50 @@ export async function revertirPago(
     .where(and(eq(cuotas.id, cuotaId), eq(cuotas.pagoId, pagoId)));
 }
 
+/** El abono vigente de un alumno en una sede, para asistencia (0020). */
+interface AbonoVigente {
+  cuotaId: string;
+  /** La medianoche del centro del día en que empieza. */
+  inicio: Date;
+  /** El final de su última clase. */
+  fin: Date;
+  clases: number;
+}
+
 /**
- * Cuándo termina el abono del alumno en esa sede que está vigente en ese momento: el final de su
- * última clase (0020), o undefined si no tiene. Toma la cuota que empezó más tarde hasta ese día;
- * si no le alcanzan las fechas del horario fijo, no hay final. Lo usa asistencia, conectado por
- * la API.
+ * El abono del alumno en esa sede que está vigente en ese momento, o undefined. Toma la cuota que
+ * empezó más tarde hasta ese día; si no le alcanzan las fechas del horario fijo, no hay abono
+ * vigente. Lo usa asistencia para las recuperaciones, conectado por la API.
  */
-export async function finDelAbono(
+export async function abonoVigente(
   tx: Transaccion,
   { alumnoId, sedeId, en }: { alumnoId: string; sedeId: string; en: Date },
-): Promise<Date | undefined> {
-  const dia = diaDe(en, await repositorioPlanes(tx).zonaHoraria());
+): Promise<AbonoVigente | undefined> {
+  const zona = await repositorioPlanes(tx).zonaHoraria();
   const [cuota] = await tx
-    .select({ desde: cuotas.desde, clases: cuotas.clases })
+    .select({
+      cuotaId: cuotas.id,
+      desde: cuotas.desde,
+      clases: cuotas.clases,
+      inicio: sql<Date>`(${cuotas.desde}::timestamp at time zone ${zona})`.mapWith(
+        (valor: string | Date) => new Date(valor),
+      ),
+    })
     .from(cuotas)
     .where(
       and(
         eq(cuotas.alumnoId, alumnoId),
         eq(cuotas.sedeId, sedeId),
         isNull(cuotas.anuladaEn),
-        lte(cuotas.desde, dia),
+        lte(cuotas.desde, diaDe(en, zona)),
       ),
     )
     .orderBy(desc(cuotas.desde))
     .limit(1);
   if (cuota === undefined) return undefined;
-  const { desde, clases } = cuota;
+  const { cuotaId, desde, clases, inicio } = cuota;
   const fechas = await fechasDeAlumno(tx, { alumnoId, sedeId, desde, cantidad: clases });
   const ultima = fechas.length === clases ? fechas.at(-1) : undefined;
-  return ultima !== undefined && en < ultima.terminaEn ? ultima.terminaEn : undefined;
+  if (ultima === undefined || en >= ultima.terminaEn) return undefined;
+  return { cuotaId, inicio, fin: ultima.terminaEn, clases };
 }

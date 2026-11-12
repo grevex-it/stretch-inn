@@ -49,9 +49,10 @@ congelados al generarla. Cada fecha del horario fijo del alumno gasta una clase.
     `for update`). Falla con `cuota-inexistente` o `cuota-pagada`.
   - `revertirPago(tx, { cuotaId, pagoId })`: si ese pago la saldó, la cuota vuelve a estar sin
     pagar (caja anuló el pago).
-  - `finDelAbono(tx, { alumnoId, sedeId, en })`: el final de la última clase del abono del alumno
-    en esa sede que está vigente en ese momento, o undefined. La API se lo pasa a `asistencia`
-    (0020).
+  - `abonoVigente(tx, { alumnoId, sedeId, en })`: el abono del alumno en esa sede que está
+    vigente en ese momento (`{ cuotaId, inicio, fin, clases }`: `inicio`, la medianoche del día
+    en que empieza; `fin`, el final de su última clase), o undefined si no tiene o no le alcanzan
+    las fechas del horario fijo. La API se lo pasa a `asistencia` (0020).
 - `rutasDeAbonos(abonos)`: `GET /abonos/planes`, `GET /abonos/cuotas/impagas?sede&pagina` y
   `GET /alumnos/:id/cuotas` (`abonos.ver`);
   `POST /abonos/planes`, `PUT /abonos/planes/:id`, `PUT`/`DELETE /abonos/planes/:id/baja` y

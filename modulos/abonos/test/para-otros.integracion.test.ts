@@ -4,8 +4,8 @@ import { crearBase, enContexto, type Base } from "@app/plataforma";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
 import {
+  abonoVigente,
   crearAbonos,
-  finDelAbono,
   obtenerCuota,
   registrarPago,
   revertirPago,
@@ -94,28 +94,40 @@ describe("obtenerCuota y registrarPago", () => {
   });
 });
 
-describe("finDelAbono", () => {
+describe("abonoVigente", () => {
   const en = (instante: string) => new Date(instante);
 
-  it("es el final de la última clase del abono vigente en ese momento", async () => {
-    const { ctx, norte, alumnoId } = await conCuota();
-    const fin = (instante: string, sedeId = norte) =>
-      enContexto(base, ctx, (tx) => finDelAbono(tx, { alumnoId, sedeId, en: en(instante) }));
-    // Abono desde el 15/11 con clase los lunes a las 18:30 de Buenos Aires (21:30 UTC, una hora):
-    // 16/11, 23/11, 30/11 y 7/12. La última termina el 7/12 a las 22:30 UTC.
-    expect(await fin("2026-11-20T21:00:00Z")).toEqual(en("2026-12-07T22:30:00Z"));
-    expect(await fin("2026-12-07T22:29:00Z")).toEqual(en("2026-12-07T22:30:00Z"));
-    expect(await fin("2026-12-07T22:30:00Z")).toBeUndefined();
-    expect(await fin("2026-11-15T02:59:00Z")).toBeUndefined();
+  it("va desde la medianoche del día en que empieza hasta el final de su última clase", async () => {
+    const { ctx, norte, alumnoId, cuotaId } = await conCuota();
+    const vigente = (instante: string, sedeId = norte) =>
+      enContexto(base, ctx, (tx) => abonoVigente(tx, { alumnoId, sedeId, en: en(instante) }));
+    // Abono desde el 15/11 (medianoche de Buenos Aires: 03:00 UTC) con clase los lunes a las 18:30
+    // (21:30 UTC, una hora): 16/11, 23/11, 30/11 y 7/12. La última termina el 7/12 a las 22:30 UTC.
+    const abono = {
+      cuotaId,
+      inicio: en("2026-11-15T03:00:00Z"),
+      fin: en("2026-12-07T22:30:00Z"),
+      clases: 4,
+    };
+    expect(await vigente("2026-11-20T21:00:00Z")).toEqual(abono);
+    expect(await vigente("2026-12-07T22:29:00Z")).toEqual(abono);
+    expect(await vigente("2026-12-07T22:30:00Z")).toBeUndefined();
+    expect(await vigente("2026-11-15T02:59:00Z")).toBeUndefined();
   });
 
-  it("sin cuota en esa sede, o con la cuota anulada, no hay abono", async () => {
-    const { ctx, sur, norte, alumnoId, cuotaId } = await conCuota();
+  it("sin cuota en esa sede, con la cuota anulada o sin horario fijo, no hay abono vigente", async () => {
+    const { ctx, sur, norte, alumnoId, cuotaId, alumno } = await conCuota();
     const momento = en("2026-11-20T21:00:00Z");
-    const fin = (sedeId: string) =>
-      enContexto(base, ctx, (tx) => finDelAbono(tx, { alumnoId, sedeId, en: momento }));
-    expect(await fin(sur)).toBeUndefined();
+    const vigente = (sedeId: string, de = alumnoId) =>
+      enContexto(base, ctx, (tx) => abonoVigente(tx, { alumnoId: de, sedeId, en: momento }));
+    expect(await vigente(sur)).toBeUndefined();
     await abonos().anularCuota(ctx, { id: cuotaId });
-    expect(await fin(norte)).toBeUndefined();
+    expect(await vigente(norte)).toBeUndefined();
+
+    const sinHorario = await alumno("Bea");
+    const planes = await abonos().planes(ctx, { pagina: 1, porPagina: 50 });
+    const planId = planes.ok ? (planes.valor.elementos[0]?.id ?? "") : "";
+    await abonos().generarCuota(ctx, { alumnoId: sinHorario, planId, sedeId: norte });
+    expect(await vigente(norte, sinHorario)).toBeUndefined();
   });
 });
