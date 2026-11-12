@@ -23,5 +23,6 @@ Una decisión por archivo, con su contexto y su porqué. Una decisión aceptada 
 | [0017](0017-cuentas-login-y-sesiones.md)           | Cuentas, login y sesiones                                   |
 | [0018](0018-identidad-visual.md)                   | Identidad visual                                            |
 | [0019](0019-reglas-de-stretch-inn.md)              | Abonos, recuperaciones, sedes y permisos según Stretch Inn  |
+| [0020](0020-abono-por-clases.md)                   | El abono es un paquete de clases, no un período             |
 
 Temas abiertos: [`../pendientes.md`](../pendientes.md).
