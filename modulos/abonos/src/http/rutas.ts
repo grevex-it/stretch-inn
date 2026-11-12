@@ -16,10 +16,10 @@ export function rutasDeAbonos(abonos: Abonos): FastifyPluginCallback {
     app.post("/abonos/cuotas", { config: asignar }, async (pedido, respuesta) => {
       const datos = leer(pedidoDeCuota, pedido.body, respuesta);
       if (datos === undefined) return respuesta;
-      const { periodo, ...cuota } = datos;
+      const { desde, ...cuota } = datos;
       const resultado = await abonos.generarCuota(
         contextoDe(pedido),
-        periodo === undefined ? cuota : { ...cuota, periodo },
+        desde === undefined ? cuota : { ...cuota, desde },
       );
       return enviar(respuesta, resultado, 201);
     });

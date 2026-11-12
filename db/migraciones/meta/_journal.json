@@ -187,15 +187,15 @@
     {
       "idx": 26,
       "version": "7",
-      "when": 1794116659061,
-      "tag": "20261108054419_abonos",
+      "when": 1794485501294,
+      "tag": "20261112121141_abonos",
       "breakpoints": true
     },
     {
       "idx": 27,
       "version": "7",
-      "when": 1794116660459,
-      "tag": "20261108054420_rls-abonos",
+      "when": 1794485502935,
+      "tag": "20261112121142_rls-abonos",
       "breakpoints": true
     }
   ]

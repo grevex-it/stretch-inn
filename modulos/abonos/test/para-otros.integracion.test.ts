@@ -1,9 +1,15 @@
-// Lo que abonos les da a otros módulos (caja), sobre Postgres real: leer la cuota y registrar su
-// pago una sola vez, dentro de la transacción del que cobra.
+// Lo que abonos les da a otros módulos, sobre Postgres real: leer la cuota y registrar su pago una
+// sola vez, dentro de la transacción del que cobra (caja), y el fin del abono (asistencia, 0019).
 import { crearBase, enContexto, type Base } from "@app/plataforma";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
-import { crearAbonos, obtenerCuota, registrarPago, revertirPago } from "../src/index.ts";
+import {
+  crearAbonos,
+  finDelAbono,
+  obtenerCuota,
+  registrarPago,
+  revertirPago,
+} from "../src/index.ts";
 import { centroConDosSedes } from "./ayudas.ts";
 
 let base: Base;
@@ -56,7 +62,8 @@ describe("obtenerCuota y registrarPago", () => {
       id: cuotaId,
       alumnoId,
       sedeId: norte,
-      periodo: "2026-11",
+      desde: "2026-11-15",
+      hasta: "2026-12-13",
       monto: 35_000,
       pagadaEn: null,
     });
@@ -83,5 +90,30 @@ describe("obtenerCuota y registrarPago", () => {
         registrarPago(tx, { cuotaId, pagoId: randomUUID(), en: new Date() }),
       ),
     ).toMatchObject({ ok: false, error: { codigo: "cuota-inexistente" } });
+  });
+});
+
+describe("finDelAbono", () => {
+  const en = (instante: string) => new Date(instante);
+
+  it("es la medianoche del centro del día en que termina el ciclo vigente en ese momento", async () => {
+    const { ctx, norte, alumnoId } = await conCuota();
+    const fin = (instante: string, sedeId = norte) =>
+      enContexto(base, ctx, (tx) => finDelAbono(tx, { alumnoId, sedeId, en: en(instante) }));
+    // Ciclo del 15/11 al 13/12, en Buenos Aires (UTC−3).
+    expect(await fin("2026-11-20T21:00:00Z")).toEqual(en("2026-12-13T03:00:00Z"));
+    expect(await fin("2026-12-13T02:59:00Z")).toEqual(en("2026-12-13T03:00:00Z"));
+    expect(await fin("2026-12-13T03:00:00Z")).toBeUndefined();
+    expect(await fin("2026-11-15T02:59:00Z")).toBeUndefined();
+  });
+
+  it("sin cuota en esa sede, o con la cuota anulada, no hay abono", async () => {
+    const { ctx, sur, norte, alumnoId, cuotaId } = await conCuota();
+    const momento = en("2026-11-20T21:00:00Z");
+    const fin = (sedeId: string) =>
+      enContexto(base, ctx, (tx) => finDelAbono(tx, { alumnoId, sedeId, en: momento }));
+    expect(await fin(sur)).toBeUndefined();
+    await abonos().anularCuota(ctx, { id: cuotaId });
+    expect(await fin(norte)).toBeUndefined();
   });
 });
