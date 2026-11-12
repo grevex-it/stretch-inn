@@ -21,6 +21,24 @@ Elegir el servicio que consulta `/salud` cada minuto y avisa al grupo de Telegra
 
 El panel y la API tienen que estar en el mismo sitio para que la cookie de sesión funcione (0017): por ejemplo `app.dominio` y `api.dominio`. Los dominios `*.up.railway.app` no sirven entre sí. Comprarlo antes de salir a producción.
 
+### Alcance de la primera entrega (cotización del 12/11)
+
+El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-implementacion.md` y
+`docs/alcance-y-reglas-compartidas.md`). Falta decidir cómo se modelan:
+
+- **Profesores:** ¿una ficha en `personas` vinculada a su cuenta del equipo (`identidad`)? Las
+  clases de `agenda` todavía no tienen profesor asignado, y el reporte de clases por profesor lo
+  necesita.
+- **Gastos:** ¿un módulo nuevo o una ampliación de `caja`? Hoy el `AGENTS.md` de caja los deja
+  fuera de alcance.
+- **Reportes:** módulo nuevo, con filtro por período y sede y vista consolidada según permisos.
+  «Bajas por período» necesita la fecha de baja del alumno: hoy `personas` guarda solo si está
+  activo.
+- **Material para profesores:** alojar y reproducir hasta 150 clases en video necesita un servicio
+  de almacenamiento y streaming. Su costo tiene que entrar en la mensualidad.
+- **Licencias por sede** (0009): la mensualidad cambia por sede (base, sede nueva) y hay un alta
+  por sede nueva.
+
 ### Nombre del producto
 
 Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@app/...`. Se define más adelante. A tener en cuenta: la regla de GREVEX de no usar nombres de clientes en redes, y que otros centros (posibles competidores) usarían un sistema con el nombre de Stretch Inn.
@@ -39,6 +57,13 @@ Casi todo quedó respondido en 0019. Falta:
 - **Costo de los mensajes de WhatsApp:** dejar claro en la propuesta que lo paga el centro, aparte de la licencia.
 - **Contrato de licencia:** cláusula que autorice a GREVEX a acceder a los datos para soporte (0008, Ley 25.326).
 - **Cámaras:** grabar clases y contar asistentes entra en protección de datos personales; definir avisos y consentimientos antes de presupuestarlo.
+- **Lo que pidió Stretch Inn y no está en la cotización del 12/11:** confirmar con el cliente si
+  queda afuera o se cotiza aparte.
+  - Asistencia con huella de alumnos y profesores, y el lector (no tienen).
+  - Ficha médica firmada desde el celular.
+  - Transferencias que se registran solas como pago.
+  - Cámaras (ver el punto anterior).
+  - El costo de los mensajes de WhatsApp tampoco figura: aclarar que lo paga el centro.
 
 - **Telegram:** crear el bot y el grupo con un tema por capa de alerta (0015).
 
