@@ -224,6 +224,9 @@ importers:
 
   modulos/identidad:
     dependencies:
+      '@app/centros':
+        specifier: workspace:*
+        version: link:../centros
       '@app/contratos':
         specifier: workspace:*
         version: link:../../paquetes/contratos

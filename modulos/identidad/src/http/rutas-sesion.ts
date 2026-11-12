@@ -23,13 +23,17 @@ function permisosDelContexto(porSede: ReadonlyMap<unknown, ReadonlySet<string>>)
 
 async function estado(acceso: Acceso, sesion: SesionResuelta): Promise<EstadoDeSesion> {
   const centro = sesion.centro;
-  const [centros, sedes] = await Promise.all([acceso.centros(sesion), acceso.sedes(sesion)]);
+  const [centros, sedes, zonaHoraria] = await Promise.all([
+    acceso.centros(sesion),
+    acceso.sedes(sesion),
+    acceso.zonaHoraria(sesion),
+  ]);
   const activo = centros.find((c) => c.id === centro?.contexto.centroId);
   return {
     debeCambiarClave: sesion.debeCambiarClave,
     centros,
     centroActivo:
-      centro === null || activo === undefined
+      centro === null || activo === undefined || zonaHoraria === null
         ? null
         : {
             id: activo.id,
@@ -38,6 +42,7 @@ async function estado(acceso: Acceso, sesion: SesionResuelta): Promise<EstadoDeS
             sedes,
             sedeCambiada: centro.sedeCambiada,
             permisos: permisosDelContexto(centro.contexto.permisosPorSede),
+            zonaHoraria,
           },
   };
 }
