@@ -22,7 +22,7 @@ beforeAll(async () => {
   await migrar({ urlDueno, urlApp, urlLogs });
   await consultar(urlDueno, "create table logs.prueba_log (id int, mensaje text)");
   await consultar(urlDueno, "insert into logs.prueba_log values (1, 'hola')");
-  // Con RLS como toda tabla de centro: el test de aislamiento corre en paralelo sobre esta base.
+  // Con RLS como toda tabla de centro: el test de aislamiento recorre esta misma base.
   await consultar(
     urlDueno,
     `create table dato_de_centro (id int, centro_id uuid);
