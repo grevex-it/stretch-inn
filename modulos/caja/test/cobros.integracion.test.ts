@@ -25,7 +25,7 @@ const clave = () => `cobro-${randomUUID()}`;
 async function cuotaDe(ctx: ContextoCentro, sedeId: string, alumnoId: string) {
   const plan = await abonos().crearPlan(ctx, {
     nombre: `Plan ${randomUUID()}`,
-    clasesPorSemana: 2,
+    clases: 4,
     precio: 30_000,
   });
   if (!plan.ok) throw new Error(plan.error.mensaje);

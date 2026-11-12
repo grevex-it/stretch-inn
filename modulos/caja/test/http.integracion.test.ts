@@ -44,7 +44,7 @@ async function conCuota() {
   const abonos = crearAbonos(base, { ahora: () => AHORA });
   const plan = await abonos.crearPlan(centro.ctx, {
     nombre: "Libre",
-    clasesPorSemana: 3,
+    clases: 4,
     precio: 35_000,
   });
   if (!plan.ok) throw new Error(plan.error.mensaje);

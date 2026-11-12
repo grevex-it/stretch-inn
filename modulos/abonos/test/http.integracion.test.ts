@@ -6,7 +6,6 @@ import {
   paginaDeImpagas,
   paginaDePlanes,
   planCreado,
-  renovacionHecha,
 } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
@@ -23,7 +22,7 @@ afterAll(async () => {
   await base.cerrar();
 });
 
-const PLAN = { nombre: "Dos por semana", clasesPorSemana: 2, precio: 30_000 };
+const PLAN = { nombre: "Abono de 4 clases", clases: 4, precio: 30_000 };
 
 async function app(contexto: ContextoCentro) {
   const servidor = Fastify();
@@ -62,7 +61,6 @@ describe("rutas de los abonos", () => {
       "PUT /abonos/planes/:id/sedes/:sedeId/precio": "abonos.gestionar",
       "DELETE /abonos/planes/:id/sedes/:sedeId/precio": "abonos.gestionar",
       "POST /abonos/cuotas": "abonos.asignar",
-      "POST /abonos/cuotas/renovacion": "abonos.asignar",
       "GET /abonos/cuotas/impagas": "abonos.ver",
       "DELETE /abonos/cuotas/:id": "abonos.asignar",
       "GET /alumnos/:id/cuotas": "abonos.ver",
@@ -94,7 +92,7 @@ describe("rutas de los abonos", () => {
     expect(cuotaGenerada.parse(cuota.json())).toMatchObject({
       monto: 28_000,
       desde: "2026-11-15",
-      hasta: "2026-12-13",
+      clases: 4,
     });
     const repetida = await servidor.inject({
       method: "POST",
@@ -106,27 +104,19 @@ describe("rutas de los abonos", () => {
     expect(paginaDeCuotas.parse(lista.json()).total).toBe(1);
   });
 
-  it("renovar los ciclos y las impagas de la sede, con el contrato", async () => {
+  it("las impagas de la sede, con el contrato", async () => {
     const { ctx, norte, alumno } = await centroConDosSedes(base);
     const { servidor } = await app(ctx);
     const alta = await servidor.inject({ method: "POST", url: "/abonos/planes", payload: PLAN });
     const { id } = planCreado.parse(alta.json());
     const ana = await alumno();
-    await servidor.inject({
-      method: "POST",
-      url: "/abonos/cuotas",
-      payload: { alumnoId: ana, planId: id, sedeId: norte, desde: "2026-10-18" },
-    });
-    const renovacion = await servidor.inject({
-      method: "POST",
-      url: "/abonos/cuotas/renovacion",
-      payload: { sedeId: norte },
-    });
-    expect(renovacion.statusCode).toBe(200);
-    expect(renovacionHecha.parse(renovacion.json())).toMatchObject({
-      dia: "2026-11-15",
-      generadas: 1,
-    });
+    for (const desde of ["2026-10-18", "2026-11-15"]) {
+      await servidor.inject({
+        method: "POST",
+        url: "/abonos/cuotas",
+        payload: { alumnoId: ana, planId: id, sedeId: norte, desde },
+      });
+    }
 
     const impagas = await servidor.inject({ url: `/abonos/cuotas/impagas?sede=${norte}` });
     expect(impagas.statusCode).toBe(200);

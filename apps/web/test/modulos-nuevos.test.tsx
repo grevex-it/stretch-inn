@@ -91,13 +91,15 @@ it("da de alta un plan de abono y vuelve a consultar la lista", async () => {
   await usuario.click(await screen.findByRole("link", { name: "Abonos" }));
   await usuario.click(screen.getByText("Nuevo plan"));
   await usuario.type(screen.getByLabelText("Nombre del plan"), "Mensual");
-  await usuario.type(screen.getByLabelText("Clases por semana"), "2");
+  const clases = screen.getByLabelText("Clases del abono");
+  await usuario.clear(clases);
+  await usuario.type(clases, "4");
   await usuario.type(screen.getByLabelText("Precio general en pesos"), "12000");
   await usuario.click(screen.getByRole("button", { name: "Guardar" }));
   expect(await screen.findByText("Cambios guardados.")).toBeDefined();
   expect(
     servidor.pedidos.find((pedido) => pedido.clave === "POST /api/abonos/planes")?.cuerpo,
-  ).toEqual({ nombre: "Mensual", clasesPorSemana: 2, precio: 12000 });
+  ).toEqual({ nombre: "Mensual", clases: 4, precio: 12000 });
   expect(
     servidor.pedidos.filter((pedido) => pedido.clave === "GET /api/abonos/planes?pagina=1"),
   ).toHaveLength(2);

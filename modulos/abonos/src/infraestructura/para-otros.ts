@@ -2,7 +2,8 @@
 // limita al centro y a las sedes visibles. Abonos escribe en sus propias tablas (regla 4).
 import { falla, ok, type Resultado } from "@app/nucleo";
 import type { Transaccion } from "@app/plataforma";
-import { and, eq, gt, isNull, lte, sql } from "drizzle-orm";
+import { fechasDeAlumno } from "@app/agenda";
+import { and, desc, eq, isNull, lte } from "drizzle-orm";
 import { diaDe } from "../dominio/ciclo.ts";
 import type { Cuota } from "../aplicacion/puertos.ts";
 import { cuotas } from "./esquema.ts";
@@ -42,22 +43,18 @@ export async function revertirPago(
 }
 
 /**
- * Cuándo termina el abono vigente del alumno en esa sede y en ese momento: la medianoche del
- * centro del día en que termina el ciclo, o undefined si no tiene una cuota vigente (0019). Lo
- * usa asistencia para el vencimiento de los créditos, conectado por la API.
+ * Cuándo termina el abono del alumno en esa sede que está vigente en ese momento: el final de su
+ * última clase (0020), o undefined si no tiene. Toma la cuota que empezó más tarde hasta ese día;
+ * si no le alcanzan las fechas del horario fijo, no hay final. Lo usa asistencia, conectado por
+ * la API.
  */
 export async function finDelAbono(
   tx: Transaccion,
   { alumnoId, sedeId, en }: { alumnoId: string; sedeId: string; en: Date },
 ): Promise<Date | undefined> {
-  const zona = await repositorioPlanes(tx).zonaHoraria();
-  const dia = diaDe(en, zona);
-  const [fila] = await tx
-    .select({
-      fin: sql<Date>`(${cuotas.hasta}::timestamp at time zone ${zona})`.mapWith(
-        (valor: string | Date) => new Date(valor),
-      ),
-    })
+  const dia = diaDe(en, await repositorioPlanes(tx).zonaHoraria());
+  const [cuota] = await tx
+    .select({ desde: cuotas.desde, clases: cuotas.clases })
     .from(cuotas)
     .where(
       and(
@@ -65,9 +62,13 @@ export async function finDelAbono(
         eq(cuotas.sedeId, sedeId),
         isNull(cuotas.anuladaEn),
         lte(cuotas.desde, dia),
-        gt(cuotas.hasta, dia),
       ),
     )
+    .orderBy(desc(cuotas.desde))
     .limit(1);
-  return fila?.fin;
+  if (cuota === undefined) return undefined;
+  const { desde, clases } = cuota;
+  const fechas = await fechasDeAlumno(tx, { alumnoId, sedeId, desde, cantidad: clases });
+  const ultima = fechas.length === clases ? fechas.at(-1) : undefined;
+  return ultima !== undefined && en < ultima.terminaEn ? ultima.terminaEn : undefined;
 }

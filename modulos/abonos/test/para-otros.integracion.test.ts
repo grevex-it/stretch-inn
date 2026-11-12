@@ -10,7 +10,7 @@ import {
   registrarPago,
   revertirPago,
 } from "../src/index.ts";
-import { centroConDosSedes } from "./ayudas.ts";
+import { centroConDosSedes, conHorario } from "./ayudas.ts";
 
 let base: Base;
 beforeAll(() => {
@@ -25,12 +25,13 @@ const abonos = () => crearAbonos(base, { ahora: () => new Date("2026-11-15T12:00
 async function conCuota() {
   const centro = await centroConDosSedes(base);
   const plan = await abonos().crearPlan(centro.ctx, {
-    nombre: "Libre",
-    clasesPorSemana: 3,
+    nombre: "Abono de 4 clases",
+    clases: 4,
     precio: 35_000,
   });
   if (!plan.ok) throw new Error(plan.error.mensaje);
   const alumnoId = await centro.alumno();
+  await conHorario(base, centro.ctx, { sedeId: centro.norte, alumnoId, dias: [1] });
   const cuota = await abonos().generarCuota(centro.ctx, {
     alumnoId,
     planId: plan.valor.id,
@@ -63,7 +64,7 @@ describe("obtenerCuota y registrarPago", () => {
       alumnoId,
       sedeId: norte,
       desde: "2026-11-15",
-      hasta: "2026-12-13",
+      clases: 4,
       monto: 35_000,
       pagadaEn: null,
     });
@@ -96,14 +97,15 @@ describe("obtenerCuota y registrarPago", () => {
 describe("finDelAbono", () => {
   const en = (instante: string) => new Date(instante);
 
-  it("es la medianoche del centro del día en que termina el ciclo vigente en ese momento", async () => {
+  it("es el final de la última clase del abono vigente en ese momento", async () => {
     const { ctx, norte, alumnoId } = await conCuota();
     const fin = (instante: string, sedeId = norte) =>
       enContexto(base, ctx, (tx) => finDelAbono(tx, { alumnoId, sedeId, en: en(instante) }));
-    // Ciclo del 15/11 al 13/12, en Buenos Aires (UTC−3).
-    expect(await fin("2026-11-20T21:00:00Z")).toEqual(en("2026-12-13T03:00:00Z"));
-    expect(await fin("2026-12-13T02:59:00Z")).toEqual(en("2026-12-13T03:00:00Z"));
-    expect(await fin("2026-12-13T03:00:00Z")).toBeUndefined();
+    // Abono desde el 15/11 con clase los lunes a las 18:30 de Buenos Aires (21:30 UTC, una hora):
+    // 16/11, 23/11, 30/11 y 7/12. La última termina el 7/12 a las 22:30 UTC.
+    expect(await fin("2026-11-20T21:00:00Z")).toEqual(en("2026-12-07T22:30:00Z"));
+    expect(await fin("2026-12-07T22:29:00Z")).toEqual(en("2026-12-07T22:30:00Z"));
+    expect(await fin("2026-12-07T22:30:00Z")).toBeUndefined();
     expect(await fin("2026-11-15T02:59:00Z")).toBeUndefined();
   });
 

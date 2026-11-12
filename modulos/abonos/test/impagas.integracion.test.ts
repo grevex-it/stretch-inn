@@ -20,7 +20,7 @@ const abonos = () => crearAbonos(base, { ahora: () => new Date("2026-11-15T12:00
 async function conDeudas() {
   const centro = await centroConDosSedes(base);
   const { ctx, norte, sur, alumno } = centro;
-  const alta = await abonos().crearPlan(ctx, { nombre: "Dos", clasesPorSemana: 2, precio: 30_000 });
+  const alta = await abonos().crearPlan(ctx, { nombre: "Abono", clases: 4, precio: 30_000 });
   if (!alta.ok) throw new Error(alta.error.mensaje);
   const planId = alta.valor.id;
   await abonos().fijarPrecioDeSede(ctx, { planId, sedeId: norte, precio: 28_000 });
@@ -61,7 +61,7 @@ describe("cuotas impagas de una sede", () => {
       planId,
       sedeId: norte,
       desde: "2026-10-05",
-      hasta: "2026-11-02",
+      clases: 4,
       monto: 28_000,
       alumno: { nombre: "Ana", apellido: "Prueba", activo: true },
     });

@@ -40,7 +40,7 @@ function CuotaDePlan({ plan, sede }: { plan: Plan; sede: string }) {
             {alumno.nombre} · {pesos.format(precio)}
           </p>
           <label>
-            Empieza el (opcional, por defecto hoy; dura 4 semanas)
+            Empieza el (opcional: si no, sigue al abono anterior o arranca hoy)
             <input type="date" name="desde" />
           </label>
         </FormularioRemoto>

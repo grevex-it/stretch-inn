@@ -9,7 +9,7 @@ export function EditarPlan({ plan }: { plan?: Plan }) {
       cuerpo={(datos) => {
         const campos = {
           nombre: datos.get("nombre"),
-          clasesPorSemana: Number(datos.get("clases")),
+          clases: Number(datos.get("clases")),
           precio: Number(datos.get("precio")),
         };
         return plan
@@ -22,8 +22,15 @@ export function EditarPlan({ plan }: { plan?: Plan }) {
         <input name="nombre" required maxLength={100} defaultValue={plan?.nombre} />
       </label>
       <label>
-        Clases por semana
-        <input name="clases" type="number" min={1} required defaultValue={plan?.clasesPorSemana} />
+        Clases del abono
+        <input
+          name="clases"
+          type="number"
+          min={1}
+          max={100}
+          required
+          defaultValue={plan?.clases ?? 4}
+        />
       </label>
       <label>
         Precio general en pesos

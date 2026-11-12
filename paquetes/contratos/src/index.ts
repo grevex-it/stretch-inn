@@ -94,11 +94,9 @@ export {
   pedidoDeCuota,
   pedidoDeImpagas,
   pedidoDePrecioDeSede,
-  pedidoDeRenovacion,
   plan,
   planCreado,
   planEditado,
-  renovacionHecha,
   type Cuota,
   type CuotaImpaga,
   type EdicionDePlan,
@@ -107,9 +105,7 @@ export {
   type PaginaDeImpagas,
   type PaginaDePlanes,
   type PedidoDeCuota,
-  type PedidoDeRenovacion,
   type Plan,
-  type RenovacionHecha,
 } from "./abonos.ts";
 export {
   cobroHecho,

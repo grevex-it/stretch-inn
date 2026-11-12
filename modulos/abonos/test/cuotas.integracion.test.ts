@@ -1,10 +1,11 @@
-// Cuotas por ciclo de 4 semanas sobre Postgres real (0019): el precio de la sede, el monto
-// congelado, ciclos que no se pisan, el día en la zona del centro, alumno de baja, anular y permisos.
+// Cuotas por paquete de clases sobre Postgres real (0020): cada fecha del horario fijo gasta una
+// clase; el abono siguiente arranca después de la última clase del anterior; los abonos de un
+// alumno no se pisan. También el precio de la sede, el monto congelado, bajas, anular y permisos.
 import { fijarActivo } from "@app/personas";
 import { crearBase, enContexto, type Base } from "@app/plataforma";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
 import { crearAbonos } from "../src/index.ts";
-import { centroConDosSedes } from "./ayudas.ts";
+import { centroConDosSedes, conHorario } from "./ayudas.ts";
 
 let base: Base;
 beforeAll(() => {
@@ -15,14 +16,14 @@ afterAll(async () => {
 });
 
 const PRIMERA = { pagina: 1, porPagina: 50 };
-const DOS = { nombre: "Dos por semana", clasesPorSemana: 2, precio: 30_000 };
-/** 1 de diciembre a las 02:00 UTC: en Buenos Aires todavía es 30 de noviembre. */
+const ABONO = { nombre: "Abono de 4 clases", clases: 4, precio: 30_000 };
+/** 1 de diciembre a las 02:00 UTC: en Buenos Aires todavía es el lunes 30 de noviembre. */
 const AHORA = new Date("2026-12-01T02:00:00Z");
 const abonos = () => crearAbonos(base, { ahora: () => AHORA });
 
-async function conPlan() {
+async function conPlan(plan = ABONO) {
   const centro = await centroConDosSedes(base);
-  const alta = await abonos().crearPlan(centro.ctx, DOS);
+  const alta = await abonos().crearPlan(centro.ctx, plan);
   if (!alta.ok) throw new Error(alta.error.mensaje);
   await abonos().fijarPrecioDeSede(centro.ctx, {
     planId: alta.valor.id,
@@ -33,33 +34,72 @@ async function conPlan() {
 }
 
 describe("generar la cuota", () => {
-  it("dura 4 semanas desde hoy en el centro, con el precio de la sede", async () => {
+  it("es un paquete de las clases del plan, desde hoy en el centro, con el precio de la sede", async () => {
     const { ctx, norte, planId, ana } = await conPlan();
-    const cuota = await abonos().generarCuota(ctx, { alumnoId: ana, planId, sedeId: norte });
-    expect(cuota).toMatchObject({
+    expect(
+      await abonos().generarCuota(ctx, { alumnoId: ana, planId, sedeId: norte }),
+    ).toMatchObject({ ok: true, valor: { monto: 28_000, desde: "2026-11-30", clases: 4 } });
+  });
+
+  it("el abono siguiente arranca después de la última clase del anterior (una vez por semana)", async () => {
+    const { ctx, norte, planId, ana } = await conPlan();
+    await conHorario(base, ctx, { sedeId: norte, alumnoId: ana, dias: [1] });
+    const pedido = { alumnoId: ana, planId, sedeId: norte };
+    await abonos().generarCuota(ctx, pedido);
+    // Los lunes 30/11, 7/12, 14/12 y 21/12 gastan las 4 clases.
+    expect(await abonos().generarCuota(ctx, pedido)).toMatchObject({
       ok: true,
-      valor: { monto: 28_000, desde: "2026-11-30", hasta: "2026-12-28" },
+      valor: { desde: "2026-12-22" },
     });
   });
 
-  it("los ciclos de un alumno no se pisan, en ninguna sede; el siguiente empieza donde termina", async () => {
+  it("dos veces por semana, las 4 clases se gastan en dos semanas", async () => {
+    const { ctx, norte, planId, ana } = await conPlan();
+    await conHorario(base, ctx, { sedeId: norte, alumnoId: ana, dias: [1, 4] });
+    const pedido = { alumnoId: ana, planId, sedeId: norte };
+    await abonos().generarCuota(ctx, pedido);
+    // Lunes 30/11, jueves 3/12, lunes 7/12 y jueves 10/12.
+    expect(await abonos().generarCuota(ctx, pedido)).toMatchObject({
+      ok: true,
+      valor: { desde: "2026-12-11" },
+    });
+  });
+
+  it("los abonos de un alumno no se pisan, en ninguna sede", async () => {
     const { ctx, norte, sur, planId, ana } = await conPlan();
+    await conHorario(base, ctx, { sedeId: norte, alumnoId: ana, dias: [1] });
     const pedido = { alumnoId: ana, planId, sedeId: norte };
     await abonos().generarCuota(ctx, pedido);
     const pisada = { ok: false, error: { codigo: "ya-tiene-cuota" } };
-    expect(await abonos().generarCuota(ctx, { ...pedido, sedeId: sur })).toMatchObject(pisada);
     expect(await abonos().generarCuota(ctx, { ...pedido, desde: "2026-12-10" })).toMatchObject(
       pisada,
     );
-    expect(await abonos().generarCuota(ctx, { ...pedido, desde: "2026-11-10" })).toMatchObject(
-      pisada,
-    );
     expect(
-      await abonos().generarCuota(ctx, { ...pedido, sedeId: sur, desde: "2026-12-28" }),
-    ).toMatchObject({
-      ok: true,
-      valor: { monto: 30_000, desde: "2026-12-28", hasta: "2027-01-25" },
+      await abonos().generarCuota(ctx, { ...pedido, sedeId: sur, desde: "2026-12-21" }),
+    ).toMatchObject(pisada);
+    expect(
+      await abonos().generarCuota(ctx, { ...pedido, sedeId: sur, desde: "2026-12-22" }),
+    ).toMatchObject({ ok: true, valor: { monto: 30_000, desde: "2026-12-22" } });
+  });
+
+  it("sin horario fijo (clase suelta), una cuota por día", async () => {
+    const { ctx, norte, ana } = await conPlan();
+    const suelta = await abonos().crearPlan(ctx, {
+      nombre: "Clase suelta",
+      clases: 1,
+      precio: 9_000,
     });
+    if (!suelta.ok) throw new Error(suelta.error.mensaje);
+    const pedido = { alumnoId: ana, planId: suelta.valor.id, sedeId: norte };
+    expect(await abonos().generarCuota(ctx, pedido)).toMatchObject({
+      ok: true,
+      valor: { clases: 1, monto: 9_000 },
+    });
+    expect(await abonos().generarCuota(ctx, pedido)).toMatchObject({
+      ok: false,
+      error: { codigo: "ya-tiene-cuota" },
+    });
+    expect((await abonos().generarCuota(ctx, { ...pedido, desde: "2026-12-03" })).ok).toBe(true);
   });
 
   it("dos cuotas del mismo alumno a la vez: una sola queda", async () => {
@@ -67,7 +107,7 @@ describe("generar la cuota", () => {
     const pedido = { alumnoId: ana, planId, sedeId: norte };
     const resultados = await Promise.all([
       abonos().generarCuota(ctx, pedido),
-      abonos().generarCuota(ctx, { ...pedido, desde: "2026-12-05" }),
+      abonos().generarCuota(ctx, pedido),
     ]);
     expect(resultados.filter((r) => r.ok)).toHaveLength(1);
   });
@@ -77,7 +117,9 @@ describe("generar la cuota", () => {
     await abonos().generarCuota(ctx, { alumnoId: ana, planId, sedeId: norte });
     await abonos().fijarPrecioDeSede(ctx, { planId, sedeId: norte, precio: 40_000 });
     const lista = await abonos().cuotasDeAlumno(ctx, { ...PRIMERA, alumnoId: ana });
-    expect(lista.ok && lista.valor.elementos.map((c) => c.monto)).toEqual([28_000]);
+    expect(lista.ok && lista.valor.elementos.map((c) => [c.monto, c.clases])).toEqual([
+      [28_000, 4],
+    ]);
   });
 
   it("rechaza plan dado de baja, alumno de baja y día mal escrito", async () => {
