@@ -26,7 +26,8 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
     muestra una sola vez y no se guarda en ninguna consulta.
   - `personas/`: pantalla Alumnos (lista con buscador, alta, edición, baja y reactivación).
   - `agenda/`: clases de cada sede, alta y edición, e inscriptos.
-  - `asistencia/`: planilla de una fecha, marcar, avisos y recuperaciones.
+  - `asistencia/`: planilla de una fecha, marcar, avisos y recuperaciones, y las reglas de
+    recuperación de la sede (`ReglasDeLaSede.tsx`, con `asistencia.configurar`, 0020).
   - `abonos/`: planes (con las clases del paquete), precio por sede y generar la cuota (0020).
     `ciclo.ts` muestra la cuota con su inicio y sus clases («Desde el 30/11/2026 · 4 clases»).
   - `caja/`: el día de caja de una sede, cobrar una cuota (efectivo o transferencia) y anular.
