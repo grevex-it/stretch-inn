@@ -6,15 +6,14 @@ import { obtenerAlumnos } from "@app/personas";
 import type { Transaccion } from "@app/plataforma";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { RepositorioAsistencia } from "../aplicacion/puertos.ts";
-import { asistencias } from "./esquema.ts";
+import { asistencias, reglasDeRecuperacion } from "./esquema.ts";
 import { repositorioAvisos } from "./repositorio-avisos.ts";
-import { repositorioCreditos } from "./repositorio-creditos.ts";
 import { repositorioRecuperaciones } from "./repositorio-recuperaciones.ts";
 
 export function repositorioAsistencia(tx: Transaccion): RepositorioAsistencia {
   return {
     ...repositorioAvisos(tx),
-    ...repositorioCreditos(tx),
+    ...repositorioReglas(tx),
     ...repositorioRecuperaciones(tx),
     fecha: (id) => obtenerFecha(tx, id),
     inscriptos: (filtro) => inscriptosEnFecha(tx, filtro),
@@ -70,4 +69,29 @@ async function guardar(
         registradaEn: sql`excluded.registrada_en`,
       },
     });
+}
+
+/** Las reglas de recuperación de la sede: una fila por sede, que guardar reemplaza. */
+function repositorioReglas(
+  tx: Transaccion,
+): Pick<RepositorioAsistencia, "reglas" | "guardarReglas"> {
+  return {
+    async reglas(sedeId) {
+      const [fila] = await tx
+        .select({
+          anticipacionMinutos: reglasDeRecuperacion.anticipacionMinutos,
+          maximoPorAbono: reglasDeRecuperacion.maximoPorAbono,
+          sinAbono: reglasDeRecuperacion.sinAbono,
+        })
+        .from(reglasDeRecuperacion)
+        .where(eq(reglasDeRecuperacion.sedeId, sedeId));
+      return fila;
+    },
+    async guardarReglas(sedeId, reglas) {
+      await tx
+        .insert(reglasDeRecuperacion)
+        .values({ ...reglas, sedeId, centroId: sql`app_centro_actual()` })
+        .onConflictDoUpdate({ target: reglasDeRecuperacion.sedeId, set: reglas });
+    },
+  };
 }

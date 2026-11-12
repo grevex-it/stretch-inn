@@ -2,9 +2,9 @@
 // asistencia. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula.
 import {
   avisoHecho,
-  paginaDeCreditos,
   planillaDeAsistencia,
   recuperacionHecha,
+  reglasDeRecuperacion,
 } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
@@ -22,6 +22,8 @@ afterAll(async () => {
   await base.cerrar();
 });
 
+const DIA = 24 * 60 * 60_000;
+
 async function app(contexto: ContextoCentro, ahora: Date) {
   const servidor = Fastify();
   const declaradas: Record<string, FastifyContextConfig> = {};
@@ -38,7 +40,16 @@ async function app(contexto: ContextoCentro, ahora: Date) {
     };
     listo();
   });
-  await servidor.register(rutasDeAsistencia(crearAsistencia(base, { ahora: () => ahora })));
+  // Todos tienen un abono vigente: una semana para atrás y tres para adelante.
+  const abono = {
+    inicio: new Date(ahora.getTime() - 7 * DIA),
+    fin: new Date(ahora.getTime() + 21 * DIA),
+  };
+  const asistencia = crearAsistencia(base, {
+    ahora: () => ahora,
+    abonoVigente: () => Promise.resolve(abono),
+  });
+  await servidor.register(rutasDeAsistencia(asistencia));
   return { servidor, declaradas };
 }
 
@@ -54,46 +65,44 @@ describe("rutas de la asistencia", () => {
       "PUT /asistencia/fechas/:id": "asistencia.tomar",
       "POST /asistencia/fechas/:id/avisos": "asistencia.avisar",
       "DELETE /asistencia/avisos/:id": "asistencia.avisar",
-      "GET /alumnos/:id/creditos": "asistencia.ver",
+      "GET /asistencia/sedes/:id/reglas": "asistencia.ver",
+      "PUT /asistencia/sedes/:id/reglas": "asistencia.configurar",
       "POST /asistencia/fechas/:id/recuperaciones": "asistencia.recuperar",
       "DELETE /asistencia/recuperaciones/:id": "asistencia.recuperar",
     });
   });
 
-  it("POST recupera (201 con el id), DELETE lo anula (204) y sin crédito da 409", async () => {
-    const { ctx, ana, bea, fecha, otraClase } = await claseConFecha(base);
+  it("POST recupera (201 con el id), DELETE lo anula (204) y repetir da 409", async () => {
+    const { ctx, ana, fecha, otraClase } = await claseConFecha(base);
     const { servidor } = await app(ctx, new Date(fecha.empiezaEn.getTime() - 3 * 60 * 60_000));
-    await servidor.inject({
-      method: "POST",
-      url: `/asistencia/fechas/${fecha.id}/avisos`,
-      payload: { alumnoId: ana },
-    });
     const yoga = await otraClase(2, 0);
     const url = `/asistencia/fechas/${yoga.fecha.id}/recuperaciones`;
 
     const reserva = await servidor.inject({ method: "POST", url, payload: { alumnoId: ana } });
     expect(reserva.statusCode).toBe(201);
     const { id } = recuperacionHecha.parse(reserva.json());
-    const sinCredito = await servidor.inject({ method: "POST", url, payload: { alumnoId: bea } });
-    expect(sinCredito.statusCode).toBe(409);
+    const repetida = await servidor.inject({ method: "POST", url, payload: { alumnoId: ana } });
+    expect(repetida.statusCode).toBe(409);
     const anular = { method: "DELETE" as const, url: `/asistencia/recuperaciones/${id}` };
     expect((await servidor.inject(anular)).statusCode).toBe(204);
     expect((await servidor.inject(anular)).statusCode).toBe(404);
   });
 
-  it("GET /alumnos/:id/creditos devuelve los créditos vigentes con el contrato", async () => {
-    const { ctx, ana, fecha } = await claseConFecha(base);
-    const { servidor } = await app(ctx, new Date(fecha.empiezaEn.getTime() - 3 * 60 * 60_000));
-    await servidor.inject({
-      method: "POST",
-      url: `/asistencia/fechas/${fecha.id}/avisos`,
-      payload: { alumnoId: ana },
+  it("GET y PUT de las reglas de la sede, con el contrato; mal formadas, 400", async () => {
+    const { ctx, norte, fecha } = await claseConFecha(base);
+    const { servidor } = await app(ctx, fecha.empiezaEn);
+    const url = `/asistencia/sedes/${norte}/reglas`;
+    const mendoza = { anticipacionMinutos: 60, maximoPorAbono: 2, sinAbono: false };
+    expect((await servidor.inject({ method: "PUT", url, payload: mendoza })).statusCode).toBe(204);
+    const leidas = await servidor.inject({ url });
+    expect(leidas.statusCode).toBe(200);
+    expect(reglasDeRecuperacion.parse(leidas.json())).toEqual(mendoza);
+    const mal = await servidor.inject({
+      method: "PUT",
+      url,
+      payload: { ...mendoza, maximoPorAbono: 1.5 },
     });
-    const respuesta = await servidor.inject({ url: `/alumnos/${ana}/creditos` });
-    expect(respuesta.statusCode).toBe(200);
-    expect(paginaDeCreditos.parse(respuesta.json()).elementos.map((c) => c.ocurrenciaId)).toEqual([
-      fecha.id,
-    ]);
+    expect(mal.statusCode).toBe(400);
   });
 
   it("POST avisa (201 con el id), DELETE lo anula (204) y repetir da 409 y 404", async () => {

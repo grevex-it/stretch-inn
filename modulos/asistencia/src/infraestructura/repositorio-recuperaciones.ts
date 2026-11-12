@@ -2,34 +2,53 @@
 // enContexto: RLS limita al centro y a las sedes visibles.
 import { inscriptosEnFecha } from "@app/agenda";
 import type { Transaccion } from "@app/plataforma";
-import { and, asc, count, eq, gt, inArray, isNull, notExists, sql } from "drizzle-orm";
+import { and, asc, count, eq, gte, inArray, isNull, lt, sql } from "drizzle-orm";
 import type { RepositorioAsistencia } from "../aplicacion/puertos.ts";
-import { avisosDeAusencia, creditos, recuperaciones } from "./esquema.ts";
+import { avisosDeAusencia, recuperaciones } from "./esquema.ts";
 
 type RepositorioRecuperaciones = Pick<
   RepositorioAsistencia,
   | "bloquearFecha"
   | "cuentaDeLugares"
-  | "creditoParaUsar"
   | "recuperar"
   | "recuperacion"
   | "anularRecuperacion"
   | "recuperan"
   | "recuperanEntre"
-  | "creditoUsado"
+  | "bloquearAlumno"
+  | "recuperacionesEntre"
 >;
 
 const vigentes = (ocurrenciaId: string) =>
   and(eq(recuperaciones.ocurrenciaId, ocurrenciaId), isNull(recuperaciones.anuladaEn));
 
-/** El crédito no tiene una recuperación vigente. */
-export const sinUsar = (tx: Transaccion) =>
-  notExists(
-    tx
-      .select({ uno: sql`1` })
-      .from(recuperaciones)
-      .where(and(eq(recuperaciones.creditoId, creditos.id), isNull(recuperaciones.anuladaEn))),
-  );
+/** Lo que hace falta para el máximo de recuperaciones por abono (0020). */
+function porAlumno(
+  tx: Transaccion,
+): Pick<RepositorioAsistencia, "bloquearAlumno" | "recuperacionesEntre"> {
+  return {
+    async bloquearAlumno(alumnoId) {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtextextended(${`rec:${alumnoId}`}, 0))`,
+      );
+    },
+    async recuperacionesEntre({ alumnoId, sedeId, desde, hasta }) {
+      const [fila] = await tx
+        .select({ total: count() })
+        .from(recuperaciones)
+        .where(
+          and(
+            eq(recuperaciones.alumnoId, alumnoId),
+            eq(recuperaciones.sedeId, sedeId),
+            isNull(recuperaciones.anuladaEn),
+            gte(recuperaciones.empiezaEn, desde),
+            lt(recuperaciones.empiezaEn, hasta),
+          ),
+        );
+      return fila?.total ?? 0;
+    },
+  };
+}
 
 export function repositorioRecuperaciones(tx: Transaccion): RepositorioRecuperaciones {
   return {
@@ -38,7 +57,6 @@ export function repositorioRecuperaciones(tx: Transaccion): RepositorioRecuperac
       await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${id}, 0))`);
     },
     cuentaDeLugares: (fecha) => cuentaDeLugares(tx, fecha),
-    creditoParaUsar: (filtro) => creditoParaUsar(tx, filtro),
     recuperar: (fecha, reserva, registro) => recuperar(tx, fecha, reserva, registro),
     async recuperacion(id) {
       const [fila] = await tx
@@ -64,38 +82,8 @@ export function repositorioRecuperaciones(tx: Transaccion): RepositorioRecuperac
         .where(and(vigentes(ocurrenciaId), inArray(recuperaciones.alumnoId, [...alumnoIds])));
       return new Set(filas.map((f) => f.alumnoId));
     },
-    async creditoUsado(avisoId) {
-      const [fila] = await tx
-        .select({ uno: sql`1` })
-        .from(recuperaciones)
-        .innerJoin(creditos, eq(creditos.id, recuperaciones.creditoId))
-        .where(and(eq(creditos.avisoId, avisoId), isNull(recuperaciones.anuladaEn)));
-      return fila !== undefined;
-    },
+    ...porAlumno(tx),
   };
-}
-
-/** Vigente al empezar la fecha y sin usar; queda tomado hasta el fin de la transacción. */
-async function creditoParaUsar(
-  tx: Transaccion,
-  { alumnoId, sedeId, empiezaEn, ahora }: Parameters<RepositorioAsistencia["creditoParaUsar"]>[0],
-): ReturnType<RepositorioAsistencia["creditoParaUsar"]> {
-  const [fila] = await tx
-    .select({ id: creditos.id })
-    .from(creditos)
-    .where(
-      and(
-        eq(creditos.alumnoId, alumnoId),
-        eq(creditos.sedeId, sedeId),
-        isNull(creditos.anuladoEn),
-        gt(creditos.venceEn, ahora > empiezaEn ? ahora : empiezaEn),
-        sinUsar(tx),
-      ),
-    )
-    .orderBy(asc(creditos.venceEn), asc(creditos.id))
-    .limit(1)
-    .for("update");
-  return fila;
 }
 
 async function cuentaDeLugares(
@@ -123,7 +111,7 @@ async function cuentaDeLugares(
 /** Los índices únicos parciales son la barrera: si choca, no hay fila. */
 async function recuperar(
   tx: Transaccion,
-  ...[fecha, { alumnoId, creditoId }, registro]: Parameters<RepositorioAsistencia["recuperar"]>
+  ...[fecha, { alumnoId }, registro]: Parameters<RepositorioAsistencia["recuperar"]>
 ): Promise<string | undefined> {
   const [fila] = await tx
     .insert(recuperaciones)
@@ -132,7 +120,7 @@ async function recuperar(
       sedeId: fecha.sedeId,
       ocurrenciaId: fecha.id,
       alumnoId,
-      creditoId,
+      empiezaEn: fecha.empiezaEn,
       reservadaPorTipo: registro.tipo,
       reservadaPorId: registro.id,
       reservadaEn: registro.en,

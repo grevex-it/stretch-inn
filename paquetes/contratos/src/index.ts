@@ -71,16 +71,17 @@ export {
 } from "./agenda.ts";
 export {
   avisoHecho,
-  paginaDeCreditos,
   pedidoDeAsistencia,
   pedidoDeAviso,
   pedidoDeRecuperacion,
   planillaDeAsistencia,
   recuperacionHecha,
+  reglasDeRecuperacion,
   type PedidoDeAsistencia,
   type PedidoDeAviso,
   type PedidoDeRecuperacion,
   type PlanillaDeAsistencia,
+  type ReglasDeRecuperacion,
 } from "./asistencia.ts";
 export {
   cuota,

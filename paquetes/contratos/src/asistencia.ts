@@ -30,30 +30,34 @@ const renglon = z.object({
 export const pedidoDeAviso = z.object({ alumnoId: z.uuid("Ese alumno no existe.") });
 
 /** Respuesta de POST /asistencia/fechas/:id/avisos: con este id se anula. */
-export const avisoHecho = z.object({
-  id: z.uuid(),
-  /** Si le dio un crédito para recuperar. Hoy siempre: todo aviso da crédito (0019). */
-  conCredito: z.boolean(),
-});
+export const avisoHecho = z.object({ id: z.uuid() });
 
-/** Un crédito para recuperar: se usa en la sede de la fecha a la que se faltó. */
-const credito = z.object({
-  id: z.uuid(),
-  sedeId: z.uuid(),
-  /** La fecha a la que se faltó. */
-  ocurrenciaId: z.uuid(),
-  /** En UTC. */
-  venceEn: z.iso.datetime(),
-});
-
-/** Respuesta de GET /alumnos/:id/creditos: los vigentes, el que vence antes primero. */
-export const paginaDeCreditos = paginaDe(credito);
-
-/** Cuerpo de POST /asistencia/fechas/:id/recuperaciones: usa el crédito que vence antes. */
+/** Cuerpo de POST /asistencia/fechas/:id/recuperaciones (0020: no hace falta un aviso previo). */
 export const pedidoDeRecuperacion = z.object({ alumnoId: z.uuid("Ese alumno no existe.") });
 
 /** Respuesta de POST /asistencia/fechas/:id/recuperaciones: con este id se anula. */
 export const recuperacionHecha = z.object({ id: z.uuid() });
+
+/**
+ * Las reglas de recuperación de una sede (0020): cuerpo de PUT y respuesta de GET
+ * /asistencia/sedes/:id/reglas.
+ */
+export const reglasDeRecuperacion = z.object({
+  /** Cuántos minutos antes de la clase hay que anotarse a recuperar. */
+  anticipacionMinutos: z
+    .number("La anticipación va en minutos enteros, de 0 a una semana.")
+    .int("La anticipación va en minutos enteros, de 0 a una semana.")
+    .min(0, "La anticipación va en minutos enteros, de 0 a una semana.")
+    .max(10_080, "La anticipación va en minutos enteros, de 0 a una semana."),
+  /** Cuántas recuperaciones se pueden hacer por abono. */
+  maximoPorAbono: z
+    .number("El máximo por abono va de 0 a 100 recuperaciones.")
+    .int("El máximo por abono va de 0 a 100 recuperaciones.")
+    .min(0, "El máximo por abono va de 0 a 100 recuperaciones.")
+    .max(100, "El máximo por abono va de 0 a 100 recuperaciones."),
+  /** Si se puede recuperar sin un abono vigente. */
+  sinAbono: z.boolean(),
+});
 
 /**
  * Respuesta de GET /asistencia/fechas/:id: la fecha, la misma página de sus inscriptos y de los
@@ -82,3 +86,4 @@ export type PedidoDeAsistencia = z.infer<typeof pedidoDeAsistencia>;
 export type PlanillaDeAsistencia = z.infer<typeof planillaDeAsistencia>;
 export type PedidoDeAviso = z.infer<typeof pedidoDeAviso>;
 export type PedidoDeRecuperacion = z.infer<typeof pedidoDeRecuperacion>;
+export type ReglasDeRecuperacion = z.infer<typeof reglasDeRecuperacion>;
