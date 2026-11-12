@@ -29,7 +29,7 @@ export const asistencias = pgTable(
 );
 
 /**
- * El derecho a recuperar que genera un aviso a tiempo, uno por aviso. Anularlo no lo borra.
+ * El derecho a recuperar que genera un aviso de ausencia, uno por aviso. Anularlo no lo borra.
  * Se usa en la sede de la fecha a la que se faltó.
  */
 export const creditos = pgTable(

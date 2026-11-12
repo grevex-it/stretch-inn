@@ -1,11 +1,12 @@
 // Casos de uso de los avisos de ausencia. El permiso se controla en la sede de la fecha (0007).
-// El aviso a tiempo genera un crédito para recuperar en la misma transacción (ver credito.ts).
+// Todo aviso genera un crédito para recuperar en la misma transacción, que vence con el abono
+// del alumno (0019, ver credito.ts).
 import { falla, ok, type ContextoCentro, type Resultado } from "@app/nucleo";
 import { puedeAvisar } from "../dominio/aviso.ts";
-import { daCredito, venceEl } from "../dominio/credito.ts";
+import { venceEl } from "../dominio/credito.ts";
 import { AVISAR } from "../dominio/permisos.ts";
 import { fechaCon, registroDe } from "./comun.ts";
-import type { ErrorDeAsistencia, RepositorioAsistencia } from "./puertos.ts";
+import type { ConsultaFinDelAbono, ErrorDeAsistencia, RepositorioAsistencia } from "./puertos.ts";
 
 const INEXISTENTE = falla("aviso-inexistente", "Ese aviso no existe o ya se anuló.");
 
@@ -15,6 +16,7 @@ export async function avisar(
   quien: ContextoCentro,
   ahora: Date,
   { fechaId, alumnoId }: { fechaId: string; alumnoId: string },
+  finDelAbono: ConsultaFinDelAbono,
 ): Promise<Resultado<{ id: string; conCredito: boolean }, ErrorDeAsistencia>> {
   const fecha = await fechaCon(repo, quien, AVISAR, fechaId);
   if (!fecha.ok) return fecha;
@@ -31,17 +33,16 @@ export async function avisar(
   }
   const id = await repo.avisar(fecha.valor, alumnoId, registroDe(quien, ahora));
   if (id === undefined) return falla("ya-avisado", "Ese alumno ya avisó que no viene.");
-  const conCredito = daCredito(empiezaEn, ahora);
-  if (conCredito) {
-    await repo.crearCredito({
-      avisoId: id,
-      alumnoId,
-      sedeId: fecha.valor.sedeId,
-      ocurrenciaId: fechaId,
-      venceEn: venceEl(empiezaEn),
-    });
-  }
-  return ok({ id, conCredito });
+  const { sedeId } = fecha.valor;
+  const fin = await finDelAbono({ alumnoId, sedeId, en: empiezaEn });
+  await repo.crearCredito({
+    avisoId: id,
+    alumnoId,
+    sedeId,
+    ocurrenciaId: fechaId,
+    venceEn: venceEl(empiezaEn, fin),
+  });
+  return ok({ id, conCredito: true });
 }
 
 /** Anular no borra el aviso: lo marca. También solo antes del inicio. */
