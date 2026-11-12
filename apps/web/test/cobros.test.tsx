@@ -1,4 +1,4 @@
-// Cobrar una cuota desde Caja (0019): la cuota se ve con las fechas de su ciclo de 4 semanas y los
+// Cobrar una cuota desde Caja (0019 y 0020): la cuota se ve con su inicio y sus clases, y los
 // medios de pago son efectivo y transferencia.
 import { screen, within } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
@@ -12,7 +12,7 @@ afterEach(() => {
 const ANA = "00000000-0000-4000-8000-0000000000aa";
 const PLAN = "00000000-0000-4000-8000-0000000000bb";
 
-it("muestra el ciclo de la cuota y cobra con efectivo o transferencia", async () => {
+it("muestra el inicio y las clases de la cuota, y cobra con efectivo o transferencia", async () => {
   const servidor = servidorFalso({
     "GET /api/sesion": enCentro([{ id: NORTE, nombre: "Norte" }], {
       permisos: ["caja.ver", "caja.cobrar", "personas.ver", "abonos.ver"],
@@ -52,7 +52,7 @@ it("muestra el ciclo de la cuota y cobra con efectivo o transferencia", async ()
             planId: PLAN,
             sedeId: NORTE,
             desde: "2026-11-30",
-            hasta: "2026-12-28",
+            clases: 4,
             monto: 28_000,
             pagadaEn: null,
           },
@@ -67,7 +67,7 @@ it("muestra el ciclo de la cuota y cobra con efectivo o transferencia", async ()
   await usuario.type(screen.getByLabelText("Buscar alumno"), "Ana");
   await usuario.click(await screen.findByRole("button", { name: "Ana Pérez" }));
 
-  expect(await screen.findByText(/Del 30\/11\/2026 al 27\/12\/2026/)).toBeDefined();
+  expect(await screen.findByText(/Desde el 30\/11\/2026 · 4 clases/)).toBeDefined();
   const medio = screen.getByLabelText("Medio de pago");
   const opciones = within(medio)
     .getAllByRole("option")
@@ -83,7 +83,7 @@ it("muestra el ciclo de la cuota y cobra con efectivo o transferencia", async ()
   });
 });
 
-it("genera la cuota de un ciclo desde el día elegido", async () => {
+it("genera la cuota desde el día elegido", async () => {
   const servidor = servidorFalso({
     "GET /api/sesion": enCentro([{ id: NORTE, nombre: "Norte" }], {
       permisos: ["abonos.ver", "abonos.asignar", "personas.ver"],
@@ -98,7 +98,7 @@ it("genera la cuota de un ciclo desde el día elegido", async () => {
           {
             id: PLAN,
             nombre: "Una por semana",
-            clasesPorSemana: 1,
+            clases: 4,
             precio: 30_000,
             activo: true,
             version: 1,
@@ -131,7 +131,7 @@ it("genera la cuota de un ciclo desde el día elegido", async () => {
     },
     "POST /api/abonos/cuotas": {
       estado: 201,
-      cuerpo: { id: SUR, monto: 30_000, desde: "2026-11-30", hasta: "2026-12-28" },
+      cuerpo: { id: SUR, monto: 30_000, desde: "2026-11-30", clases: 4 },
     },
   });
   const usuario = montarPanel();

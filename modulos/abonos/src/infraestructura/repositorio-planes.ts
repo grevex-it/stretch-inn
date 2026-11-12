@@ -24,7 +24,7 @@ type RepositorioPlanes = Pick<
 const columnas = {
   id: planes.id,
   nombre: planes.nombre,
-  clasesPorSemana: planes.clasesPorSemana,
+  clases: planes.clases,
   precio: planes.precio,
   activo: planes.activo,
   version: planes.version,

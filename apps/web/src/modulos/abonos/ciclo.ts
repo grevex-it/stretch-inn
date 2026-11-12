@@ -1,13 +1,11 @@
-// Cómo se muestra el ciclo de 4 semanas de una cuota (0019). `hasta` es el día en que empieza el
-// siguiente: el último día del ciclo es el anterior. Los días ya vienen en la zona del centro.
+// Cómo se muestra una cuota (0020): un paquete de clases que cuenta desde un día. Cuándo termina
+// lo dicen las fechas del horario fijo del alumno. Los días ya vienen en la zona del centro.
 
 const dia = (texto: string) => {
   const [anio, mes, d] = texto.split("-");
   return `${d ?? ""}/${mes ?? ""}/${anio ?? ""}`;
 };
 
-export function textoDelCiclo({ desde, hasta }: { desde: string; hasta: string }): string {
-  const ultimo = new Date(`${hasta}T00:00:00Z`);
-  ultimo.setUTCDate(ultimo.getUTCDate() - 1);
-  return `Del ${dia(desde)} al ${dia(ultimo.toISOString().slice(0, 10))}`;
+export function textoDelCiclo({ desde, clases }: { desde: string; clases: number }): string {
+  return `Desde el ${dia(desde)} · ${String(clases)} ${clases === 1 ? "clase" : "clases"}`;
 }

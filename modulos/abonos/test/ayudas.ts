@@ -1,6 +1,7 @@
 // Datos de prueba: un centro con dos sedes (Norte y Sur) y personas que entran de verdad, con
 // permisos distintos en cada sede. El contexto sale de una sesión real (regla 1 de AGENTS.md).
 import type {} from "@app/db/pruebas";
+import { crearAgenda } from "@app/agenda";
 import { crearAcceso, hashearClave } from "@app/identidad";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearAlumno } from "@app/personas";
@@ -17,6 +18,9 @@ const TODO = [
   "abonos.asignar",
   "personas.ver",
   "personas.editar",
+  "agenda.ver",
+  "agenda.gestionar",
+  "agenda.inscribir",
 ];
 
 async function comoDueno(consulta: string, valores: unknown[] = []): Promise<void> {
@@ -117,4 +121,29 @@ export async function centroConDosSedes(base: Base) {
         [sur, permisos.sur],
       ]),
   };
+}
+
+/**
+ * Inscribe al alumno en una clase de la sede por cada día (1 = lunes … 7 = domingo), a las 18:30:
+ * su horario fijo. Cada fecha de ese horario gasta una clase del abono (0020).
+ */
+export async function conHorario(
+  base: Base,
+  ctx: ContextoCentro,
+  { sedeId, alumnoId, dias }: { sedeId: string; alumnoId: string; dias: readonly number[] },
+): Promise<void> {
+  const agenda = crearAgenda(base);
+  for (const dia of dias) {
+    const clase = await agenda.crearClase(ctx, {
+      sedeId,
+      nombre: `Stretching ${String(dia)}`,
+      dia,
+      hora: "18:30",
+      duracionMinutos: 60,
+      cupo: 12,
+    });
+    if (!clase.ok) throw new Error(clase.error.mensaje);
+    const alta = await agenda.inscribir(ctx, { claseId: clase.valor.id, alumnoId });
+    if (!alta.ok) throw new Error(alta.error.mensaje);
+  }
 }

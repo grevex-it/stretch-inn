@@ -1,14 +1,23 @@
 // Adaptador Drizzle de las cuotas. Corre dentro de enContexto: RLS limita al centro y a las sedes
-// visibles. El alumno se lee por la API pública de personas (regla 4).
+// visibles. El alumno y su horario fijo se leen por las API públicas de personas y agenda (regla 4).
+import { fechasDeAlumno } from "@app/agenda";
 import { obtenerAlumno } from "@app/personas";
 import type { Transaccion } from "@app/plataforma";
-import { and, count, desc, eq, gt, inArray, isNull, lt, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { RepositorioAbonos } from "../aplicacion/puertos.ts";
 import { cuotas } from "./esquema.ts";
 
 type RepositorioCuotas = Pick<
   RepositorioAbonos,
-  "alumno" | "generarCuota" | "cuota" | "anularCuota" | "marcarPagada" | "cuotasDeAlumno"
+  | "alumno"
+  | "bloquearAlumno"
+  | "ultimaCuota"
+  | "fechasDeAlumno"
+  | "generarCuota"
+  | "cuota"
+  | "anularCuota"
+  | "marcarPagada"
+  | "cuotasDeAlumno"
 >;
 
 const columnas = {
@@ -17,12 +26,36 @@ const columnas = {
   planId: cuotas.planId,
   sedeId: cuotas.sedeId,
   desde: cuotas.desde,
-  hasta: cuotas.hasta,
+  clases: cuotas.clases,
   monto: cuotas.monto,
   pagadaEn: cuotas.pagadaEn,
 };
 
 const vigente = (id: string) => and(eq(cuotas.id, id), isNull(cuotas.anuladaEn));
+
+/** Lo que hace falta para que las cuotas de un alumno no se pisen (0020). */
+function delAlumno(
+  tx: Transaccion,
+): Pick<RepositorioAbonos, "bloquearAlumno" | "ultimaCuota" | "fechasDeAlumno"> {
+  return {
+    async bloquearAlumno(alumnoId) {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`cuotas:${alumnoId}`}))`);
+    },
+    async ultimaCuota(alumnoId) {
+      const [fila] = await tx
+        .select(columnas)
+        .from(cuotas)
+        .where(and(eq(cuotas.alumnoId, alumnoId), isNull(cuotas.anuladaEn)))
+        .orderBy(desc(cuotas.desde))
+        .limit(1);
+      return fila;
+    },
+    async fechasDeAlumno(pedido) {
+      const fechas = await fechasDeAlumno(tx, pedido);
+      return fechas.map(({ fecha, terminaEn }) => ({ fecha, terminaEn }));
+    },
+  };
+}
 
 export function repositorioCuotas(tx: Transaccion): RepositorioCuotas {
   return {
@@ -30,7 +63,16 @@ export function repositorioCuotas(tx: Transaccion): RepositorioCuotas {
       const alumno = await obtenerAlumno(tx, id);
       return alumno === undefined ? undefined : { activo: alumno.activo };
     },
-    generarCuota: (cuota) => generarCuota(tx, cuota),
+    ...delAlumno(tx),
+    async generarCuota(cuota) {
+      // El índice único parcial (alumno, desde vigente) es la última barrera.
+      const [fila] = await tx
+        .insert(cuotas)
+        .values({ ...cuota, centroId: sql`app_centro_actual()` })
+        .onConflictDoNothing()
+        .returning({ id: cuotas.id });
+      return fila?.id;
+    },
     async cuota(id, bloquear = false) {
       const consulta = tx.select(columnas).from(cuotas).where(vigente(id));
       const [fila] = bloquear ? await consulta.for("update") : await consulta;
@@ -60,33 +102,4 @@ export function repositorioCuotas(tx: Transaccion): RepositorioCuotas {
       return { pagina, porPagina, total: total?.total ?? 0, elementos };
     },
   };
-}
-
-/** El id de la cuota nueva, o undefined si pisa otro ciclo vigente del alumno. */
-async function generarCuota(
-  tx: Transaccion,
-  cuota: Parameters<RepositorioAbonos["generarCuota"]>[0],
-): Promise<string | undefined> {
-  // De a una por alumno hasta el fin de la transacción: así dos altas a la vez no se pisan.
-  await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`cuotas:${cuota.alumnoId}`}))`);
-  const [pisa] = await tx
-    .select({ id: cuotas.id })
-    .from(cuotas)
-    .where(
-      and(
-        eq(cuotas.alumnoId, cuota.alumnoId),
-        isNull(cuotas.anuladaEn),
-        lt(cuotas.desde, cuota.hasta),
-        gt(cuotas.hasta, cuota.desde),
-      ),
-    )
-    .limit(1);
-  if (pisa !== undefined) return undefined;
-  // El índice único parcial (alumno, desde vigente) es la última barrera.
-  const [fila] = await tx
-    .insert(cuotas)
-    .values({ ...cuota, centroId: sql`app_centro_actual()` })
-    .onConflictDoNothing()
-    .returning({ id: cuotas.id });
-  return fila?.id;
 }

@@ -11,8 +11,8 @@ acuerdo.
 - `src/alumnos.ts`: lista con buscador, ficha, alta y edición de alumnos (0011).
 - `src/agenda.ts`: clases semanales de cada sede y la semana de fechas concretas.
 - `src/asistencia.ts`: la planilla de asistencia de una fecha y las marcas que se guardan.
-- `src/abonos.ts`: planes del centro, precios por sede y cuotas de los alumnos, por ciclo de 4
-  semanas (0019).
+- `src/abonos.ts`: planes del centro, precios por sede y cuotas de los alumnos: paquetes de
+  clases (0020).
 - `src/caja.ts`: cobros con clave de idempotencia, anulaciones y el día de caja.
 - `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
@@ -53,10 +53,10 @@ acuerdo.
   `recuperacionId` para anularla) y `lugares`.
 - `fichaDePlan`, `edicionDePlan`, `plan`, `paginaDePlanes`, `planCreado`, `planEditado`,
   `pedidoDePrecioDeSede`, `pedidoDeCuota` (día de inicio opcional `desde`, AAAA-MM-DD),
-  `cuotaGenerada`, `cuota` (con `desde` y `hasta`) y `paginaDeCuotas`, con sus tipos. Los montos
-  van en pesos enteros.
-- `pedidoDeImpagas` (query `?sede&pagina`), `cuotaImpaga`, `paginaDeImpagas` (con `adeudado`),
-  `pedidoDeRenovacion` (`{ sedeId, dia? }`) y `renovacionHecha`, con sus tipos.
+  `cuotaGenerada`, `cuota` (con `desde` y `clases`) y `paginaDeCuotas`, con sus tipos. El plan
+  lleva `clases` (1 a 100). Los montos van en pesos enteros.
+- `pedidoDeImpagas` (query `?sede&pagina`), `cuotaImpaga` y `paginaDeImpagas` (con `adeudado`),
+  con sus tipos.
 - `pedidoDeCobro` (cuota, medio y `claveIdempotencia`), `cobroHecho` (`{ id, monto, repetido }`),
   `pedidoDeAnulacion` (`{ motivo }`), `pedidoDelDia` (query `?sede&dia&pagina`), `pago` y
   `diaDeCaja` (una página de pagos más `cobrado`), con sus tipos.

@@ -1,5 +1,5 @@
 // Rutas /abonos. El permiso en la sede (o en alguna sede, para los planes) lo controla el módulo.
-import { pedidoDeCuota, pedidoDeImpagas, pedidoDePagina, pedidoDeRenovacion } from "@app/contratos";
+import { pedidoDeCuota, pedidoDeImpagas, pedidoDePagina } from "@app/contratos";
 import { contextoDe } from "@app/plataforma";
 import type { FastifyPluginCallback } from "fastify";
 import type { Abonos } from "../aplicacion/puertos.ts";
@@ -22,17 +22,6 @@ export function rutasDeAbonos(abonos: Abonos): FastifyPluginCallback {
         desde === undefined ? cuota : { ...cuota, desde },
       );
       return enviar(respuesta, resultado, 201);
-    });
-
-    app.post("/abonos/cuotas/renovacion", { config: asignar }, async (pedido, respuesta) => {
-      const datos = leer(pedidoDeRenovacion, pedido.body, respuesta);
-      if (datos === undefined) return respuesta;
-      const { dia, sedeId } = datos;
-      const resultado = await abonos.renovarCuotas(
-        contextoDe(pedido),
-        dia === undefined ? { sedeId } : { sedeId, dia },
-      );
-      return enviar(respuesta, resultado, 200);
     });
 
     app.get("/abonos/cuotas/impagas", { config: ver }, async (pedido, respuesta) => {

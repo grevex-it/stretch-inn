@@ -10,7 +10,7 @@ import {
 } from "../src/index.ts";
 
 const UUID = "7b0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f67";
-const PLAN = { nombre: "Dos por semana", clasesPorSemana: 2, precio: 30_000 };
+const PLAN = { nombre: "Abono de 4 clases", clases: 4, precio: 30_000 };
 
 describe("pedidos de los abonos", () => {
   it("el plan va con precio en pesos enteros; la edición, con la versión", () => {
@@ -19,6 +19,9 @@ describe("pedidos de los abonos", () => {
       "El precio va en pesos, sin centavos.",
     );
     expect(edicionDePlan.parse({ ...PLAN, version: 2 })).toEqual({ ...PLAN, version: 2 });
+    expect(fichaDePlan.safeParse({ ...PLAN, clases: 0 }).error?.issues[0]?.message).toBe(
+      "El abono tiene entre 1 y 100 clases.",
+    );
   });
 
   it("el precio de una sede es un entero; la cuota lleva el día de inicio opcional", () => {
@@ -33,7 +36,7 @@ describe("pedidos de los abonos", () => {
 });
 
 describe("respuestas de los abonos", () => {
-  it("planes con sus precios de sede, y cuotas con monto, período y si están pagadas", () => {
+  it("planes con sus precios de sede, y cuotas con monto, inicio, clases y si están pagadas", () => {
     const planes = {
       pagina: 1,
       porPagina: 50,
@@ -60,7 +63,7 @@ describe("respuestas de los abonos", () => {
           planId: UUID,
           sedeId: UUID,
           desde: "2026-11-30",
-          hasta: "2026-12-28",
+          clases: 4,
           monto: 28_000,
           pagadaEn: null,
         },

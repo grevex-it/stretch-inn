@@ -1,5 +1,5 @@
-// Abonos: planes del centro, precios por sede y cuotas de los alumnos por ciclo de 4 semanas
-// (0019). Los montos van en pesos enteros (0009). Las reglas las aplica el módulo abonos.
+// Abonos: planes del centro, precios por sede y cuotas de los alumnos: paquetes de clases
+// (0020). Los montos van en pesos enteros (0009). Las reglas las aplica el módulo abonos.
 import { z } from "zod";
 import { numeroDePagina, paginaDe, POR_PAGINA } from "./paginas.ts";
 
@@ -10,7 +10,12 @@ const pesos = z
 
 export const fichaDePlan = z.object({
   nombre: z.string().max(100, "El nombre es muy largo."),
-  clasesPorSemana: z.number("Revisá las clases por semana.").int("Revisá las clases por semana."),
+  /** Cuántas clases trae el paquete (0020): 4 el abono, 1 la clase suelta. */
+  clases: z
+    .number("Revisá las clases del abono.")
+    .int("El abono tiene entre 1 y 100 clases.")
+    .min(1, "El abono tiene entre 1 y 100 clases.")
+    .max(100, "El abono tiene entre 1 y 100 clases."),
   precio: pesos,
 });
 
@@ -35,7 +40,7 @@ export const pedidoDePrecioDeSede = z.object({ precio: pesos });
 /** Un día del calendario, AAAA-MM-DD, en la zona del centro. */
 const dia = z.iso.date("El día va como AAAA-MM-DD.");
 
-/** Cuerpo de POST /abonos/cuotas: un ciclo de 4 semanas desde `desde` (sin él, hoy). */
+/** Cuerpo de POST /abonos/cuotas: un paquete de clases desde `desde` (sin él, sigue al abono anterior o arranca hoy). */
 export const pedidoDeCuota = z.object({
   alumnoId: z.uuid("Ese alumno no existe."),
   planId: z.uuid("Ese plan no existe."),
@@ -47,7 +52,7 @@ export const cuotaGenerada = z.object({
   id: z.uuid(),
   monto: z.number().int(),
   desde: z.string(),
-  hasta: z.string(),
+  clases: z.number().int(),
 });
 
 export const cuota = z.object({
@@ -55,10 +60,10 @@ export const cuota = z.object({
   alumnoId: z.uuid(),
   planId: z.uuid(),
   sedeId: z.uuid(),
-  /** El primer día del ciclo de 4 semanas, AAAA-MM-DD. */
+  /** Desde qué día cuenta, AAAA-MM-DD: cada fecha del horario fijo gasta una clase (0020). */
   desde: z.string(),
-  /** El día en que termina y empieza el siguiente. */
-  hasta: z.string(),
+  /** Cuántas clases trae. */
+  clases: z.number().int(),
   monto: z.number().int(),
   /** En UTC; null mientras no se pagó. */
   pagadaEn: z.iso.datetime().nullable(),
@@ -80,20 +85,6 @@ export const cuotaImpaga = cuota.omit({ pagadaEn: true }).extend({
 /** Respuesta de GET /abonos/cuotas/impagas: la más vieja primero, y lo que suman todas. */
 export const paginaDeImpagas = paginaDe(cuotaImpaga).extend({ adeudado: z.number().int() });
 
-/** Cuerpo de POST /abonos/cuotas/renovacion: los ciclos que terminaron hasta `dia` (sin él, hoy). */
-export const pedidoDeRenovacion = z.object({
-  sedeId: z.uuid("Esa sede no existe."),
-  dia: dia.optional(),
-});
-
-/** Respuesta de POST /abonos/cuotas/renovacion: cuántas se generaron y cuántas no, y por qué. */
-export const renovacionHecha = z.object({
-  dia: z.string(),
-  generadas: z.number().int(),
-  alumnosDeBaja: z.number().int(),
-  planesDeBaja: z.number().int(),
-});
-
 export type FichaDePlan = z.infer<typeof fichaDePlan>;
 export type EdicionDePlan = z.infer<typeof edicionDePlan>;
 export type Plan = z.infer<typeof plan>;
@@ -103,5 +94,3 @@ export type Cuota = z.infer<typeof cuota>;
 export type PaginaDeCuotas = z.infer<typeof paginaDeCuotas>;
 export type CuotaImpaga = z.infer<typeof cuotaImpaga>;
 export type PaginaDeImpagas = z.infer<typeof paginaDeImpagas>;
-export type PedidoDeRenovacion = z.infer<typeof pedidoDeRenovacion>;
-export type RenovacionHecha = z.infer<typeof renovacionHecha>;

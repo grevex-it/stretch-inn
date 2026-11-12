@@ -16,7 +16,7 @@ afterAll(async () => {
 });
 
 const PRIMERA = { pagina: 1, porPagina: 50 };
-const DOS = { nombre: "Dos por semana", clasesPorSemana: 2, precio: 30_000 };
+const DOS = { nombre: "Abono de 4 clases", clases: 4, precio: 30_000 };
 
 describe("planes", () => {
   it("crea, edita con la versión y lista con los precios propios de cada sede", async () => {
@@ -43,8 +43,8 @@ describe("planes", () => {
         elementos: [
           {
             id,
-            nombre: "Dos por semana",
-            clasesPorSemana: 2,
+            nombre: "Abono de 4 clases",
+            clases: 4,
             precio: 32_000,
             activo: true,
             version: 2,

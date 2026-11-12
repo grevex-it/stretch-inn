@@ -27,14 +27,17 @@ export const planes = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     centroId: uuid("centro_id").notNull(),
     nombre: text("nombre").notNull(),
-    clasesPorSemana: smallint("clases_por_semana").notNull(),
+    /** Cuántas clases trae el paquete (0020): 4 el abono, 1 la clase suelta. */
+    clases: smallint("clases").notNull().default(4),
+    /** En desuso desde 0020: se borra en una migración posterior (dos pasos, db/AGENTS.md). */
+    clasesPorSemana: smallint("clases_por_semana"),
     precio: pesos("precio").notNull(),
     activo: boolean("activo").notNull().default(true),
     version: integer("version").notNull().default(1),
   },
   (tabla) => [
     index("planes_centro_nombre").on(tabla.centroId, tabla.nombre),
-    check("planes_clases", sql`${tabla.clasesPorSemana} between 1 and 7`),
+    check("planes_clases_del_paquete", sql`${tabla.clases} between 1 and 100`),
     check("planes_precio", sql`${tabla.precio} > 0`),
   ],
 );
@@ -59,8 +62,8 @@ export const preciosDeSede = pgTable(
 );
 
 /**
- * La cuota de un ciclo de 4 semanas de un alumno (0019). El monto se congela al generarla.
- * Anular no borra. Los ciclos vigentes de un alumno no se pisan: lo controla la app con un
+ * La cuota de un paquete de clases de un alumno (0020). El monto y las clases se congelan al
+ * generarla. Anular no borra. Los abonos de un alumno no se pisan: lo controla la app con un
  * bloqueo por alumno, y el índice único es la última barrera.
  */
 export const cuotas = pgTable(
@@ -73,10 +76,12 @@ export const cuotas = pgTable(
     planId: uuid("plan_id")
       .notNull()
       .references(() => planes.id),
-    /** El primer día del ciclo, en la zona del centro. */
+    /** Desde qué día cuenta, en la zona del centro: cada fecha del horario fijo gasta una clase. */
     desde: date("desde", { mode: "string" }).notNull(),
-    /** El día en que termina (y empieza el siguiente): desde + 28 días. */
-    hasta: date("hasta", { mode: "string" }).notNull(),
+    /** Cuántas clases trae, congeladas del plan al generarla. */
+    clases: smallint("clases").notNull().default(4),
+    /** En desuso desde 0020: se borra en una migración posterior (dos pasos, db/AGENTS.md). */
+    hasta: date("hasta", { mode: "string" }),
     monto: pesos("monto").notNull(),
     creadaEn: timestamp("creada_en", { withTimezone: true }).notNull().defaultNow(),
     /** El pago de caja que la saldó. */
@@ -89,12 +94,12 @@ export const cuotas = pgTable(
       .on(tabla.alumnoId, tabla.desde)
       .where(sql`${tabla.anuladaEn} is null`),
     index("cuotas_centro_alumno_desde").on(tabla.centroId, tabla.alumnoId, tabla.desde),
-    // Las impagas de una sede, la más vieja primero; y el último ciclo de cada alumno, para renovar.
+    // Las impagas de una sede, la más vieja primero; y la última cuota de cada alumno.
     index("cuotas_sede_impagas")
       .on(tabla.centroId, tabla.sedeId, tabla.desde)
       .where(sql`${tabla.pagadaEn} is null and ${tabla.anuladaEn} is null`),
     index("cuotas_sede_alumno_desde").on(tabla.centroId, tabla.sedeId, tabla.alumnoId, tabla.desde),
-    check("cuotas_ciclo", sql`${tabla.hasta} = ${tabla.desde} + 28`),
+    check("cuotas_clases", sql`${tabla.clases} between 1 and 100`),
     check("cuotas_monto", sql`${tabla.monto} > 0`),
     check("cuotas_pagada_o_anulada", sql`${tabla.pagadaEn} is null or ${tabla.anuladaEn} is null`),
   ],

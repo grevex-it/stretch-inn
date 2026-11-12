@@ -202,6 +202,9 @@ importers:
 
   modulos/abonos:
     dependencies:
+      '@app/agenda':
+        specifier: workspace:*
+        version: link:../agenda
       '@app/centros':
         specifier: workspace:*
         version: link:../centros

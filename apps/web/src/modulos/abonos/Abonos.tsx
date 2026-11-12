@@ -34,8 +34,9 @@ export function Abonos() {
                   {gestionar && <Edicion plan={plan} />}
                   <GenerarCuota plan={plan} />
                   <p>
-                    {plan.clasesPorSemana} clases por semana · {pesos.format(plan.precio)} de precio
-                    general · {plan.activo ? "Activo" : "De baja"}
+                    {plan.clases} {plan.clases === 1 ? "clase" : "clases"} ·{" "}
+                    {pesos.format(plan.precio)} de precio general ·{" "}
+                    {plan.activo ? "Activo" : "De baja"}
                   </p>
                   {plan.preciosDeSede.map((precio) => (
                     <p key={precio.sedeId}>

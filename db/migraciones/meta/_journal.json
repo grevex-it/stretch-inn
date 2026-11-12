@@ -218,6 +218,13 @@
       "when": 1794486560259,
       "tag": "20261112122920_cuotas-de-sede",
       "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1794499366588,
+      "tag": "20261112160246_abono-por-clases",
+      "breakpoints": true
     }
   ]
 }
