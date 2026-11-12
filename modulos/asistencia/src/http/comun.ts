@@ -10,9 +10,12 @@ const ESTADOS: Record<ErrorDeAsistencia, number> = {
   "demasiadas-marcas": 400,
   "sin-permiso": 403,
   "fecha-inexistente": 404,
+  "aviso-inexistente": 404,
   "fecha-cancelada": 409,
   "todavia-no-empieza": 409,
+  "clase-empezada": 409,
   "no-inscripto": 409,
+  "ya-avisado": 409,
 };
 
 /** El dato validado, o undefined si ya se respondió 400. */

@@ -3,6 +3,7 @@ import type { Permiso } from "@app/nucleo";
 
 export const VER: Permiso = "asistencia.ver";
 export const TOMAR: Permiso = "asistencia.tomar";
+export const AVISAR: Permiso = "asistencia.avisar";
 
 export const PERMISOS_ASISTENCIA: {
   seccion: string;
@@ -12,5 +13,6 @@ export const PERMISOS_ASISTENCIA: {
   permisos: [
     { permiso: VER, descripcion: "Ver la asistencia de cada fecha" },
     { permiso: TOMAR, descripcion: "Tomar y corregir la asistencia" },
+    { permiso: AVISAR, descripcion: "Registrar y anular ausencias avisadas" },
   ],
 };

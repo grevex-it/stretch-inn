@@ -1,6 +1,6 @@
 // Rutas /asistencia sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // asistencia. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula.
-import { planillaDeAsistencia } from "@app/contratos";
+import { avisoHecho, planillaDeAsistencia } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
 import Fastify, { type FastifyContextConfig } from "fastify";
@@ -47,7 +47,25 @@ describe("rutas de la asistencia", () => {
     expect(permisos).toEqual({
       "GET /asistencia/fechas/:id": "asistencia.ver",
       "PUT /asistencia/fechas/:id": "asistencia.tomar",
+      "POST /asistencia/fechas/:id/avisos": "asistencia.avisar",
+      "DELETE /asistencia/avisos/:id": "asistencia.avisar",
     });
+  });
+
+  it("POST avisa (201 con el id), DELETE lo anula (204) y repetir da 409 y 404", async () => {
+    const { ctx, ana, fecha } = await claseConFecha(base);
+    const { servidor } = await app(ctx, new Date(fecha.empiezaEn.getTime() - 60 * 60_000));
+    const url = `/asistencia/fechas/${fecha.id}/avisos`;
+
+    const aviso = await servidor.inject({ method: "POST", url, payload: { alumnoId: ana } });
+    expect(aviso.statusCode).toBe(201);
+    const { id } = avisoHecho.parse(aviso.json());
+    const otraVez = await servidor.inject({ method: "POST", url, payload: { alumnoId: ana } });
+    expect(otraVez.statusCode).toBe(409);
+
+    const anular = { method: "DELETE" as const, url: `/asistencia/avisos/${id}` };
+    expect((await servidor.inject(anular)).statusCode).toBe(204);
+    expect((await servidor.inject(anular)).statusCode).toBe(404);
   });
 
   it("PUT guarda las marcas (204) y GET devuelve la planilla con el contrato", async () => {

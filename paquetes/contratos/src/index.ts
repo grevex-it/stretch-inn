@@ -70,8 +70,11 @@ export {
   type PedidoDeOcurrencias,
 } from "./agenda.ts";
 export {
+  avisoHecho,
   pedidoDeAsistencia,
+  pedidoDeAviso,
   planillaDeAsistencia,
   type PedidoDeAsistencia,
+  type PedidoDeAviso,
   type PlanillaDeAsistencia,
 } from "./asistencia.ts";

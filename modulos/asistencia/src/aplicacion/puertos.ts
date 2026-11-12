@@ -1,5 +1,6 @@
 // Lo que la asistencia necesita de afuera (ver docs/decisiones/0003): la base, agenda y personas.
 import type { ContextoCentro, Resultado } from "@app/nucleo";
+import type { ErrorDeAviso } from "../dominio/aviso.ts";
 import type { ErrorDePlanilla, Estado, Marca } from "../dominio/planilla.ts";
 
 export interface Pagina {
@@ -32,6 +33,8 @@ export interface Renglon {
   /** El alumno puede estar de baja en personas aunque haya estado inscripto. */
   activo: boolean;
   estado: Estado | null;
+  /** El aviso de ausencia vigente (con este id se anula), o null si no avisó. */
+  avisoId: string | null;
 }
 
 export interface Planilla {
@@ -72,10 +75,28 @@ export interface RepositorioAsistencia {
     marcas: readonly Marca[],
     registro: Registro,
   ): Promise<void>;
+  /** Los avisos de ausencia vigentes de esos alumnos en la fecha: alumno → id del aviso. */
+  avisos(ocurrenciaId: string, alumnoIds: readonly string[]): Promise<Map<string, string>>;
+  /** El id del aviso nuevo, o undefined si ya tenía uno vigente en esa fecha. */
+  avisar(
+    fecha: Pick<Fecha, "id" | "sedeId">,
+    alumnoId: string,
+    registro: Registro,
+  ): Promise<string | undefined>;
+  /** El aviso vigente, o undefined si no existe o ya se anuló. */
+  aviso(id: string): Promise<{ ocurrenciaId: string } | undefined>;
+  /** false si ya estaba anulado (otra anulación ganó la carrera). */
+  anularAviso(id: string, ahora: Date): Promise<boolean>;
 }
 
 export type ErrorDeAsistencia =
-  ErrorDePlanilla | "fecha-inexistente" | "sin-permiso" | "no-inscripto";
+  | ErrorDePlanilla
+  | ErrorDeAviso
+  | "fecha-inexistente"
+  | "sin-permiso"
+  | "no-inscripto"
+  | "ya-avisado"
+  | "aviso-inexistente";
 
 export interface Asistencia {
   /** La fecha y una página de sus inscriptos, con la marca de cada uno. */
@@ -87,5 +108,15 @@ export interface Asistencia {
   tomar(
     quien: ContextoCentro,
     pedido: { fechaId: string; marcas: readonly Marca[] },
+  ): Promise<Resultado<null, ErrorDeAsistencia>>;
+  /** Avisa que el alumno no va a esa fecha, antes de que empiece. */
+  avisar(
+    quien: ContextoCentro,
+    aviso: { fechaId: string; alumnoId: string },
+  ): Promise<Resultado<{ id: string }, ErrorDeAsistencia>>;
+  /** Anula un aviso (al final viene), antes de que empiece la fecha. No lo borra. */
+  anularAviso(
+    quien: ContextoCentro,
+    aviso: { id: string },
   ): Promise<Resultado<null, ErrorDeAsistencia>>;
 }

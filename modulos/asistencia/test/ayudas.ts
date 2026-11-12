@@ -21,7 +21,7 @@ export const ARMAR = [
   "personas.ver",
   "personas.editar",
 ];
-const TODO = [...ARMAR, "asistencia.ver", "asistencia.tomar"];
+const TODO = [...ARMAR, "asistencia.ver", "asistencia.tomar", "asistencia.avisar"];
 
 /** Como dueño del esquema: sin RLS. Para armar datos y para contar lo que quedó guardado. */
 export async function comoDueno<Fila extends pg.QueryResultRow = pg.QueryResultRow>(

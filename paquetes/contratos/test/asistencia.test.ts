@@ -1,8 +1,23 @@
 // Contratos de la asistencia: la planilla de una fecha y las marcas que se guardan.
 import { describe, expect, it } from "vitest";
-import { pedidoDeAsistencia, planillaDeAsistencia } from "../src/index.ts";
+import {
+  avisoHecho,
+  pedidoDeAsistencia,
+  pedidoDeAviso,
+  planillaDeAsistencia,
+} from "../src/index.ts";
 
 const UUID = "7b0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f67";
+
+describe("avisos de ausencia", () => {
+  it("el aviso lleva el alumno; la respuesta, el id con que se anula", () => {
+    expect(pedidoDeAviso.parse({ alumnoId: UUID })).toEqual({ alumnoId: UUID });
+    expect(pedidoDeAviso.safeParse({ alumnoId: "ana" }).error?.issues[0]?.message).toBe(
+      "Ese alumno no existe.",
+    );
+    expect(avisoHecho.parse({ id: UUID })).toEqual({ id: UUID });
+  });
+});
 
 describe("pedidoDeAsistencia", () => {
   it("lleva de 1 a 100 marcas con presente o ausente", () => {
@@ -35,7 +50,14 @@ describe("planillaDeAsistencia", () => {
         porPagina: 50,
         total: 1,
         elementos: [
-          { alumnoId: UUID, nombre: "Ana", apellido: "Pérez", activo: true, estado: null },
+          {
+            alumnoId: UUID,
+            nombre: "Ana",
+            apellido: "Pérez",
+            activo: true,
+            estado: null,
+            avisoId: UUID,
+          },
         ],
       },
     };

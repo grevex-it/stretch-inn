@@ -39,8 +39,9 @@ acuerdo.
 - `pedidoDeInscripcion`, `inscripcionHecha`, `inscripto`, `paginaDeInscriptos`, `claseDeAlumno`
   y `paginaDeClasesDeAlumno`, con sus tipos.
 - `pedidoDeAsistencia` (de 1 a 100 marcas `{ alumnoId, estado }`, presente o ausente) y
-  `planillaDeAsistencia` (la fecha y una página de sus inscriptos con su `estado`, `null` si no
-  se marcó), con sus tipos.
+  `planillaDeAsistencia` (la fecha y una página de sus inscriptos con su `estado` y su
+  `avisoId`, `null` si no se marcó o no avisó), con sus tipos.
+- `pedidoDeAviso` (`{ alumnoId }`) y `avisoHecho` (`{ id }`, con el que se anula), con sus tipos.
 
 ## Reglas de uso
 
