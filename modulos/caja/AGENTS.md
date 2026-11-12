@@ -48,7 +48,8 @@ el día de caja de cada sede con lo cobrado.
 
 - **Toda operación que mueve dinero lleva clave de idempotencia** (regla 7): única por centro
   en la base. El mismo cobro repetido (doble clic, reintento) devuelve el pago que ya se hizo; la
-  misma clave en otra cuota se rechaza.
+  misma clave en otra cuota se rechaza. Si dos pedidos con la misma clave llegan a la vez y el
+  segundo encuentra la cuota ya pagada, vuelve a buscar la clave y devuelve ese pago.
 - El pago y la cuota pagada van juntos: si la cuota no se puede marcar (otro cobro la pagó
   recién), el pago se deshace (punto de guardado). `registrarPago` de abonos toma la cuota con
   `for update`.

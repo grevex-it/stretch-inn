@@ -35,6 +35,20 @@ function repeticion(pago: Pago, cuotaId: string): Resultado<Cobro, ErrorDeCaja> 
   return ok({ id: pago.id, monto: pago.monto, repetido: true });
 }
 
+/**
+ * La cuota ya está pagada. Puede haberla pagado este mismo cobro, confirmado por otro pedido con
+ * la misma clave mientras tanto: entonces se devuelve ese pago.
+ */
+async function yaPagada(
+  repo: RepositorioCaja,
+  clave: string,
+  cuotaId: string,
+): Promise<Resultado<Cobro, ErrorDeCaja>> {
+  const ganador = await repo.pagoPorClave(clave);
+  if (ganador !== undefined) return repeticion(ganador, cuotaId);
+  return falla("cuota-pagada", "Esa cuota ya está pagada.");
+}
+
 export async function cobrarCuota(
   repo: RepositorioCaja,
   quien: ContextoCentro,
@@ -53,7 +67,7 @@ export async function cobrarCuota(
   const cuota = await repo.cuota(cuotaId);
   if (cuota === undefined) return falla("cuota-inexistente", "Esa cuota no existe o se anuló.");
   if (!enSede(quien, COBRAR, cuota.sedeId)) return SIN_PERMISO;
-  if (cuota.pagadaEn !== null) return falla("cuota-pagada", "Esa cuota ya está pagada.");
+  if (cuota.pagadaEn !== null) return yaPagada(repo, clave.valor, cuotaId);
   const { alumnoId, sedeId, monto } = cuota;
   // Si la cuota no se puede marcar (otro cobro la pagó recién), el pago tampoco queda.
   return repo.todoONada(async (): Promise<Resultado<Cobro, ErrorDeCaja>> => {
