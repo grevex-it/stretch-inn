@@ -147,7 +147,7 @@ async function recuperan(
   { ocurrenciaId, pagina, porPagina }: Parameters<RepositorioAsistencia["recuperan"]>[0],
 ): ReturnType<RepositorioAsistencia["recuperan"]> {
   const elementos = await tx
-    .select({ alumnoId: recuperaciones.alumnoId })
+    .select({ alumnoId: recuperaciones.alumnoId, recuperacionId: recuperaciones.id })
     .from(recuperaciones)
     .where(vigentes(ocurrenciaId))
     .orderBy(asc(recuperaciones.reservadaEn), asc(recuperaciones.id))

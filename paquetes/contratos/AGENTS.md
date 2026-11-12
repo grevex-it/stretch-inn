@@ -49,7 +49,8 @@ acuerdo.
 - `paginaDeCreditos`: los créditos vigentes de un alumno, con su sede, su fecha de origen y su
   vencimiento; el que vence antes, primero.
 - `pedidoDeRecuperacion` (`{ alumnoId }`) y `recuperacionHecha` (`{ id }`), con sus tipos. La
-  planilla trae también `recuperan` (la misma página de los que recuperan) y `lugares`.
+  planilla trae también `recuperan` (la misma página de los que recuperan, cada uno con su
+  `recuperacionId` para anularla) y `lugares`.
 - `fichaDePlan`, `edicionDePlan`, `plan`, `paginaDePlanes`, `planCreado`, `planEditado`,
   `pedidoDePrecioDeSede`, `pedidoDeCuota` (día de inicio opcional `desde`, AAAA-MM-DD),
   `cuotaGenerada`, `cuota` (con `desde` y `hasta`) y `paginaDeCuotas`, con sus tipos. Los montos
