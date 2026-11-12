@@ -102,3 +102,14 @@ export {
   type PedidoDeCuota,
   type Plan,
 } from "./abonos.ts";
+export {
+  cobroHecho,
+  diaDeCaja,
+  pago,
+  pedidoDeAnulacion,
+  pedidoDeCobro,
+  pedidoDelDia,
+  type DiaDeCaja,
+  type Pago,
+  type PedidoDeCobro,
+} from "./caja.ts";

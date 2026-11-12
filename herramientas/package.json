@@ -10,6 +10,7 @@
     "@app/abonos": "workspace:*",
     "@app/agenda": "workspace:*",
     "@app/asistencia": "workspace:*",
+    "@app/caja": "workspace:*",
     "@app/identidad": "workspace:*",
     "@app/personas": "workspace:*",
     "pg": "^8.23.1"

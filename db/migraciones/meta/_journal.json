@@ -197,6 +197,20 @@
       "when": 1794485502935,
       "tag": "20261112121142_rls-abonos",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1794485998946,
+      "tag": "20261112121958_caja",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1794486000537,
+      "tag": "20261112122000_rls-caja",
+      "breakpoints": true
     }
   ]
 }
