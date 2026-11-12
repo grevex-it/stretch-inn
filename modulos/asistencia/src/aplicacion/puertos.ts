@@ -8,7 +8,7 @@ export interface Pagina {
   porPagina: number;
 }
 
-interface PaginaDe<T> extends Pagina {
+export interface PaginaDe<T> extends Pagina {
   elementos: T[];
   total: number;
 }
@@ -87,6 +87,34 @@ export interface RepositorioAsistencia {
   aviso(id: string): Promise<{ ocurrenciaId: string } | undefined>;
   /** false si ya estaba anulado (otra anulación ganó la carrera). */
   anularAviso(id: string, ahora: Date): Promise<boolean>;
+  /** El crédito que genera un aviso (uno por aviso). */
+  crearCredito(credito: Omit<Credito, "id"> & { avisoId: string; alumnoId: string }): Promise<void>;
+  /** Anula el crédito vigente de ese aviso, si lo tiene. */
+  anularCreditoDeAviso(avisoId: string, ahora: Date): Promise<void>;
+  /** Los créditos vigentes del alumno en esas sedes, por vencimiento (el que vence antes, primero). */
+  creditos(
+    filtro: Pagina & { alumnoId: string; sedeIds: readonly string[]; ahora: Date },
+  ): Promise<PaginaDe<Credito>>;
+}
+
+/**
+ * Cuándo termina el abono vigente del alumno en ese instante, o undefined si no tiene. Lo
+ * responde `abonos`; la API lo conecta al armar los módulos (asistencia no importa abonos).
+ */
+export type ConsultaFinDelAbono = (consulta: {
+  alumnoId: string;
+  sedeId: string;
+  en: Date;
+}) => Promise<Date | undefined>;
+
+/** Un derecho a recuperar, generado por un aviso de ausencia. Vence con el abono (0019). */
+export interface Credito {
+  id: string;
+  /** La sede de la fecha a la que se faltó: se recupera en esa sede. */
+  sedeId: string;
+  /** La fecha a la que se faltó. */
+  ocurrenciaId: string;
+  venceEn: Date;
 }
 
 export type ErrorDeAsistencia =
@@ -109,11 +137,16 @@ export interface Asistencia {
     quien: ContextoCentro,
     pedido: { fechaId: string; marcas: readonly Marca[] },
   ): Promise<Resultado<null, ErrorDeAsistencia>>;
-  /** Avisa que el alumno no va a esa fecha, antes de que empiece. */
+  /** Avisa que el alumno no va a esa fecha, antes de que empiece. Siempre da crédito (0019). */
   avisar(
     quien: ContextoCentro,
     aviso: { fechaId: string; alumnoId: string },
-  ): Promise<Resultado<{ id: string }, ErrorDeAsistencia>>;
+  ): Promise<Resultado<{ id: string; conCredito: boolean }, ErrorDeAsistencia>>;
+  /** Los créditos vigentes del alumno, en las sedes donde se puede ver la asistencia. */
+  creditos(
+    quien: ContextoCentro,
+    filtro: Pagina & { alumnoId: string },
+  ): Promise<Resultado<PaginaDe<Credito>, ErrorDeAsistencia>>;
   /** Anula un aviso (al final viene), antes de que empiece la fecha. No lo borra. */
   anularAviso(
     quien: ContextoCentro,

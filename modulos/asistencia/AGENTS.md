@@ -5,8 +5,8 @@ Nivel: completo (`src/dominio/`, `src/aplicacion/`, `src/infraestructura/`, `src
 ## Alcance
 
 La asistencia a cada fecha de clase: la planilla con los inscriptos de esa fecha, tomarla y
-corregirla (presente o ausente), y las ausencias avisadas antes de la clase. Más adelante, los
-créditos y las reservas de recuperación.
+corregirla (presente o ausente), las ausencias avisadas antes de la clase y los créditos para
+recuperar que generan. Después, las reservas de recuperación.
 
 ## Fuera de alcance
 
@@ -25,18 +25,24 @@ créditos y las reservas de recuperación.
 
 ## API pública
 
-- `crearAsistencia(base, { ahora? })`: devuelve `Asistencia`. Cada operación recibe el
+- `crearAsistencia(base, { ahora?, finDelAbono? })`: devuelve `Asistencia`. `finDelAbono(tx,
+{ alumnoId, sedeId, en })` dice cuándo termina el abono vigente del alumno; lo conecta la API
+  con `abonos`, así `asistencia` no lo importa. Cada operación recibe el
   `ContextoCentro` de quien la pide y corre en su propia transacción:
   - `planilla(quien, { fechaId, pagina, porPagina })`: la fecha y una página de sus inscriptos,
     con nombre, apellido, si el alumno está activo, su `estado` (`null` si no se marcó) y su
     `avisoId` (`null` si no avisó).
   - `tomar(quien, { fechaId, marcas })`: guarda o corrige de 1 a 100 marcas
     (`{ alumnoId, estado }`), todas o ninguna.
-  - `avisar(quien, { fechaId, alumnoId })`: registra que no va; devuelve el `id` del aviso.
-  - `anularAviso(quien, { id })`: al final viene. No borra el aviso.
+  - `avisar(quien, { fechaId, alumnoId })`: registra que no va; devuelve el `id` del aviso y
+    `conCredito` (hoy siempre `true`: todo aviso da crédito, 0019).
+  - `anularAviso(quien, { id })`: al final viene. No borra el aviso; anula su crédito.
+  - `creditos(quien, { alumnoId, pagina, porPagina })`: los vigentes del alumno, el que vence
+    antes primero, en las sedes donde puede ver la asistencia.
 - `rutasDeAsistencia(asistencia)`: `GET /asistencia/fechas/:id?pagina` (`asistencia.ver`),
   `PUT /asistencia/fechas/:id` (`asistencia.tomar`), `POST /asistencia/fechas/:id/avisos` y
-  `DELETE /asistencia/avisos/:id` (`asistencia.avisar`).
+  `DELETE /asistencia/avisos/:id` (`asistencia.avisar`), y `GET /alumnos/:id/creditos?pagina`
+  (`asistencia.ver`).
 - `PERMISOS_ASISTENCIA`: la sección «Asistencia» del catálogo (`asistencia.ver`,
   `asistencia.tomar`, `asistencia.avisar`).
 
@@ -60,8 +66,13 @@ créditos y las reservas de recuperación.
 - Un aviso de ausencia vigente por alumno y fecha (índice único parcial). Solo avisa quien
   estaba inscripto, antes del inicio y en una fecha no cancelada; anular sigue la misma regla y
   no borra: marca `anulado_en`.
-- Avisar no decide si hay crédito para recuperar: eso es de los créditos. Con aviso, igual se le
-  puede tomar asistencia (si vino, queda presente).
+- Con aviso, igual se le puede tomar asistencia (si vino, queda presente).
+- Todo aviso genera **un** crédito en la misma transacción (índice único por aviso). No hay
+  anticipación mínima (0019).
+  Anular el aviso anula su crédito; nada se borra.
+- El crédito es de la sede de la fecha a la que se faltó, y vale hasta `vence_en`: el fin del
+  abono vigente del alumno en esa fecha (0019). **[SUPUESTO]** Sin abono vigente, 4 semanas
+  desde la fecha.
 
 ## Glosario
 
@@ -69,16 +80,19 @@ créditos y las reservas de recuperación.
 - **Planilla:** los inscriptos de una fecha, con su marca.
 - **Marca:** presente o ausente de un alumno en una fecha.
 - **Aviso de ausencia:** el alumno (o la recepción por él) avisa antes de la clase que no va.
+- **Crédito:** derecho a recuperar una clase, generado por un aviso de ausencia.
 
 ## Configuración por centro
 
-_Ninguna por ahora._
+_Ninguna por ahora._ Las reglas de los créditos están en `src/dominio/credito.ts` (0019); si
+otro centro las necesita distintas, pasan a configuración por centro (0011).
 
 ## Pendientes
 
 - Desde cuándo y hasta cuándo se toma la asistencia: hoy desde una hora antes del inicio y sin
   límite después. Si Stretch Inn quiere cerrar la planilla, va como configuración por centro.
-- Créditos y reservas de recuperación (relevar con Stretch Inn: con cuánta anticipación un aviso
-  da crédito, vigencia del crédito, en qué clases se recupera).
+- Si faltar sin avisar también da crédito (0019, pendiente con Stretch Inn). Hoy, no.
+- Una fecha cancelada (suspensión) todavía no da crédito a sus inscriptos (0019).
+- Reservas de recuperación con los créditos.
 - El alumno avisando desde el portal (Fase 4): otro actor, con sus propias reglas.
 - Los alumnos que recuperan en una fecha van a figurar en su planilla.

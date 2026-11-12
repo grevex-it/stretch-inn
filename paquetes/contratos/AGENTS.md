@@ -41,7 +41,10 @@ acuerdo.
 - `pedidoDeAsistencia` (de 1 a 100 marcas `{ alumnoId, estado }`, presente o ausente) y
   `planillaDeAsistencia` (la fecha y una página de sus inscriptos con su `estado` y su
   `avisoId`, `null` si no se marcó o no avisó), con sus tipos.
-- `pedidoDeAviso` (`{ alumnoId }`) y `avisoHecho` (`{ id }`, con el que se anula), con sus tipos.
+- `pedidoDeAviso` (`{ alumnoId }`) y `avisoHecho` (`{ id, conCredito }`: con el id se anula),
+  con sus tipos.
+- `paginaDeCreditos`: los créditos vigentes de un alumno, con su sede, su fecha de origen y su
+  vencimiento; el que vence antes, primero.
 
 ## Reglas de uso
 

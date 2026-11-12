@@ -29,7 +29,24 @@ const renglon = z.object({
 export const pedidoDeAviso = z.object({ alumnoId: z.uuid("Ese alumno no existe.") });
 
 /** Respuesta de POST /asistencia/fechas/:id/avisos: con este id se anula. */
-export const avisoHecho = z.object({ id: z.uuid() });
+export const avisoHecho = z.object({
+  id: z.uuid(),
+  /** Si le dio un crédito para recuperar. Hoy siempre: todo aviso da crédito (0019). */
+  conCredito: z.boolean(),
+});
+
+/** Un crédito para recuperar: se usa en la sede de la fecha a la que se faltó. */
+const credito = z.object({
+  id: z.uuid(),
+  sedeId: z.uuid(),
+  /** La fecha a la que se faltó. */
+  ocurrenciaId: z.uuid(),
+  /** En UTC. */
+  venceEn: z.iso.datetime(),
+});
+
+/** Respuesta de GET /alumnos/:id/creditos: los vigentes, el que vence antes primero. */
+export const paginaDeCreditos = paginaDe(credito);
 
 /** Respuesta de GET /asistencia/fechas/:id: la fecha y una página de sus inscriptos. */
 export const planillaDeAsistencia = z.object({

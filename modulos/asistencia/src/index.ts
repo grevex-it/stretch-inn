@@ -2,6 +2,7 @@
 export { crearAsistencia, type OpcionesAsistencia } from "./modulo.ts";
 export type {
   Asistencia,
+  Credito,
   ErrorDeAsistencia,
   Fecha,
   Planilla,

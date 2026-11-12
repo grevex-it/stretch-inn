@@ -1,6 +1,6 @@
 // Rutas /asistencia sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // asistencia. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula.
-import { avisoHecho, planillaDeAsistencia } from "@app/contratos";
+import { avisoHecho, paginaDeCreditos, planillaDeAsistencia } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
 import Fastify, { type FastifyContextConfig } from "fastify";
@@ -49,7 +49,23 @@ describe("rutas de la asistencia", () => {
       "PUT /asistencia/fechas/:id": "asistencia.tomar",
       "POST /asistencia/fechas/:id/avisos": "asistencia.avisar",
       "DELETE /asistencia/avisos/:id": "asistencia.avisar",
+      "GET /alumnos/:id/creditos": "asistencia.ver",
     });
+  });
+
+  it("GET /alumnos/:id/creditos devuelve los créditos vigentes con el contrato", async () => {
+    const { ctx, ana, fecha } = await claseConFecha(base);
+    const { servidor } = await app(ctx, new Date(fecha.empiezaEn.getTime() - 3 * 60 * 60_000));
+    await servidor.inject({
+      method: "POST",
+      url: `/asistencia/fechas/${fecha.id}/avisos`,
+      payload: { alumnoId: ana },
+    });
+    const respuesta = await servidor.inject({ url: `/alumnos/${ana}/creditos` });
+    expect(respuesta.statusCode).toBe(200);
+    expect(paginaDeCreditos.parse(respuesta.json()).elementos.map((c) => c.ocurrenciaId)).toEqual([
+      fecha.id,
+    ]);
   });
 
   it("POST avisa (201 con el id), DELETE lo anula (204) y repetir da 409 y 404", async () => {
