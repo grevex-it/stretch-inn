@@ -4,7 +4,7 @@ export type { Abonos, Cuota, ErrorDeAbonos, NuevoPlan, Plan } from "./aplicacion
 export { PERMISOS_ABONOS } from "./dominio/permisos.ts";
 export { rutasDeAbonos } from "./http/rutas.ts";
 export {
-  finDelAbono,
+  abonoVigente,
   obtenerCuota,
   registrarPago,
   revertirPago,
