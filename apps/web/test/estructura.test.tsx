@@ -26,7 +26,7 @@ describe("selector de sede", () => {
       .map((opcion) => opcion.textContent);
     expect(opciones).toEqual(["Todas mis sedes", "Norte", "Sur"]);
 
-    await usuario.selectOptions(selector, "Sur");
+    await usuario.selectOptions(selector, SUR);
     await vi.waitFor(() => {
       expect(servidor.pedidos.find((p) => p.clave === "PUT /api/sesion/sede")?.cuerpo).toEqual({
         sede: SUR,
@@ -84,7 +84,7 @@ describe("salir y sesión vencida", () => {
       "PUT /api/sesion/sede": SIN_SESION,
     });
     const usuario = montarPanel();
-    await usuario.selectOptions(await screen.findByLabelText("Sede"), "Sur");
+    await usuario.selectOptions(await screen.findByLabelText("Sede"), SUR);
     servidor.responder("GET /api/sesion", SIN_SESION);
     expect(await screen.findByRole("button", { name: "Entrar" })).toBeDefined();
   });

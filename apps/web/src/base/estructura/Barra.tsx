@@ -1,8 +1,8 @@
 // Barra superior: centro y sede con los que se trabaja, y salir (0017). Con un solo centro o una
 // sola sede no hay nada que elegir: se muestra el nombre.
 import type { EstadoDeSesion } from "@app/contratos";
-import logo from "@app/ui/assets/isotipo-crema.png";
-import { Boton } from "../controles/Boton.tsx";
+import isotipo from "@app/ui/assets/isotipo-crema.png";
+import logo from "@app/ui/assets/logo-crema.png";
 import { useElegirCentro, useElegirSede, useSalir } from "../sesion.ts";
 import estilos from "./Barra.module.css";
 import { Selector } from "./Selector.tsx";
@@ -14,7 +14,7 @@ interface Props {
   centro: CentroActivo;
 }
 
-function SelectorDeSede({ centro }: { centro: CentroActivo }) {
+function SelectorDeSede({ centros, centro }: Props) {
   const elegir = useElegirSede();
   const [unica] = centro.sedes;
   if (centro.sedes.length === 1 && unica !== undefined) {
@@ -27,6 +27,7 @@ function SelectorDeSede({ centro }: { centro: CentroActivo }) {
   return (
     <Selector
       etiqueta="Sede"
+      ocultarEtiqueta={centros.length <= 1}
       valor={centro.sedeActiva}
       opciones={opciones}
       deshabilitado={elegir.isPending}
@@ -39,7 +40,7 @@ function SelectorDeSede({ centro }: { centro: CentroActivo }) {
 
 function SelectorDeCentro({ centros, centro }: Props) {
   const elegir = useElegirCentro();
-  if (centros.length <= 1) return <span className={estilos.nombre}>{centro.nombre}</span>;
+  if (centros.length <= 1) return null;
   return (
     <Selector
       etiqueta="Centro"
@@ -57,19 +58,37 @@ export function Barra({ centros, centro }: Props) {
   const salir = useSalir();
   return (
     <header className={estilos.barra}>
-      <img className={estilos.logo} src={logo} alt="" />
+      <picture>
+        <source media="(max-width: 600px)" srcSet={isotipo} />
+        <img className={estilos.logo} src={logo} alt="Stretch Inn" />
+      </picture>
       <SelectorDeCentro centros={centros} centro={centro} />
-      <SelectorDeSede centro={centro} />
-      <div className={estilos.salir}>
-        <Boton
-          variante="secundario"
-          alHacerClic={() => {
-            salir.mutate();
-          }}
+      <SelectorDeSede centros={centros} centro={centro} />
+      <button
+        type="button"
+        className={estilos.salir}
+        aria-label="Salir"
+        title="Salir"
+        disabled={salir.isPending}
+        onClick={() => {
+          salir.mutate();
+        }}
+      >
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
         >
-          Salir
-        </Boton>
-      </div>
+          <path d="M13 7V4H4v16h9v-3" />
+          <path className={estilos.flecha} d="m12 8 4 4-4 4m4-4H7" />
+        </svg>
+      </button>
     </header>
   );
 }

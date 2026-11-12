@@ -23,7 +23,7 @@ describe("entrar", () => {
     await usuario.type(screen.getByLabelText("Contraseña"), "una clave larga");
     await usuario.click(screen.getByRole("button", { name: "Entrar" }));
 
-    expect(await screen.findByText("Centro Uno")).toBeDefined();
+    expect(await screen.findByRole("heading", { name: "Te damos la bienvenida" })).toBeDefined();
     expect(servidor.pedidos.find((p) => p.clave === "POST /api/sesion")?.cuerpo).toEqual({
       email: "ana@ejemplo.com",
       clave: "una clave larga",
