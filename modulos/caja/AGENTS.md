@@ -59,6 +59,7 @@ el día de caja de cada sede con lo cobrado.
 - Anular no borra: guarda quién, cuándo y por qué (el motivo es obligatorio), y la cuota vuelve
   a estar sin pagar. Un pago anulado no se anula de nuevo.
 - El día de caja va de medianoche a medianoche en la zona del centro.
+- Medios de pago: efectivo y transferencia (0019); restricción en la base.
 
 ## Glosario
 
@@ -73,7 +74,6 @@ _Ninguna por ahora._
 
 ## Pendientes
 
-- **[SUPUESTO]** Medios de pago: efectivo, transferencia, débito, crédito y Mercado Pago.
 - **[SUPUESTO]** Se cobra la cuota completa; sin pagos parciales, recargos ni descuentos.
 - **[SUPUESTO]** Un pago se puede anular en cualquier momento, con motivo. Si Stretch Inn
   quiere cerrar la caja del día, va como regla nueva.

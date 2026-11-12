@@ -90,9 +90,11 @@ describe("cobrar una cuota", () => {
 
   it("rechaza medio desconocido, clave corta y una clave usada en otra cuota", async () => {
     const { ctx, norte, cuotaId, alumno } = await conCuota();
-    expect(
-      await caja().cobrarCuota(ctx, { cuotaId, medio: "cheque", claveIdempotencia: clave() }),
-    ).toMatchObject({ ok: false, error: { codigo: "medio-invalido" } });
+    for (const medio of ["cheque", "mercadopago"]) {
+      expect(
+        await caja().cobrarCuota(ctx, { cuotaId, medio, claveIdempotencia: clave() }),
+      ).toMatchObject({ ok: false, error: { codigo: "medio-invalido" } });
+    }
     expect(
       await caja().cobrarCuota(ctx, { cuotaId, medio: "efectivo", claveIdempotencia: "corta" }),
     ).toMatchObject({ ok: false, error: { codigo: "clave-invalida" } });
@@ -111,7 +113,7 @@ describe("anular un pago", () => {
     const { ctx, alumnoId, cuotaId } = await conCuota();
     const pago = await caja().cobrarCuota(ctx, {
       cuotaId,
-      medio: "debito",
+      medio: "transferencia",
       claveIdempotencia: clave(),
     });
     if (!pago.ok) throw new Error(pago.error.mensaje);

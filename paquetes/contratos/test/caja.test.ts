@@ -8,6 +8,7 @@ describe("pedidos de la caja", () => {
   it("el cobro lleva la cuota, el medio y la clave de idempotencia (regla 7)", () => {
     const cobro = { cuotaId: UUID, medio: "efectivo", claveIdempotencia: "cobro-12345" };
     expect(pedidoDeCobro.parse(cobro)).toEqual(cobro);
+    expect(pedidoDeCobro.safeParse({ ...cobro, medio: "mercadopago" }).success).toBe(false);
     expect(pedidoDeCobro.safeParse({ ...cobro, medio: "cheque" }).error?.issues[0]?.message).toBe(
       "Elegí el medio de pago.",
     );

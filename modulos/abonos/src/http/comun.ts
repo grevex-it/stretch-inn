@@ -8,7 +8,7 @@ const ESTADOS: Record<ErrorDeAbonos, number> = {
   "nombre-vacio": 400,
   "clases-invalidas": 400,
   "precio-invalido": 400,
-  "periodo-invalido": 400,
+  "dia-invalido": 400,
   "sin-permiso": 403,
   "plan-inexistente": 404,
   "alumno-inexistente": 404,

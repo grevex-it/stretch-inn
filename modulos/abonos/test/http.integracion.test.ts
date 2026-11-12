@@ -82,7 +82,11 @@ describe("rutas de los abonos", () => {
       payload: { alumnoId: ana, planId: id, sedeId: norte },
     });
     expect(cuota.statusCode).toBe(201);
-    expect(cuotaGenerada.parse(cuota.json())).toMatchObject({ monto: 28_000, periodo: "2026-11" });
+    expect(cuotaGenerada.parse(cuota.json())).toMatchObject({
+      monto: 28_000,
+      desde: "2026-11-15",
+      hasta: "2026-12-13",
+    });
     const repetida = await servidor.inject({
       method: "POST",
       url: "/abonos/cuotas",

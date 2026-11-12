@@ -6,6 +6,7 @@ import {
   bigint,
   boolean,
   check,
+  date,
   index,
   integer,
   pgTable,
@@ -57,7 +58,11 @@ export const preciosDeSede = pgTable(
   ],
 );
 
-/** La cuota mensual de un alumno. El monto se congela al generarla. Anular no borra. */
+/**
+ * La cuota de un ciclo de 4 semanas de un alumno (0019). El monto se congela al generarla.
+ * Anular no borra. Los ciclos vigentes de un alumno no se pisan: lo controla la app con un
+ * bloqueo por alumno, y el índice único es la última barrera.
+ */
 export const cuotas = pgTable(
   "cuotas",
   {
@@ -68,8 +73,10 @@ export const cuotas = pgTable(
     planId: uuid("plan_id")
       .notNull()
       .references(() => planes.id),
-    /** AAAA-MM. */
-    periodo: text("periodo").notNull(),
+    /** El primer día del ciclo, en la zona del centro. */
+    desde: date("desde", { mode: "string" }).notNull(),
+    /** El día en que termina (y empieza el siguiente): desde + 28 días. */
+    hasta: date("hasta", { mode: "string" }).notNull(),
     monto: pesos("monto").notNull(),
     creadaEn: timestamp("creada_en", { withTimezone: true }).notNull().defaultNow(),
     /** El pago de caja que la saldó. */
@@ -78,12 +85,11 @@ export const cuotas = pgTable(
     anuladaEn: timestamp("anulada_en", { withTimezone: true }),
   },
   (tabla) => [
-    // [SUPUESTO] Una cuota vigente por alumno y mes.
-    uniqueIndex("cuotas_alumno_periodo_vigente")
-      .on(tabla.alumnoId, tabla.periodo)
+    uniqueIndex("cuotas_alumno_desde_vigente")
+      .on(tabla.alumnoId, tabla.desde)
       .where(sql`${tabla.anuladaEn} is null`),
-    index("cuotas_centro_alumno_periodo").on(tabla.centroId, tabla.alumnoId, tabla.periodo),
-    check("cuotas_periodo", sql`${tabla.periodo} ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'`),
+    index("cuotas_centro_alumno_desde").on(tabla.centroId, tabla.alumnoId, tabla.desde),
+    check("cuotas_ciclo", sql`${tabla.hasta} = ${tabla.desde} + 28`),
     check("cuotas_monto", sql`${tabla.monto} > 0`),
     check("cuotas_pagada_o_anulada", sql`${tabla.pagadaEn} is null or ${tabla.anuladaEn} is null`),
   ],

@@ -3,10 +3,7 @@
 import { z } from "zod";
 import { numeroDePagina, paginaDe, POR_PAGINA } from "./paginas.ts";
 
-const medio = z.enum(
-  ["efectivo", "transferencia", "debito", "credito", "mercadopago"],
-  "Elegí el medio de pago.",
-);
+const medio = z.enum(["efectivo", "transferencia"], "Elegí el medio de pago.");
 
 /** Cuerpo de POST /caja/cobros. La clave la arma el panel, una por intento de cobro. */
 export const pedidoDeCobro = z.object({

@@ -15,7 +15,7 @@ CREATE TABLE "pagos" (
 	"anulado_por_id" uuid,
 	"motivo_anulacion" text,
 	CONSTRAINT "pagos_monto" CHECK ("pagos"."monto" > 0),
-	CONSTRAINT "pagos_medio" CHECK ("pagos"."medio" in ('efectivo', 'transferencia', 'debito', 'credito', 'mercadopago')),
+	CONSTRAINT "pagos_medio" CHECK ("pagos"."medio" in ('efectivo', 'transferencia')),
 	CONSTRAINT "pagos_registrado_por" CHECK ("pagos"."registrado_por_tipo" in ('usuario', 'soporte')),
 	CONSTRAINT "pagos_anulacion" CHECK (("pagos"."anulado_en" is null) = ("pagos"."motivo_anulacion" is null))
 );

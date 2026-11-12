@@ -32,21 +32,22 @@ export const planEditado = z.object({ version: z.number().int() });
 /** Cuerpo de PUT /abonos/planes/:id/sedes/:sedeId/precio. */
 export const pedidoDePrecioDeSede = z.object({ precio: pesos });
 
-/** Cuerpo de POST /abonos/cuotas. Sin período, el mes actual del centro. */
+/** Un día del calendario, AAAA-MM-DD, en la zona del centro. */
+const dia = z.iso.date("El día va como AAAA-MM-DD.");
+
+/** Cuerpo de POST /abonos/cuotas: un ciclo de 4 semanas desde `desde` (sin él, hoy). */
 export const pedidoDeCuota = z.object({
   alumnoId: z.uuid("Ese alumno no existe."),
   planId: z.uuid("Ese plan no existe."),
   sedeId: z.uuid("Esa sede no existe."),
-  periodo: z
-    .string()
-    .regex(/^\d{4}-(0[1-9]|1[0-2])$/, "El mes va como AAAA-MM.")
-    .optional(),
+  desde: dia.optional(),
 });
 
 export const cuotaGenerada = z.object({
   id: z.uuid(),
   monto: z.number().int(),
-  periodo: z.string(),
+  desde: z.string(),
+  hasta: z.string(),
 });
 
 export const cuota = z.object({
@@ -54,8 +55,10 @@ export const cuota = z.object({
   alumnoId: z.uuid(),
   planId: z.uuid(),
   sedeId: z.uuid(),
-  /** AAAA-MM. */
-  periodo: z.string(),
+  /** El primer día del ciclo de 4 semanas, AAAA-MM-DD. */
+  desde: z.string(),
+  /** El día en que termina y empieza el siguiente. */
+  hasta: z.string(),
   monto: z.number().int(),
   /** En UTC; null mientras no se pagó. */
   pagadaEn: z.iso.datetime().nullable(),

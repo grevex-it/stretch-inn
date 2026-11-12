@@ -92,6 +92,8 @@ export interface Acceso {
   centros(sesion: SesionResuelta): Promise<{ id: string; nombre: string }[]>;
   /** Las sedes del selector (donde tiene algún permiso), con nombre. Vacío sin centro. */
   sedes(sesion: SesionResuelta): Promise<{ id: string; nombre: string }[]>;
+  /** La zona horaria del centro activo (de `centros`). null sin centro. */
+  zonaHoraria(sesion: SesionResuelta): Promise<string | null>;
   elegirCentro(sesion: SesionResuelta, centroId: string): Promise<Resultado<null, ErrorDeCentro>>;
   elegirSede(sesion: SesionResuelta, sede: SedeActiva): Promise<Resultado<null, ErrorDeSede>>;
   salir(sesion: SesionResuelta): Promise<void>;

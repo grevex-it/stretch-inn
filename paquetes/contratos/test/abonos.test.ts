@@ -21,14 +21,14 @@ describe("pedidos de los abonos", () => {
     expect(edicionDePlan.parse({ ...PLAN, version: 2 })).toEqual({ ...PLAN, version: 2 });
   });
 
-  it("el precio de una sede es un entero; la cuota lleva el período opcional AAAA-MM", () => {
+  it("el precio de una sede es un entero; la cuota lleva el día de inicio opcional", () => {
     expect(pedidoDePrecioDeSede.parse({ precio: 28_000 })).toEqual({ precio: 28_000 });
     const cuota = { alumnoId: UUID, planId: UUID, sedeId: UUID };
     expect(pedidoDeCuota.parse(cuota)).toEqual(cuota);
-    expect(pedidoDeCuota.parse({ ...cuota, periodo: "2026-11" })).toMatchObject({
-      periodo: "2026-11",
+    expect(pedidoDeCuota.parse({ ...cuota, desde: "2026-11-30" })).toMatchObject({
+      desde: "2026-11-30",
     });
-    expect(pedidoDeCuota.safeParse({ ...cuota, periodo: "11/2026" }).success).toBe(false);
+    expect(pedidoDeCuota.safeParse({ ...cuota, desde: "30/11/2026" }).success).toBe(false);
   });
 });
 
@@ -59,7 +59,8 @@ describe("respuestas de los abonos", () => {
           alumnoId: UUID,
           planId: UUID,
           sedeId: UUID,
-          periodo: "2026-11",
+          desde: "2026-11-30",
+          hasta: "2026-12-28",
           monto: 28_000,
           pagadaEn: null,
         },
