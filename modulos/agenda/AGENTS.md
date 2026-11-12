@@ -50,6 +50,15 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 - `PERMISOS_AGENDA`: la sección «Agenda» del catálogo (`agenda.ver`, `agenda.gestionar`,
   `agenda.inscribir`).
 
+Para otros módulos (asistencia). Reciben la `Transaccion` de `enContexto` y solo leen:
+
+- `obtenerFecha(tx, id)`: una fecha con su clase (`claseId`, `sedeId`, `nombre`, `cupo`,
+  `fecha`, `empiezaEn`, `terminaEn`, `cancelada`), o undefined.
+- `inscriptosEnFecha(tx, { claseId, momento, pagina, porPagina })`: los alumnos con inscripción
+  vigente **en ese momento**, por orden de inscripción.
+- `estabanInscriptos(tx, { claseId, momento, alumnoIds })`: cuáles de esos alumnos (hasta 100)
+  la tenían vigente en ese momento.
+
 ## Eventos
 
 - Emite: _ninguno por ahora_.
@@ -74,6 +83,8 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
   los inscriptos se rechaza.
 - Un alumno tiene a lo sumo una inscripción vigente por clase (índice único parcial). La baja
   no borra: marca `baja_en`.
+- Una inscripción está vigente en un momento si se creó antes (o en ese momento) y no tiene baja
+  o la baja es posterior. Una baja de hoy no saca al alumno de las fechas pasadas.
 - Solo se inscribe un alumno activo del centro, leído por la API pública de `personas`.
 
 ## Glosario
