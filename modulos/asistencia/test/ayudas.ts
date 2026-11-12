@@ -27,6 +27,7 @@ const TODO = [
   "asistencia.tomar",
   "asistencia.avisar",
   "asistencia.recuperar",
+  "asistencia.configurar",
 ];
 
 /** Como dueño del esquema: sin RLS. Para armar datos y para contar lo que quedó guardado. */

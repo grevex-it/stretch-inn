@@ -2,30 +2,30 @@
 // en su transacción con el contexto de quien la pide.
 import { enContexto, type Base, type Transaccion } from "@app/plataforma";
 import * as avisos from "./aplicacion/avisos.ts";
-import * as creditos from "./aplicacion/creditos.ts";
 import * as planillas from "./aplicacion/planilla.ts";
-import type { Asistencia, ConsultaFinDelAbono } from "./aplicacion/puertos.ts";
+import type { Asistencia, ConsultaAbonoVigente } from "./aplicacion/puertos.ts";
 import * as recuperaciones from "./aplicacion/recuperaciones.ts";
+import * as reglas from "./aplicacion/reglas.ts";
 import { repositorioAsistencia } from "./infraestructura/repositorio.ts";
 
 export interface OpcionesAsistencia {
   /** Reloj; en los tests se adelanta a mano. */
   ahora?: () => Date;
   /**
-   * Cuándo termina el abono del alumno, dentro de la transacción del aviso. Lo conecta la API con
-   * `abonos`. Sin él, el crédito vence a las 4 semanas de la fecha (ver dominio/credito.ts).
+   * El abono vigente del alumno, dentro de la transacción de la recuperación. Lo conecta la API
+   * con `abonos`. Sin él, nadie tiene abono vigente (0020).
    */
-  finDelAbono?: (
+  abonoVigente?: (
     tx: Transaccion,
-    consulta: Parameters<ConsultaFinDelAbono>[0],
-  ) => Promise<Date | undefined>;
+    consulta: Parameters<ConsultaAbonoVigente>[0],
+  ) => ReturnType<ConsultaAbonoVigente>;
 }
 
-const sinAbono = (): Promise<Date | undefined> => Promise.resolve(undefined);
+const sinAbono = (): ReturnType<ConsultaAbonoVigente> => Promise.resolve(undefined);
 
 export function crearAsistencia(base: Base, opciones: OpcionesAsistencia = {}): Asistencia {
   const ahora = opciones.ahora ?? (() => new Date());
-  const finDelAbono = opciones.finDelAbono ?? sinAbono;
+  const abonoVigente = opciones.abonoVigente ?? sinAbono;
   return {
     planilla: (quien, filtro) =>
       enContexto(base, quien, (tx) => planillas.planilla(repositorioAsistencia(tx), quien, filtro)),
@@ -35,17 +35,13 @@ export function crearAsistencia(base: Base, opciones: OpcionesAsistencia = {}): 
       ),
     avisar: (quien, aviso) =>
       enContexto(base, quien, (tx) =>
-        avisos.avisar(repositorioAsistencia(tx), quien, ahora(), aviso, (consulta) =>
-          finDelAbono(tx, consulta),
-        ),
-      ),
-    creditos: (quien, filtro) =>
-      enContexto(base, quien, (tx) =>
-        creditos.deAlumno(repositorioAsistencia(tx), quien, ahora(), filtro),
+        avisos.avisar(repositorioAsistencia(tx), quien, ahora(), aviso),
       ),
     recuperar: (quien, reserva) =>
       enContexto(base, quien, (tx) =>
-        recuperaciones.recuperar(repositorioAsistencia(tx), quien, ahora(), reserva),
+        recuperaciones.recuperar(repositorioAsistencia(tx), quien, ahora(), reserva, (consulta) =>
+          abonoVigente(tx, consulta),
+        ),
       ),
     anularRecuperacion: (quien, reserva) =>
       enContexto(base, quien, (tx) =>
@@ -55,5 +51,9 @@ export function crearAsistencia(base: Base, opciones: OpcionesAsistencia = {}): 
       enContexto(base, quien, (tx) =>
         avisos.anular(repositorioAsistencia(tx), quien, ahora(), aviso),
       ),
+    reglas: (quien, filtro) =>
+      enContexto(base, quien, (tx) => reglas.reglas(repositorioAsistencia(tx), quien, filtro)),
+    fijarReglas: (quien, cambio) =>
+      enContexto(base, quien, (tx) => reglas.fijar(repositorioAsistencia(tx), quien, cambio)),
   };
 }

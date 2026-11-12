@@ -1,5 +1,6 @@
-// Recuperaciones sobre Postgres real: reservar con un crédito, los lugares de la fecha, anular,
-// el aviso cuyo lugar ya se ocupó y el último lugar disputado por dos a la vez.
+// Recuperaciones sobre Postgres real (0020): se recupera si hay lugar, sin aviso previo, dentro
+// del abono vigente; cada sede fija la anticipación, el máximo por abono y si se puede recuperar
+// sin abono. También los lugares de la fecha, anular y el último lugar disputado por dos a la vez.
 import { crearBase, type Base } from "@app/plataforma";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
@@ -16,25 +17,38 @@ afterAll(async () => {
 
 const PRIMERA = { pagina: 1, porPagina: 50 };
 const HORA = 60 * 60_000;
+const DIA = 24 * HORA;
 
-/** El reloj tres horas antes de la fecha del lunes: los avisos dan crédito. */
-async function conCredito() {
+/**
+ * El reloj tres horas antes de la fecha del lunes. Todos tienen un abono que empezó una semana
+ * antes y termina tres semanas después, salvo que se pase otro.
+ */
+async function conAbono(abono: "vigente" | "sin abono" = "vigente") {
   const datos = await claseConFecha(base);
+  const lunes = datos.fecha.empiezaEn.getTime();
+  const vigente = { inicio: new Date(lunes - 7 * DIA), fin: new Date(lunes + 21 * DIA) };
   const asistencia = crearAsistencia(base, {
-    ahora: () => new Date(datos.fecha.empiezaEn.getTime() - 3 * HORA),
+    ahora: () => new Date(lunes - 3 * HORA),
+    abonoVigente: () => Promise.resolve(abono === "vigente" ? vigente : undefined),
   });
-  const avisar = async (alumnoId: string) => {
-    const aviso = await asistencia.avisar(datos.ctx, { fechaId: datos.fecha.id, alumnoId });
-    if (!aviso.ok || !aviso.valor.conCredito) throw new Error("El aviso no dio crédito.");
-    return aviso.valor.id;
-  };
-  return { ...datos, asistencia, avisar };
+  const reglas = (cambios: {
+    anticipacionMinutos?: number;
+    maximoPorAbono?: number;
+    sinAbono?: boolean;
+  }) =>
+    asistencia.fijarReglas(datos.ctx, {
+      sedeId: datos.norte,
+      anticipacionMinutos: 0,
+      maximoPorAbono: 4,
+      sinAbono: false,
+      ...cambios,
+    });
+  return { ...datos, asistencia, reglas };
 }
 
 describe("recuperar", () => {
-  it("reserva con el crédito: figura en la planilla, ocupa un lugar y se le toma asistencia", async () => {
-    const { ctx, ana, asistencia, avisar, otraClase } = await conCredito();
-    await avisar(ana);
+  it("sin aviso previo, si hay lugar: figura en la planilla, ocupa un lugar y se le toma asistencia", async () => {
+    const { ctx, ana, asistencia, otraClase } = await conAbono();
     const yoga = await otraClase(2, 0);
 
     const reserva = await asistencia.recuperar(ctx, { fechaId: yoga.fecha.id, alumnoId: ana });
@@ -47,8 +61,6 @@ describe("recuperar", () => {
     expect(planilla.valor.recuperan.elementos[0]?.recuperacionId).toBe(
       reserva.ok && reserva.valor.id,
     );
-    const creditos = await asistencia.creditos(ctx, { ...PRIMERA, alumnoId: ana });
-    expect(creditos.ok && creditos.valor.total).toBe(0);
 
     const enYoga = crearAsistencia(base, { ahora: () => yoga.fecha.empiezaEn });
     expect(
@@ -59,13 +71,9 @@ describe("recuperar", () => {
     ).toEqual({ ok: true, valor: null });
   });
 
-  it("sin crédito no recupera; en su propia clase tampoco; dos veces en la misma fecha, no", async () => {
-    const { ctx, ana, bea, fecha, asistencia, avisar, otraClase } = await conCredito();
+  it("en su propia clase no recupera; dos veces en la misma fecha, tampoco", async () => {
+    const { ctx, ana, fecha, asistencia, otraClase } = await conAbono();
     const yoga = await otraClase(5, 0);
-    expect(
-      await asistencia.recuperar(ctx, { fechaId: yoga.fecha.id, alumnoId: bea }),
-    ).toMatchObject({ ok: false, error: { codigo: "sin-creditos" } });
-    await avisar(ana);
     expect(await asistencia.recuperar(ctx, { fechaId: fecha.id, alumnoId: ana })).toMatchObject({
       ok: false,
       error: { codigo: "ya-inscripto" },
@@ -79,8 +87,7 @@ describe("recuperar", () => {
   });
 
   it("sin lugar no entra; el aviso de un fijo libera uno; ese aviso ya no se puede anular", async () => {
-    const { ctx, ana, asistencia, avisar, otraClase } = await conCredito();
-    await avisar(ana);
+    const { ctx, ana, asistencia, otraClase } = await conAbono();
     const yoga = await otraClase(1, 1);
     const pedido = { fechaId: yoga.fecha.id, alumnoId: ana };
     expect(await asistencia.recuperar(ctx, pedido)).toMatchObject({
@@ -98,17 +105,11 @@ describe("recuperar", () => {
     });
   });
 
-  it("anular la recuperación devuelve el crédito; el aviso de un crédito usado no se anula", async () => {
-    const { ctx, ana, asistencia, avisar, otraClase } = await conCredito();
-    const avisoId = await avisar(ana);
-    const yoga = await otraClase(2, 0);
+  it("anular la recuperación libera el lugar, una sola vez", async () => {
+    const { ctx, ana, asistencia, otraClase } = await conAbono();
+    const yoga = await otraClase(1, 0);
     const reserva = await asistencia.recuperar(ctx, { fechaId: yoga.fecha.id, alumnoId: ana });
     if (!reserva.ok) throw new Error(reserva.error.mensaje);
-
-    expect(await asistencia.anularAviso(ctx, { id: avisoId })).toMatchObject({
-      ok: false,
-      error: { codigo: "credito-usado" },
-    });
     expect(await asistencia.anularRecuperacion(ctx, reserva.valor)).toEqual({
       ok: true,
       valor: null,
@@ -117,13 +118,12 @@ describe("recuperar", () => {
       ok: false,
       error: { codigo: "recuperacion-inexistente" },
     });
-    const creditos = await asistencia.creditos(ctx, { ...PRIMERA, alumnoId: ana });
-    expect(creditos.ok && creditos.valor.total).toBe(1);
+    const planilla = await asistencia.planilla(ctx, { ...PRIMERA, fechaId: yoga.fecha.id });
+    expect(planilla.ok && planilla.valor.lugares).toBe(1);
   });
 
   it("recuperar pide asistencia.recuperar en la sede de la fecha", async () => {
-    const { ana, asistencia, avisar, otraClase, otra } = await conCredito();
-    await avisar(ana);
+    const { ana, asistencia, otraClase, otra } = await conAbono();
     const yoga = await otraClase(2, 0);
     const soloVe = await otra(["asistencia.ver"]);
     expect(
@@ -132,11 +132,72 @@ describe("recuperar", () => {
   });
 });
 
+describe("las reglas de la sede", () => {
+  it("la anticipación: hay que anotarse con esa anticipación antes de la clase", async () => {
+    const { ctx, ana, asistencia, otraClase, reglas } = await conAbono();
+    const yoga = await otraClase(2, 0);
+    // El reloj está tres horas antes del lunes; Yoga es el miércoles: faltan menos de 7 días.
+    await reglas({ anticipacionMinutos: 7 * 24 * 60 });
+    expect(
+      await asistencia.recuperar(ctx, { fechaId: yoga.fecha.id, alumnoId: ana }),
+    ).toMatchObject({ ok: false, error: { codigo: "fuera-de-tiempo" } });
+    await reglas({ anticipacionMinutos: 60 });
+    expect((await asistencia.recuperar(ctx, { fechaId: yoga.fecha.id, alumnoId: ana })).ok).toBe(
+      true,
+    );
+  });
+
+  it("el máximo por abono: cuenta las recuperaciones de ese abono", async () => {
+    const { ctx, ana, asistencia, otraClase, reglas } = await conAbono();
+    await reglas({ maximoPorAbono: 1 });
+    const [yoga, pilates] = [await otraClase(2, 0), await otraClase(2, 0)];
+    expect((await asistencia.recuperar(ctx, { fechaId: yoga.fecha.id, alumnoId: ana })).ok).toBe(
+      true,
+    );
+    expect(
+      await asistencia.recuperar(ctx, { fechaId: pilates.fecha.id, alumnoId: ana }),
+    ).toMatchObject({ ok: false, error: { codigo: "sin-recuperaciones" } });
+  });
+
+  it("sin abono vigente no recupera, salvo que la sede lo permita", async () => {
+    const { ctx, ana, asistencia, otraClase, reglas } = await conAbono("sin abono");
+    const yoga = await otraClase(2, 0);
+    const pedido = { fechaId: yoga.fecha.id, alumnoId: ana };
+    expect(await asistencia.recuperar(ctx, pedido)).toMatchObject({
+      ok: false,
+      error: { codigo: "sin-abono" },
+    });
+    await reglas({ sinAbono: true });
+    expect((await asistencia.recuperar(ctx, pedido)).ok).toBe(true);
+  });
+
+  it("sin configurar, valen las de Río Tercero; cambiarlas pide asistencia.configurar", async () => {
+    const { ctx, norte, asistencia, otra } = await conAbono();
+    expect(await asistencia.reglas(ctx, { sedeId: norte })).toEqual({
+      ok: true,
+      valor: { anticipacionMinutos: 0, maximoPorAbono: 4, sinAbono: false },
+    });
+    const soloVe = await otra(["asistencia.ver"]);
+    const mendoza = { sedeId: norte, anticipacionMinutos: 60, maximoPorAbono: 2, sinAbono: false };
+    expect(await asistencia.fijarReglas(soloVe, mendoza)).toMatchObject({
+      ok: false,
+      error: { codigo: "sin-permiso" },
+    });
+    expect(await asistencia.fijarReglas(ctx, { ...mendoza, maximoPorAbono: -1 })).toMatchObject({
+      ok: false,
+      error: { codigo: "reglas-invalidas" },
+    });
+    expect(await asistencia.fijarReglas(ctx, mendoza)).toEqual({ ok: true, valor: null });
+    expect(await asistencia.reglas(soloVe, { sedeId: norte })).toEqual({
+      ok: true,
+      valor: { anticipacionMinutos: 60, maximoPorAbono: 2, sinAbono: false },
+    });
+  });
+});
+
 describe("el último lugar", () => {
   it("dos reservas a la vez por el último lugar: entra una sola, la otra espera y ve que no hay", async () => {
-    const { ctx, ana, bea, asistencia, avisar, otraClase } = await conCredito();
-    await avisar(ana);
-    await avisar(bea);
+    const { ctx, ana, bea, asistencia, otraClase } = await conAbono();
     const yoga = await otraClase(1, 0);
 
     const resultados = await conFechaTomada(yoga.fecha.id, 2, () =>

@@ -44,10 +44,9 @@ acuerdo.
 - `pedidoDeAsistencia` (de 1 a 100 marcas `{ alumnoId, estado }`, presente o ausente) y
   `planillaDeAsistencia` (la fecha y una página de sus inscriptos con su `estado` y su
   `avisoId`, `null` si no se marcó o no avisó), con sus tipos.
-- `pedidoDeAviso` (`{ alumnoId }`) y `avisoHecho` (`{ id, conCredito }`: con el id se anula),
-  con sus tipos.
-- `paginaDeCreditos`: los créditos vigentes de un alumno, con su sede, su fecha de origen y su
-  vencimiento; el que vence antes, primero.
+- `pedidoDeAviso` (`{ alumnoId }`) y `avisoHecho` (`{ id }`: con el id se anula), con sus tipos.
+- `reglasDeRecuperacion` (`{ anticipacionMinutos, maximoPorAbono, sinAbono }`), las reglas de
+  recuperación de una sede (0020), con su tipo.
 - `pedidoDeRecuperacion` (`{ alumnoId }`) y `recuperacionHecha` (`{ id }`), con sus tipos. La
   planilla trae también `recuperan` (la misma página de los que recuperan, cada uno con su
   `recuperacionId` para anularla) y `lugares`.

@@ -4,6 +4,7 @@ import {
   pedidoDeAviso,
   pedidoDePagina,
   pedidoDeRecuperacion,
+  reglasDeRecuperacion,
 } from "@app/contratos";
 import { contextoDe } from "@app/plataforma";
 import type { FastifyInstance, FastifyPluginCallback } from "fastify";
@@ -17,7 +18,8 @@ const avisar = { permiso: "asistencia.avisar" } as const;
 const recuperar = { permiso: "asistencia.recuperar" } as const;
 const conId = z.object({ id: z.uuid("Esa fecha no existe.") });
 const avisoConId = z.object({ id: z.uuid("Ese aviso no existe.") });
-const alumnoConId = z.object({ id: z.uuid("Ese alumno no existe.") });
+const sedeConId = z.object({ id: z.uuid("Esa sede no existe.") });
+const configurar = { permiso: "asistencia.configurar" } as const;
 const recuperacionConId = z.object({ id: z.uuid("Esa recuperación no existe.") });
 
 export function rutasDeAsistencia(asistencia: Asistencia): FastifyPluginCallback {
@@ -25,6 +27,7 @@ export function rutasDeAsistencia(asistencia: Asistencia): FastifyPluginCallback
     rutasDePlanilla(app, asistencia);
     rutasDeAvisos(app, asistencia);
     rutasDeRecuperaciones(app, asistencia);
+    rutasDeReglas(app, asistencia);
     listo();
   };
 }
@@ -71,18 +74,6 @@ function rutasDeAvisos(app: FastifyInstance, asistencia: Asistencia): void {
     const resultado = await asistencia.anularAviso(contextoDe(pedido), aviso);
     return enviar(respuesta, resultado, 204);
   });
-
-  // Para la ficha del alumno. Vive en asistencia: personas no sabe de créditos.
-  app.get("/alumnos/:id/creditos", { config: ver }, async (pedido, respuesta) => {
-    const alumno = leer(alumnoConId, pedido.params, respuesta);
-    const pagina = alumno && leer(pedidoDePagina, pedido.query, respuesta);
-    if (alumno === undefined || pagina === undefined) return respuesta;
-    const resultado = await asistencia.creditos(contextoDe(pedido), {
-      ...pagina,
-      alumnoId: alumno.id,
-    });
-    return enviar(respuesta, resultado, 200);
-  });
 }
 
 function rutasDeRecuperaciones(app: FastifyInstance, asistencia: Asistencia): void {
@@ -105,6 +96,27 @@ function rutasDeRecuperaciones(app: FastifyInstance, asistencia: Asistencia): vo
     const reserva = leer(recuperacionConId, pedido.params, respuesta);
     if (reserva === undefined) return respuesta;
     const resultado = await asistencia.anularRecuperacion(contextoDe(pedido), reserva);
+    return enviar(respuesta, resultado, 204);
+  });
+}
+
+/** Las reglas de recuperación de cada sede (0020). */
+function rutasDeReglas(app: FastifyInstance, asistencia: Asistencia): void {
+  app.get("/asistencia/sedes/:id/reglas", { config: ver }, async (pedido, respuesta) => {
+    const sede = leer(sedeConId, pedido.params, respuesta);
+    if (sede === undefined) return respuesta;
+    const resultado = await asistencia.reglas(contextoDe(pedido), { sedeId: sede.id });
+    return enviar(respuesta, resultado, 200);
+  });
+
+  app.put("/asistencia/sedes/:id/reglas", { config: configurar }, async (pedido, respuesta) => {
+    const sede = leer(sedeConId, pedido.params, respuesta);
+    const reglas = sede && leer(reglasDeRecuperacion, pedido.body, respuesta);
+    if (sede === undefined || reglas === undefined) return respuesta;
+    const resultado = await asistencia.fijarReglas(contextoDe(pedido), {
+      ...reglas,
+      sedeId: sede.id,
+    });
     return enviar(respuesta, resultado, 204);
   });
 }

@@ -59,15 +59,8 @@ await app.register(rutasDeSesion(acceso));
 await app.register(rutasDeEquipo(crearEquipo(base)));
 await app.register(rutasDeAlumnos(base));
 await app.register(rutasDeAgenda(crearAgenda(base)));
-// El crédito de una ausencia vence con el abono vigente del alumno (0020): abonos se lo dice a
-// asistencia.
-await app.register(
-  rutasDeAsistencia(
-    crearAsistencia(base, {
-      finDelAbono: async (tx, consulta) => (await abonoVigente(tx, consulta))?.fin,
-    }),
-  ),
-);
+// Se recupera dentro del abono vigente del alumno (0020): abonos se lo dice a asistencia.
+await app.register(rutasDeAsistencia(crearAsistencia(base, { abonoVigente })));
 await app.register(rutasDeAbonos(crearAbonos(base)));
 await app.register(rutasDeCaja(crearCaja(base, { cola })));
 

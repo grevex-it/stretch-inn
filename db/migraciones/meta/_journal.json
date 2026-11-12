@@ -225,6 +225,20 @@
       "when": 1794499366588,
       "tag": "20261112160246_abono-por-clases",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1794513103803,
+      "tag": "20261112195143_reglas-de-recuperacion",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1794513114958,
+      "tag": "20261112195154_rls-reglas-de-recuperacion",
+      "breakpoints": true
     }
   ]
 }
