@@ -55,8 +55,9 @@ panel:
   clase nueva.
 
 **Río Tercero** (12/11/2026): el alumno siempre puede recuperar si hay lugar, avise o no y con
-cualquier anticipación. No toman lista. Máximo por abono: **[SUPUESTO]** las clases del abono (4),
-para que alguien que vino a todas no sume recuperaciones sin tope; se puede cambiar desde el panel.
+cualquier anticipación. No toman lista. Máximo por abono: arranca en las clases del abono (4),
+para que alguien que vino a todas no sume recuperaciones sin tope; el centro lo ajusta desde el
+panel, como el resto de estas reglas.
 
 **Mendoza:** hoy pide aviso una hora antes y permite hasta 2 recuperaciones por abono. Falta
 confirmar cómo queda.
