@@ -37,6 +37,14 @@ al generarla.
     `desde` (AAAA-MM-DD; sin él, hoy en el centro). Devuelve `{ id, monto, desde, hasta }`. No
     puede pisar otro ciclo vigente del alumno (`ya-tiene-cuota`).
   - `anularCuota(quien, { id })` y `cuotasDeAlumno(quien, { alumnoId, pagina, porPagina })`.
+  - `cuotasImpagas(quien, { sedeId, pagina, porPagina })`: las impagas de la sede, la más vieja
+    primero, con el nombre del alumno y `adeudado` (lo que suman todas, no solo la página).
+  - `renovarCuotas(quien, { sedeId, dia? })`: renueva los ciclos de la sede que terminaron hasta
+    `dia` (sin él, hoy en el centro). El ciclo siguiente empieza el día en que terminó el último,
+    con el mismo plan y el precio de hoy; quien quedó atrás recibe todos los que le faltan, así
+    que repetirlo no duplica. Saltea alumnos y planes de baja. Devuelve
+    `{ dia, generadas, alumnosDeBaja, planesDeBaja }`. Va de a tandas de 100 alumnos (el tope de
+    `obtenerAlumnos`).
 - Para otros módulos (`caja`, `asistencia`), con la `Transaccion` de `enContexto`:
   - `obtenerCuota(tx, id)`: la cuota vigente, o undefined.
   - `registrarPago(tx, { cuotaId, pagoId, en })`: la marca pagada una sola vez (la toma con
@@ -46,10 +54,12 @@ al generarla.
   - `finDelAbono(tx, { alumnoId, sedeId, en })`: la medianoche del centro del día en que termina
     el ciclo vigente del alumno en esa sede en ese momento, o undefined. La API se lo pasa a
     `asistencia` para el vencimiento de los créditos (0019).
-- `rutasDeAbonos(abonos)`: `GET /abonos/planes` y `GET /alumnos/:id/cuotas` (`abonos.ver`);
+- `rutasDeAbonos(abonos)`: `GET /abonos/planes`, `GET /abonos/cuotas/impagas?sede&pagina` y
+  `GET /alumnos/:id/cuotas` (`abonos.ver`);
   `POST /abonos/planes`, `PUT /abonos/planes/:id`, `PUT`/`DELETE /abonos/planes/:id/baja` y
   `PUT`/`DELETE /abonos/planes/:id/sedes/:sedeId/precio` (`abonos.gestionar`);
-  `POST /abonos/cuotas` y `DELETE /abonos/cuotas/:id` (`abonos.asignar`).
+  `POST /abonos/cuotas`, `POST /abonos/cuotas/renovacion` y `DELETE /abonos/cuotas/:id`
+  (`abonos.asignar`).
 - `PERMISOS_ABONOS`: la sección «Abonos» del catálogo (`abonos.ver`, `abonos.gestionar`,
   `abonos.asignar`).
 
@@ -97,4 +107,6 @@ _Ninguna por ahora._ Los precios por sede son datos, no configuración.
 - La sede de la cuota (la que define el precio) es la de las clases del alumno: un alumno tiene
   su horario fijo en una sola sede (0019).
 - **[SUPUESTO]** Permisos `abonos.ver`, `abonos.gestionar` y `abonos.asignar`.
-- Renovar los ciclos que terminan, y el aviso de pago ese día, con una tarea del worker.
+- Renovar los ciclos que terminan, y el aviso de pago ese día, con una tarea del worker (falta
+  el actor de sistema, ver `docs/pendientes.md`).
+- El profe ve si un alumno pagó, pero no tendría que ver el total adeudado (`adeudado`, 0019).

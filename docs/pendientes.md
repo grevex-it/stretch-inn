@@ -42,7 +42,28 @@ Casi todo quedó respondido en 0019. Falta:
 
 - **Telegram:** crear el bot y el grupo con un tema por capa de alerta (0015).
 
+## Del back (revisión del 08/11)
+
+Lo que quedó abierto de la pila de asistencia, abonos, caja y worker. Lo que ya respondió Stretch
+Inn está en 0019; los supuestos menores de cada módulo, en su `AGENTS.md`.
+
+- **Actor de sistema en el `ContextoCentro`** (estructura): lo necesitan las tareas programadas
+  del worker, como renovar los ciclos que terminan y avisar el pago ese día (0019). Hoy el
+  contexto solo admite usuario y soporte.
+- **`agenda` puede pasarse del cupo de una fecha con recuperaciones:** si inscribe a alguien en
+  una clase con recuperaciones reservadas en una fecha futura. Un evento de `agenda` o un puerto
+  para que consulte los lugares a `asistencia`.
+- **La baja de un alumno tiene que liberar sus inscripciones fijas** (0019). Hoy siguen vigentes.
+- **Una fecha suspendida tiene que dar crédito a sus inscriptos** (0019).
+- **`caja`:** la cuota se marca pagada en la transacción del cobro y no por el evento. Revisar si
+  queda así y, en ese caso, actualizar 0003.
+- **Railway:** crear el servicio del worker (`pnpm --filter @app/worker start`) con la misma
+  `DATABASE_URL` que la API.
+- **Panel:** las pantallas de agenda, asistencia, abonos y caja están en la rama
+  `panel-alumnos-detalles`, sin pull request, y usan los contratos de antes de 0019 (cuotas por
+  mes, medios de pago). Hay que adaptarlas. Además, el profe tiene que poder anular un cobro sin
+  `caja.ver`, y cobrar sin ver el total adeudado (0019).
+
 ## Del repo
 
-- Escribir `apps/web/AGENTS.md` cuando exista la app, a partir de `docs/borradores-agents/`.
 - Verificar que la versión de Postgres de Railway sea la 18, la misma que se usa en local y en los tests.

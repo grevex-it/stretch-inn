@@ -54,6 +54,8 @@ acuerdo.
   `pedidoDePrecioDeSede`, `pedidoDeCuota` (día de inicio opcional `desde`, AAAA-MM-DD),
   `cuotaGenerada`, `cuota` (con `desde` y `hasta`) y `paginaDeCuotas`, con sus tipos. Los montos
   van en pesos enteros.
+- `pedidoDeImpagas` (query `?sede&pagina`), `cuotaImpaga`, `paginaDeImpagas` (con `adeudado`),
+  `pedidoDeRenovacion` (`{ sedeId, dia? }`) y `renovacionHecha`, con sus tipos.
 - `pedidoDeCobro` (cuota, medio y `claveIdempotencia`), `cobroHecho` (`{ id, monto, repetido }`),
   `pedidoDeAnulacion` (`{ motivo }`), `pedidoDelDia` (query `?sede&dia&pagina`), `pago` y
   `diaDeCaja` (una página de pagos más `cobrado`), con sus tipos.

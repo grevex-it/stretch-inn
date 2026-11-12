@@ -25,3 +25,12 @@ export function finDelCiclo(desde: string): string {
   dia.setUTCDate(dia.getUTCDate() + DIAS_DEL_CICLO);
   return dia.toISOString().slice(0, 10);
 }
+
+/** Los ciclos seguidos desde el que empieza `desde`, hasta el que contiene `dia` inclusive. */
+export function ciclosHasta(desde: string, dia: string): { desde: string; hasta: string }[] {
+  const ciclos = [];
+  for (let inicio = desde; inicio <= dia; inicio = finDelCiclo(inicio)) {
+    ciclos.push({ desde: inicio, hasta: finDelCiclo(inicio) });
+  }
+  return ciclos;
+}

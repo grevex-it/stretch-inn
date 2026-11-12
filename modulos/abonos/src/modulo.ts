@@ -1,6 +1,7 @@
 // Arma los abonos con sus adaptadores, a mano (ver docs/decisiones/0003). Cada operación corre en
 // su transacción con el contexto de quien la pide.
 import { enContexto, type Base } from "@app/plataforma";
+import * as cuotasDeSede from "./aplicacion/cuotas-de-sede.ts";
 import * as cuotas from "./aplicacion/cuotas.ts";
 import * as planes from "./aplicacion/planes.ts";
 import type { Abonos } from "./aplicacion/puertos.ts";
@@ -28,5 +29,9 @@ export function crearAbonos(base: Base, opciones: OpcionesAbonos = {}): Abonos {
       con(quien, (repo) => cuotas.generar(repo, quien, ahora(), pedido)),
     anularCuota: (quien, cuota) => con(quien, (repo) => cuotas.anular(repo, quien, ahora(), cuota)),
     cuotasDeAlumno: (quien, filtro) => con(quien, (repo) => cuotas.deAlumno(repo, quien, filtro)),
+    cuotasImpagas: (quien, filtro) =>
+      con(quien, (repo) => cuotasDeSede.impagas(repo, quien, filtro)),
+    renovarCuotas: (quien, pedido) =>
+      con(quien, (repo) => cuotasDeSede.renovar(repo, quien, ahora(), pedido)),
   };
 }
