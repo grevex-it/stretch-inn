@@ -3,11 +3,12 @@ import { describe, expect, it } from "vitest";
 import { diaDeCaja, limpiarClave, limpiarMotivo, medioValido } from "../../src/dominio/cobro.ts";
 
 describe("medioValido", () => {
-  it("[SUPUESTO] efectivo, transferencia, débito, crédito o Mercado Pago", () => {
-    for (const medio of ["efectivo", "transferencia", "debito", "credito", "mercadopago"]) {
-      expect(medioValido(medio)).toBe(true);
+  it("efectivo o transferencia (0019)", () => {
+    expect(medioValido("efectivo")).toBe(true);
+    expect(medioValido("transferencia")).toBe(true);
+    for (const medio of ["debito", "credito", "mercadopago", "cheque"]) {
+      expect(medioValido(medio)).toBe(false);
     }
-    expect(medioValido("cheque")).toBe(false);
   });
 });
 

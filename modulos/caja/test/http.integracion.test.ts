@@ -74,7 +74,7 @@ describe("rutas de la caja", () => {
   it("cobrar (201, y 200 si se repite), anular (204) y el día de caja", async () => {
     const { ctx, norte, cuotaId } = await conCuota();
     const { servidor } = await app(ctx);
-    const cobro = { cuotaId, medio: "mercadopago", claveIdempotencia: "cobro-de-prueba-1" };
+    const cobro = { cuotaId, medio: "transferencia", claveIdempotencia: "cobro-de-prueba-1" };
 
     const primero = await servidor.inject({ method: "POST", url: "/caja/cobros", payload: cobro });
     expect(primero.statusCode).toBe(201);

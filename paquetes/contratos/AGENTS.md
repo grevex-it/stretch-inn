@@ -11,7 +11,8 @@ acuerdo.
 - `src/alumnos.ts`: lista con buscador, ficha, alta y edición de alumnos (0011).
 - `src/agenda.ts`: clases semanales de cada sede y la semana de fechas concretas.
 - `src/asistencia.ts`: la planilla de asistencia de una fecha y las marcas que se guardan.
-- `src/abonos.ts`: planes del centro, precios por sede y cuotas mensuales de los alumnos.
+- `src/abonos.ts`: planes del centro, precios por sede y cuotas de los alumnos, por ciclo de 4
+  semanas (0019).
 - `src/caja.ts`: cobros con clave de idempotencia, anulaciones y el día de caja.
 - `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
@@ -28,7 +29,8 @@ acuerdo.
 ## API pública
 
 - `pedidoDeIngreso`, `pedidoDeCentro`, `pedidoDeSede`, `pedidoDeCambioDeClave` y
-  `estadoDeSesion`, con sus tipos (`PedidoDeIngreso`, `EstadoDeSesion`, …).
+  `estadoDeSesion`, con sus tipos (`PedidoDeIngreso`, `EstadoDeSesion`, …). El centro activo
+  trae su `zonaHoraria`: el panel muestra las fechas en esa zona (regla 3).
 - `pedidoDePagina` (query `?pagina=N`, de a 50), `pedidoDeAlta`, `paginaDeEquipo`,
   `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
 - `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,
@@ -49,12 +51,11 @@ acuerdo.
 - `pedidoDeRecuperacion` (`{ alumnoId }`) y `recuperacionHecha` (`{ id }`), con sus tipos. La
   planilla trae también `recuperan` (la misma página de los que recuperan) y `lugares`.
 - `fichaDePlan`, `edicionDePlan`, `plan`, `paginaDePlanes`, `planCreado`, `planEditado`,
-  `pedidoDePrecioDeSede`, `pedidoDeCuota` (período opcional AAAA-MM), `cuotaGenerada`, `cuota`
-  y `paginaDeCuotas`, con sus tipos. Los montos van en pesos enteros.
-- `pedidoDeImpagas` (query `?sede&periodo&pagina`), `cuotaImpaga` (la cuota con `alumno`:
-  nombre, apellido y activo, o null) y `paginaDeImpagas` (más `adeudado`), con sus tipos.
-- `pedidoDeCuotasDelMes` (`{ sedeId, periodo? }`) y `cuotasDelMes` (`{ periodo, generadas,
-yaTenian, alumnosDeBaja, planesDeBaja }`), con sus tipos.
+  `pedidoDePrecioDeSede`, `pedidoDeCuota` (día de inicio opcional `desde`, AAAA-MM-DD),
+  `cuotaGenerada`, `cuota` (con `desde` y `hasta`) y `paginaDeCuotas`, con sus tipos. Los montos
+  van en pesos enteros.
+- `pedidoDeImpagas` (query `?sede&pagina`), `cuotaImpaga`, `paginaDeImpagas` (con `adeudado`),
+  `pedidoDeRenovacion` (`{ sedeId, dia? }`) y `renovacionHecha`, con sus tipos.
 - `pedidoDeCobro` (cuota, medio y `claveIdempotencia`), `cobroHecho` (`{ id, monto, repetido }`),
   `pedidoDeAnulacion` (`{ motivo }`), `pedidoDelDia` (query `?sede&dia&pagina`), `pago` y
   `diaDeCaja` (una página de pagos más `cobrado`), con sus tipos.

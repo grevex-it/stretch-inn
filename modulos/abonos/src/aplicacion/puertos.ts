@@ -20,14 +20,16 @@ export interface Plan extends DatosDePlan {
   preciosDeSede: { sedeId: string; precio: Dinero }[];
 }
 
-/** La cuota de un alumno en un mes. El monto se congela al generarla. */
+/** La cuota de un ciclo de 4 semanas de un alumno (0019). El monto se congela al generarla. */
 export interface Cuota {
   id: string;
   alumnoId: string;
   planId: string;
   sedeId: string;
-  /** AAAA-MM. */
-  periodo: string;
+  /** El primer día del ciclo, AAAA-MM-DD en la zona del centro. */
+  desde: string;
+  /** El día en que termina y empieza el siguiente: desde + 28 días. */
+  hasta: string;
   monto: Dinero;
   pagadaEn: Date | null;
 }
@@ -42,21 +44,21 @@ export interface PaginaDeImpagas extends PaginaDe<CuotaImpaga> {
   adeudado: Dinero;
 }
 
-/** Una cuota del mes anterior que se renueva, con el plan y su precio de hoy en la sede. */
-export interface CuotaARenovar {
+/** El último ciclo de un alumno en la sede, que ya terminó, con el plan y su precio de hoy. */
+export interface CicloARenovar {
   alumnoId: string;
   planId: string;
+  /** El día en que terminó: el siguiente ciclo empieza ese día. */
+  hasta: string;
   planActivo: boolean;
   precio: Dinero;
   precioDeSede: Dinero | undefined;
 }
 
-/** Lo que pasó al generar las cuotas del mes de una sede. */
-export interface CuotasDelMes {
-  periodo: string;
+/** Lo que pasó al renovar los ciclos de una sede hasta un día. */
+export interface Renovacion {
+  dia: string;
   generadas: number;
-  /** Alumnos que ya tenían la cuota de ese mes. */
-  yaTenian: number;
   alumnosDeBaja: number;
   planesDeBaja: number;
 }
@@ -77,7 +79,7 @@ export interface RepositorioAbonos {
   precioDeSede(planId: string, sedeId: string): Promise<Dinero | undefined>;
   /** El alumno del centro (por la API pública de personas), o undefined. */
   alumno(id: string): Promise<{ activo: boolean } | undefined>;
-  /** El id de la cuota nueva, o undefined si ya tenía una vigente en ese mes. */
+  /** El id de la cuota nueva, o undefined si pisa otro ciclo vigente del alumno. */
   generarCuota(cuota: Omit<Cuota, "id" | "pagadaEn">): Promise<string | undefined>;
   /** La cuota vigente (sin anular), tomada hasta el fin de la transacción si `bloquear`. */
   cuota(id: string, bloquear?: boolean): Promise<Cuota | undefined>;
@@ -88,18 +90,21 @@ export interface RepositorioAbonos {
   ): Promise<PaginaDe<Cuota>>;
   /** Sin pagar ni anular, la más vieja primero, con el total adeudado. */
   cuotasImpagas(
-    filtro: Pagina & { sedeId: string; periodo?: string },
+    filtro: Pagina & { sedeId: string },
   ): Promise<PaginaDe<Cuota> & { adeudado: Dinero }>;
   /** Hasta 100 alumnos del centro (personas), por id. */
   alumnos(ids: readonly string[]): Promise<Map<string, NonNullable<CuotaImpaga["alumno"]>>>;
-  /** Una tanda de cuotas vigentes de ese mes y sede, por alumno, después de `despuesDe`. */
-  cuotasARenovar(filtro: {
+  /**
+   * Una tanda de alumnos de la sede, por id y después de `despuesDe`, cuyo último ciclo vigente
+   * en la sede terminó hasta `dia`.
+   */
+  ciclosARenovar(filtro: {
     sedeId: string;
-    periodo: string;
+    dia: string;
     despuesDe: string | undefined;
     limite: number;
-  }): Promise<CuotaARenovar[]>;
-  /** Cuántas se generaron: las de alumnos que ya tenían cuota ese mes no se tocan. */
+  }): Promise<CicloARenovar[]>;
+  /** Cuántas se generaron: el índice único (alumno, desde) deja afuera las que ya estaban. */
   generarCuotas(cuotas: readonly Omit<Cuota, "id" | "pagadaEn">[]): Promise<number>;
 }
 
@@ -111,7 +116,7 @@ export type ErrorDeAbonos =
   | "cambio-concurrente"
   | "alumno-inexistente"
   | "alumno-de-baja"
-  | "periodo-invalido"
+  | "dia-invalido"
   | "ya-tiene-cuota"
   | "cuota-inexistente"
   | "cuota-pagada";
@@ -137,11 +142,14 @@ export interface Abonos {
     quien: ContextoCentro,
     cambio: { planId: string; sedeId: string; precio: number | null },
   ): Promise<Resultado<null, ErrorDeAbonos>>;
-  /** La cuota del alumno en ese mes (por defecto, el actual), con el precio de la sede. */
+  /**
+   * La cuota de un ciclo de 4 semanas que empieza `desde` (por defecto, hoy en el centro), con el
+   * precio de la sede. No puede pisar otro ciclo vigente del alumno.
+   */
   generarCuota(
     quien: ContextoCentro,
-    pedido: { alumnoId: string; planId: string; sedeId: string; periodo?: string },
-  ): Promise<Resultado<{ id: string; monto: Dinero; periodo: string }, ErrorDeAbonos>>;
+    pedido: { alumnoId: string; planId: string; sedeId: string; desde?: string },
+  ): Promise<Resultado<{ id: string; monto: Dinero; desde: string; hasta: string }, ErrorDeAbonos>>;
   /** Solo una cuota sin pagar. No la borra. */
   anularCuota(
     quien: ContextoCentro,
@@ -151,14 +159,14 @@ export interface Abonos {
     quien: ContextoCentro,
     filtro: Pagina & { alumnoId: string },
   ): Promise<Resultado<PaginaDe<Cuota>, ErrorDeAbonos>>;
-  /** Las impagas de la sede (de un mes, si se pide), la más vieja primero. */
+  /** Las impagas de la sede, la más vieja primero. */
   cuotasImpagas(
     quien: ContextoCentro,
-    filtro: Pagina & { sedeId: string; periodo?: string },
+    filtro: Pagina & { sedeId: string },
   ): Promise<Resultado<PaginaDeImpagas, ErrorDeAbonos>>;
-  /** [SUPUESTO] Renueva las cuotas del mes anterior de la sede. Sin período, el mes actual. */
-  generarCuotasDelMes(
+  /** Renueva los ciclos de la sede que terminaron hasta `dia` (sin él, hoy en el centro). */
+  renovarCuotas(
     quien: ContextoCentro,
-    pedido: { sedeId: string; periodo?: string },
-  ): Promise<Resultado<CuotasDelMes, ErrorDeAbonos>>;
+    pedido: { sedeId: string; dia?: string },
+  ): Promise<Resultado<Renovacion, ErrorDeAbonos>>;
 }

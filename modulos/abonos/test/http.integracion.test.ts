@@ -2,11 +2,11 @@
 // abonos. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula.
 import {
   cuotaGenerada,
-  cuotasDelMes,
   paginaDeCuotas,
   paginaDeImpagas,
   paginaDePlanes,
   planCreado,
+  renovacionHecha,
 } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
@@ -62,7 +62,7 @@ describe("rutas de los abonos", () => {
       "PUT /abonos/planes/:id/sedes/:sedeId/precio": "abonos.gestionar",
       "DELETE /abonos/planes/:id/sedes/:sedeId/precio": "abonos.gestionar",
       "POST /abonos/cuotas": "abonos.asignar",
-      "POST /abonos/cuotas/mes": "abonos.asignar",
+      "POST /abonos/cuotas/renovacion": "abonos.asignar",
       "GET /abonos/cuotas/impagas": "abonos.ver",
       "DELETE /abonos/cuotas/:id": "abonos.asignar",
       "GET /alumnos/:id/cuotas": "abonos.ver",
@@ -91,7 +91,11 @@ describe("rutas de los abonos", () => {
       payload: { alumnoId: ana, planId: id, sedeId: norte },
     });
     expect(cuota.statusCode).toBe(201);
-    expect(cuotaGenerada.parse(cuota.json())).toMatchObject({ monto: 28_000, periodo: "2026-11" });
+    expect(cuotaGenerada.parse(cuota.json())).toMatchObject({
+      monto: 28_000,
+      desde: "2026-11-15",
+      hasta: "2026-12-13",
+    });
     const repetida = await servidor.inject({
       method: "POST",
       url: "/abonos/cuotas",
@@ -102,7 +106,7 @@ describe("rutas de los abonos", () => {
     expect(paginaDeCuotas.parse(lista.json()).total).toBe(1);
   });
 
-  it("las cuotas del mes y las impagas de la sede, con el contrato", async () => {
+  it("renovar los ciclos y las impagas de la sede, con el contrato", async () => {
     const { ctx, norte, alumno } = await centroConDosSedes(base);
     const { servidor } = await app(ctx);
     const alta = await servidor.inject({ method: "POST", url: "/abonos/planes", payload: PLAN });
@@ -111,25 +115,24 @@ describe("rutas de los abonos", () => {
     await servidor.inject({
       method: "POST",
       url: "/abonos/cuotas",
-      payload: { alumnoId: ana, planId: id, sedeId: norte, periodo: "2026-10" },
+      payload: { alumnoId: ana, planId: id, sedeId: norte, desde: "2026-10-18" },
     });
-    const mes = await servidor.inject({
+    const renovacion = await servidor.inject({
       method: "POST",
-      url: "/abonos/cuotas/mes",
+      url: "/abonos/cuotas/renovacion",
       payload: { sedeId: norte },
     });
-    expect(mes.statusCode).toBe(200);
-    expect(cuotasDelMes.parse(mes.json())).toMatchObject({ periodo: "2026-11", generadas: 1 });
+    expect(renovacion.statusCode).toBe(200);
+    expect(renovacionHecha.parse(renovacion.json())).toMatchObject({
+      dia: "2026-11-15",
+      generadas: 1,
+    });
 
     const impagas = await servidor.inject({ url: `/abonos/cuotas/impagas?sede=${norte}` });
     expect(impagas.statusCode).toBe(200);
     const lista = paginaDeImpagas.parse(impagas.json());
     expect(lista).toMatchObject({ total: 2, adeudado: 60_000 });
     expect(lista.elementos[0]?.alumno).toMatchObject({ nombre: "Ana" });
-    const delMes = await servidor.inject({
-      url: `/abonos/cuotas/impagas?sede=${norte}&periodo=2026-11`,
-    });
-    expect(paginaDeImpagas.parse(delMes.json()).total).toBe(1);
     const sinSede = await servidor.inject({ url: "/abonos/cuotas/impagas" });
     expect(sinSede.statusCode).toBe(400);
   });

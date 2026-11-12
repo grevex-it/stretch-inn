@@ -1,10 +1,5 @@
 // Rutas /abonos. El permiso en la sede (o en alguna sede, para los planes) lo controla el módulo.
-import {
-  pedidoDeCuota,
-  pedidoDeCuotasDelMes,
-  pedidoDeImpagas,
-  pedidoDePagina,
-} from "@app/contratos";
+import { pedidoDeCuota, pedidoDeImpagas, pedidoDePagina, pedidoDeRenovacion } from "@app/contratos";
 import { contextoDe } from "@app/plataforma";
 import type { FastifyPluginCallback } from "fastify";
 import type { Abonos } from "../aplicacion/puertos.ts";
@@ -21,21 +16,21 @@ export function rutasDeAbonos(abonos: Abonos): FastifyPluginCallback {
     app.post("/abonos/cuotas", { config: asignar }, async (pedido, respuesta) => {
       const datos = leer(pedidoDeCuota, pedido.body, respuesta);
       if (datos === undefined) return respuesta;
-      const { periodo, ...cuota } = datos;
+      const { desde, ...cuota } = datos;
       const resultado = await abonos.generarCuota(
         contextoDe(pedido),
-        periodo === undefined ? cuota : { ...cuota, periodo },
+        desde === undefined ? cuota : { ...cuota, desde },
       );
       return enviar(respuesta, resultado, 201);
     });
 
-    app.post("/abonos/cuotas/mes", { config: asignar }, async (pedido, respuesta) => {
-      const datos = leer(pedidoDeCuotasDelMes, pedido.body, respuesta);
+    app.post("/abonos/cuotas/renovacion", { config: asignar }, async (pedido, respuesta) => {
+      const datos = leer(pedidoDeRenovacion, pedido.body, respuesta);
       if (datos === undefined) return respuesta;
-      const { periodo, sedeId } = datos;
-      const resultado = await abonos.generarCuotasDelMes(
+      const { dia, sedeId } = datos;
+      const resultado = await abonos.renovarCuotas(
         contextoDe(pedido),
-        periodo === undefined ? { sedeId } : { sedeId, periodo },
+        dia === undefined ? { sedeId } : { sedeId, dia },
       );
       return enviar(respuesta, resultado, 200);
     });

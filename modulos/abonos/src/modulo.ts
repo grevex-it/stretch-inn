@@ -31,7 +31,7 @@ export function crearAbonos(base: Base, opciones: OpcionesAbonos = {}): Abonos {
     cuotasDeAlumno: (quien, filtro) => con(quien, (repo) => cuotas.deAlumno(repo, quien, filtro)),
     cuotasImpagas: (quien, filtro) =>
       con(quien, (repo) => cuotasDeSede.impagas(repo, quien, filtro)),
-    generarCuotasDelMes: (quien, pedido) =>
-      con(quien, (repo) => cuotasDeSede.delMes(repo, quien, ahora(), pedido)),
+    renovarCuotas: (quien, pedido) =>
+      con(quien, (repo) => cuotasDeSede.renovar(repo, quien, ahora(), pedido)),
   };
 }

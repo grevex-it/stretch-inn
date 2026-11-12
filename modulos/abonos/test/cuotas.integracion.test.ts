@@ -1,5 +1,5 @@
-// Cuotas mensuales sobre Postgres real: el precio de la sede, el monto congelado, una por mes,
-// el mes actual en la zona del centro, alumno de baja, anular y permisos.
+// Cuotas por ciclo de 4 semanas sobre Postgres real (0019): el precio de la sede, el monto
+// congelado, ciclos que no se pisan, el día en la zona del centro, alumno de baja, anular y permisos.
 import { fijarActivo } from "@app/personas";
 import { crearBase, enContexto, type Base } from "@app/plataforma";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
@@ -16,7 +16,7 @@ afterAll(async () => {
 
 const PRIMERA = { pagina: 1, porPagina: 50 };
 const DOS = { nombre: "Dos por semana", clasesPorSemana: 2, precio: 30_000 };
-/** 1 de diciembre a las 02:00 UTC: en Buenos Aires todavía es noviembre. */
+/** 1 de diciembre a las 02:00 UTC: en Buenos Aires todavía es 30 de noviembre. */
 const AHORA = new Date("2026-12-01T02:00:00Z");
 const abonos = () => crearAbonos(base, { ahora: () => AHORA });
 
@@ -33,19 +33,43 @@ async function conPlan() {
 }
 
 describe("generar la cuota", () => {
-  it("[SUPUESTO] es del mes actual del centro, con el precio de la sede, y una por mes", async () => {
+  it("dura 4 semanas desde hoy en el centro, con el precio de la sede", async () => {
+    const { ctx, norte, planId, ana } = await conPlan();
+    const cuota = await abonos().generarCuota(ctx, { alumnoId: ana, planId, sedeId: norte });
+    expect(cuota).toMatchObject({
+      ok: true,
+      valor: { monto: 28_000, desde: "2026-11-30", hasta: "2026-12-28" },
+    });
+  });
+
+  it("los ciclos de un alumno no se pisan, en ninguna sede; el siguiente empieza donde termina", async () => {
     const { ctx, norte, sur, planId, ana } = await conPlan();
     const pedido = { alumnoId: ana, planId, sedeId: norte };
-
-    const cuota = await abonos().generarCuota(ctx, pedido);
-    expect(cuota).toMatchObject({ ok: true, valor: { monto: 28_000, periodo: "2026-11" } });
-    expect(await abonos().generarCuota(ctx, { ...pedido, sedeId: sur })).toMatchObject({
-      ok: false,
-      error: { codigo: "ya-tiene-cuota" },
-    });
+    await abonos().generarCuota(ctx, pedido);
+    const pisada = { ok: false, error: { codigo: "ya-tiene-cuota" } };
+    expect(await abonos().generarCuota(ctx, { ...pedido, sedeId: sur })).toMatchObject(pisada);
+    expect(await abonos().generarCuota(ctx, { ...pedido, desde: "2026-12-10" })).toMatchObject(
+      pisada,
+    );
+    expect(await abonos().generarCuota(ctx, { ...pedido, desde: "2026-11-10" })).toMatchObject(
+      pisada,
+    );
     expect(
-      await abonos().generarCuota(ctx, { ...pedido, sedeId: sur, periodo: "2026-12" }),
-    ).toMatchObject({ ok: true, valor: { monto: 30_000, periodo: "2026-12" } });
+      await abonos().generarCuota(ctx, { ...pedido, sedeId: sur, desde: "2026-12-28" }),
+    ).toMatchObject({
+      ok: true,
+      valor: { monto: 30_000, desde: "2026-12-28", hasta: "2027-01-25" },
+    });
+  });
+
+  it("dos cuotas del mismo alumno a la vez: una sola queda", async () => {
+    const { ctx, norte, planId, ana } = await conPlan();
+    const pedido = { alumnoId: ana, planId, sedeId: norte };
+    const resultados = await Promise.all([
+      abonos().generarCuota(ctx, pedido),
+      abonos().generarCuota(ctx, { ...pedido, desde: "2026-12-05" }),
+    ]);
+    expect(resultados.filter((r) => r.ok)).toHaveLength(1);
   });
 
   it("el monto queda congelado: cambiar el precio después no cambia la cuota", async () => {
@@ -56,11 +80,16 @@ describe("generar la cuota", () => {
     expect(lista.ok && lista.valor.elementos.map((c) => c.monto)).toEqual([28_000]);
   });
 
-  it("rechaza plan dado de baja, alumno de baja y período mal escrito", async () => {
+  it("rechaza plan dado de baja, alumno de baja y día mal escrito", async () => {
     const { ctx, norte, planId, ana, alumno } = await conPlan();
     expect(
-      await abonos().generarCuota(ctx, { alumnoId: ana, planId, sedeId: norte, periodo: "11/26" }),
-    ).toMatchObject({ ok: false, error: { codigo: "periodo-invalido" } });
+      await abonos().generarCuota(ctx, {
+        alumnoId: ana,
+        planId,
+        sedeId: norte,
+        desde: "30/11/2026",
+      }),
+    ).toMatchObject({ ok: false, error: { codigo: "dia-invalido" } });
 
     await enContexto(base, ctx, (tx) => fijarActivo(tx, { id: ana, activo: false }));
     expect(
@@ -76,7 +105,7 @@ describe("generar la cuota", () => {
 });
 
 describe("anular y listar", () => {
-  it("anular la cuota no la borra y permite generar otra en ese mes", async () => {
+  it("anular la cuota no la borra y permite generar otra en esas fechas", async () => {
     const { ctx, norte, planId, ana } = await conPlan();
     const cuota = await abonos().generarCuota(ctx, { alumnoId: ana, planId, sedeId: norte });
     if (!cuota.ok) throw new Error(cuota.error.mensaje);
@@ -99,7 +128,7 @@ describe("anular y listar", () => {
         alumnoId: ana,
         planId,
         sedeId: sur,
-        periodo: "2027-01",
+        desde: "2027-01-25",
       }),
     ).toMatchObject({ ok: false, error: { codigo: "sin-permiso" } });
     const lista = await abonos().cuotasDeAlumno(soloNorte, { ...PRIMERA, alumnoId: ana });

@@ -3,8 +3,8 @@ import { falla, ok, type Resultado } from "@app/nucleo";
 
 export type ErrorDeCobro = "clave-invalida" | "motivo-vacio" | "medio-invalido";
 
-/** [SUPUESTO] Los medios de pago que usa un centro en Argentina. */
-export const MEDIOS = ["efectivo", "transferencia", "debito", "credito", "mercadopago"] as const;
+/** Los medios de pago que usa Stretch Inn (0019). Otro medio se suma cuando un centro lo use. */
+export const MEDIOS = ["efectivo", "transferencia"] as const;
 export type Medio = (typeof MEDIOS)[number];
 
 export function medioValido(medio: string): medio is Medio {

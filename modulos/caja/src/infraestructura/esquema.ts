@@ -39,10 +39,7 @@ export const pagos = pgTable(
     uniqueIndex("pagos_centro_clave").on(tabla.centroId, tabla.claveIdempotencia),
     index("pagos_centro_sede_registrado").on(tabla.centroId, tabla.sedeId, tabla.registradoEn),
     check("pagos_monto", sql`${tabla.monto} > 0`),
-    check(
-      "pagos_medio",
-      sql`${tabla.medio} in ('efectivo', 'transferencia', 'debito', 'credito', 'mercadopago')`,
-    ),
+    check("pagos_medio", sql`${tabla.medio} in ('efectivo', 'transferencia')`),
     check("pagos_registrado_por", sql`${tabla.registradoPorTipo} in ('usuario', 'soporte')`),
     check(
       "pagos_anulacion",

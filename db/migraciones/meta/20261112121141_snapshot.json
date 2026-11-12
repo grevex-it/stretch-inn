@@ -1,6 +1,6 @@
 {
-  "id": "13114f32-46b4-4ff8-af37-2ba3c74d7844",
-  "prevId": "cd03329d-5b89-433b-b436-6050082d2b71",
+  "id": "d6a389ce-1550-4e49-8a9b-d90aa27f3e7f",
+  "prevId": "0a574886-5f9c-4ad0-9256-299c06a94320",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -39,9 +39,15 @@
           "primaryKey": false,
           "notNull": true
         },
-        "periodo": {
-          "name": "periodo",
-          "type": "text",
+        "desde": {
+          "name": "desde",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hasta": {
+          "name": "hasta",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
@@ -78,8 +84,8 @@
         }
       },
       "indexes": {
-        "cuotas_alumno_periodo_vigente": {
-          "name": "cuotas_alumno_periodo_vigente",
+        "cuotas_alumno_desde_vigente": {
+          "name": "cuotas_alumno_desde_vigente",
           "columns": [
             {
               "expression": "alumno_id",
@@ -88,7 +94,7 @@
               "nulls": "last"
             },
             {
-              "expression": "periodo",
+              "expression": "desde",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -100,8 +106,8 @@
           "method": "btree",
           "with": {}
         },
-        "cuotas_centro_alumno_periodo": {
-          "name": "cuotas_centro_alumno_periodo",
+        "cuotas_centro_alumno_desde": {
+          "name": "cuotas_centro_alumno_desde",
           "columns": [
             {
               "expression": "centro_id",
@@ -116,7 +122,7 @@
               "nulls": "last"
             },
             {
-              "expression": "periodo",
+              "expression": "desde",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -147,9 +153,9 @@
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "cuotas_periodo": {
-          "name": "cuotas_periodo",
-          "value": "\"cuotas\".\"periodo\" ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'"
+        "cuotas_ciclo": {
+          "name": "cuotas_ciclo",
+          "value": "\"cuotas\".\"hasta\" = \"cuotas\".\"desde\" + 28"
         },
         "cuotas_monto": {
           "name": "cuotas_monto",
@@ -1254,176 +1260,6 @@
         "recuperaciones_reservada_por": {
           "name": "recuperaciones_reservada_por",
           "value": "\"recuperaciones\".\"reservada_por_tipo\" in ('usuario', 'soporte')"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.pagos": {
-      "name": "pagos",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "centro_id": {
-          "name": "centro_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "sede_id": {
-          "name": "sede_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "alumno_id": {
-          "name": "alumno_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "cuota_id": {
-          "name": "cuota_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "monto": {
-          "name": "monto",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "medio": {
-          "name": "medio",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "clave_idempotencia": {
-          "name": "clave_idempotencia",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "registrado_por_tipo": {
-          "name": "registrado_por_tipo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "registrado_por_id": {
-          "name": "registrado_por_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "registrado_en": {
-          "name": "registrado_en",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "anulado_en": {
-          "name": "anulado_en",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "anulado_por_tipo": {
-          "name": "anulado_por_tipo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "anulado_por_id": {
-          "name": "anulado_por_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "motivo_anulacion": {
-          "name": "motivo_anulacion",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {
-        "pagos_centro_clave": {
-          "name": "pagos_centro_clave",
-          "columns": [
-            {
-              "expression": "centro_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "clave_idempotencia",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "pagos_centro_sede_registrado": {
-          "name": "pagos_centro_sede_registrado",
-          "columns": [
-            {
-              "expression": "centro_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "sede_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "registrado_en",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "pagos_monto": {
-          "name": "pagos_monto",
-          "value": "\"pagos\".\"monto\" > 0"
-        },
-        "pagos_medio": {
-          "name": "pagos_medio",
-          "value": "\"pagos\".\"medio\" in ('efectivo', 'transferencia', 'debito', 'credito', 'mercadopago')"
-        },
-        "pagos_registrado_por": {
-          "name": "pagos_registrado_por",
-          "value": "\"pagos\".\"registrado_por_tipo\" in ('usuario', 'soporte')"
-        },
-        "pagos_anulacion": {
-          "name": "pagos_anulacion",
-          "value": "(\"pagos\".\"anulado_en\" is null) = (\"pagos\".\"motivo_anulacion\" is null)"
         }
       },
       "isRLSEnabled": false

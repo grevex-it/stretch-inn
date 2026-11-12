@@ -1,6 +1,6 @@
 {
-  "id": "17f2485c-c49c-4f15-a260-6459cb28b791",
-  "prevId": "0a574886-5f9c-4ad0-9256-299c06a94320",
+  "id": "906ef67c-cb2c-41a9-b626-3903cf186407",
+  "prevId": "d6a389ce-1550-4e49-8a9b-d90aa27f3e7f",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -39,9 +39,15 @@
           "primaryKey": false,
           "notNull": true
         },
-        "periodo": {
-          "name": "periodo",
-          "type": "text",
+        "desde": {
+          "name": "desde",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "hasta": {
+          "name": "hasta",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
@@ -78,8 +84,8 @@
         }
       },
       "indexes": {
-        "cuotas_alumno_periodo_vigente": {
-          "name": "cuotas_alumno_periodo_vigente",
+        "cuotas_alumno_desde_vigente": {
+          "name": "cuotas_alumno_desde_vigente",
           "columns": [
             {
               "expression": "alumno_id",
@@ -88,20 +94,20 @@
               "nulls": "last"
             },
             {
-              "expression": "periodo",
+              "expression": "desde",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
           "isUnique": true,
-          "where": "\"cuotas\".\"anulada_en\" is null",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"cuotas\".\"anulada_en\" is null",
+          "concurrently": false
         },
-        "cuotas_centro_alumno_periodo": {
-          "name": "cuotas_centro_alumno_periodo",
+        "cuotas_centro_alumno_desde": {
+          "name": "cuotas_centro_alumno_desde",
           "columns": [
             {
               "expression": "centro_id",
@@ -116,40 +122,40 @@
               "nulls": "last"
             },
             {
-              "expression": "periodo",
+              "expression": "desde",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "cuotas_plan_id_planes_id_fk": {
           "name": "cuotas_plan_id_planes_id_fk",
           "tableFrom": "cuotas",
-          "tableTo": "planes",
           "columnsFrom": [
             "plan_id"
           ],
+          "tableTo": "planes",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {
-        "cuotas_periodo": {
-          "name": "cuotas_periodo",
-          "value": "\"cuotas\".\"periodo\" ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'"
+        "cuotas_ciclo": {
+          "name": "cuotas_ciclo",
+          "value": "\"cuotas\".\"hasta\" = \"cuotas\".\"desde\" + 28"
         },
         "cuotas_monto": {
           "name": "cuotas_monto",
@@ -230,9 +236,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -305,9 +311,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "precios_de_sede_centro_sede": {
           "name": "precios_de_sede_centro_sede",
@@ -326,24 +332,24 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "precios_de_sede_plan_id_planes_id_fk": {
           "name": "precios_de_sede_plan_id_planes_id_fk",
           "tableFrom": "precios_de_sede",
-          "tableTo": "planes",
           "columnsFrom": [
             "plan_id"
           ],
+          "tableTo": "planes",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -469,9 +475,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -479,12 +485,12 @@
       "uniqueConstraints": {
         "clases_id_centro_sede": {
           "name": "clases_id_centro_sede",
-          "nullsNotDistinct": false,
           "columns": [
             "id",
             "centro_id",
             "sede_id"
-          ]
+          ],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -579,10 +585,10 @@
             }
           ],
           "isUnique": true,
-          "where": "\"inscripciones\".\"baja_en\" is null",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"inscripciones\".\"baja_en\" is null",
+          "concurrently": false
         },
         "inscripciones_centro_alumno": {
           "name": "inscripciones_centro_alumno",
@@ -601,28 +607,28 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "inscripciones_clase": {
           "name": "inscripciones_clase",
           "tableFrom": "inscripciones",
-          "tableTo": "clases",
           "columnsFrom": [
             "clase_id",
             "centro_id",
             "sede_id"
           ],
+          "tableTo": "clases",
           "columnsTo": [
             "id",
             "centro_id",
             "sede_id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -704,9 +710,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "ocurrencias_centro_sede_empieza": {
           "name": "ocurrencias_centro_sede_empieza",
@@ -731,28 +737,28 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "ocurrencias_clase": {
           "name": "ocurrencias_clase",
           "tableFrom": "ocurrencias",
-          "tableTo": "clases",
           "columnsFrom": [
             "clase_id",
             "centro_id",
             "sede_id"
           ],
+          "tableTo": "clases",
           "columnsTo": [
             "id",
             "centro_id",
             "sede_id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -851,9 +857,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "asistencias_centro_alumno": {
           "name": "asistencias_centro_alumno",
@@ -872,9 +878,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -975,10 +981,10 @@
             }
           ],
           "isUnique": true,
-          "where": "\"avisos_de_ausencia\".\"anulado_en\" is null",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"avisos_de_ausencia\".\"anulado_en\" is null",
+          "concurrently": false
         },
         "avisos_centro_alumno": {
           "name": "avisos_centro_alumno",
@@ -997,9 +1003,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -1080,9 +1086,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "creditos_centro_alumno_vence": {
           "name": "creditos_centro_alumno_vence",
@@ -1107,9 +1113,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -1197,10 +1203,10 @@
             }
           ],
           "isUnique": true,
-          "where": "\"recuperaciones\".\"anulada_en\" is null",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"recuperaciones\".\"anulada_en\" is null",
+          "concurrently": false
         },
         "recuperaciones_ocurrencia_alumno_vigente": {
           "name": "recuperaciones_ocurrencia_alumno_vigente",
@@ -1219,10 +1225,10 @@
             }
           ],
           "isUnique": true,
-          "where": "\"recuperaciones\".\"anulada_en\" is null",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"recuperaciones\".\"anulada_en\" is null",
+          "concurrently": false
         },
         "recuperaciones_centro_alumno": {
           "name": "recuperaciones_centro_alumno",
@@ -1241,9 +1247,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -1298,15 +1304,15 @@
         "ajustes_usuario_id_usuarios_id_fk": {
           "name": "ajustes_usuario_id_usuarios_id_fk",
           "tableFrom": "ajustes",
-          "tableTo": "usuarios",
           "columnsFrom": [
             "usuario_id"
           ],
+          "tableTo": "usuarios",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1364,28 +1370,28 @@
         "asignaciones_usuario_id_usuarios_id_fk": {
           "name": "asignaciones_usuario_id_usuarios_id_fk",
           "tableFrom": "asignaciones",
-          "tableTo": "usuarios",
           "columnsFrom": [
             "usuario_id"
           ],
+          "tableTo": "usuarios",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "asignaciones_rol_id_roles_id_fk": {
           "name": "asignaciones_rol_id_roles_id_fk",
           "tableFrom": "asignaciones",
-          "tableTo": "roles",
           "columnsFrom": [
             "rol_id"
           ],
+          "tableTo": "roles",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1455,15 +1461,15 @@
           "columns": [
             {
               "expression": "lower(\"email\")",
-              "asc": true,
               "isExpression": true,
+              "asc": true,
               "nulls": "last"
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -1501,15 +1507,15 @@
         "permisos_de_rol_rol_id_roles_id_fk": {
           "name": "permisos_de_rol_rol_id_roles_id_fk",
           "tableFrom": "permisos_de_rol",
-          "tableTo": "roles",
           "columnsFrom": [
             "rol_id"
           ],
+          "tableTo": "roles",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1589,9 +1595,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -1678,9 +1684,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "sesiones_cuenta": {
           "name": "sesiones_cuenta",
@@ -1693,25 +1699,25 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "sesiones_cuenta_id_cuentas_id_fk": {
           "name": "sesiones_cuenta_id_cuentas_id_fk",
           "tableFrom": "sesiones",
-          "tableTo": "cuentas",
-          "schemaTo": "plataforma",
           "columnsFrom": [
             "cuenta_id"
           ],
+          "tableTo": "cuentas",
+          "schemaTo": "plataforma",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -1795,25 +1801,25 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "usuarios_cuenta_id_cuentas_id_fk": {
           "name": "usuarios_cuenta_id_cuentas_id_fk",
           "tableFrom": "usuarios",
-          "tableTo": "cuentas",
-          "schemaTo": "plataforma",
           "columnsFrom": [
             "cuenta_id"
           ],
+          "tableTo": "cuentas",
+          "schemaTo": "plataforma",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -1932,9 +1938,9 @@
             }
           ],
           "isUnique": true,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         },
         "sedes_una_central": {
           "name": "sedes_una_central",
@@ -1947,25 +1953,25 @@
             }
           ],
           "isUnique": true,
-          "where": "\"sedes\".\"es_central\"",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"sedes\".\"es_central\"",
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "sedes_centro_id_centros_id_fk": {
           "name": "sedes_centro_id_centros_id_fk",
           "tableFrom": "sedes",
-          "tableTo": "centros",
           "columnsFrom": [
             "centro_id"
           ],
+          "tableTo": "centros",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -2080,10 +2086,10 @@
             }
           ],
           "isUnique": true,
-          "where": "\"alumnos\".\"documento\" is not null",
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "where": "\"alumnos\".\"documento\" is not null",
+          "concurrently": false
         },
         "alumnos_centro_apellido": {
           "name": "alumnos_centro_apellido",
@@ -2108,9 +2114,9 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {},
@@ -2125,10 +2131,10 @@
   "schemas": {
     "plataforma": "plataforma"
   },
+  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

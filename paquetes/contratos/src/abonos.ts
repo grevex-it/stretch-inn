@@ -1,5 +1,5 @@
-// Abonos: planes del centro, precios por sede y cuotas mensuales de los alumnos. Los montos van
-// en pesos enteros (0009). Las reglas las aplica el módulo abonos.
+// Abonos: planes del centro, precios por sede y cuotas de los alumnos por ciclo de 4 semanas
+// (0019). Los montos van en pesos enteros (0009). Las reglas las aplica el módulo abonos.
 import { z } from "zod";
 import { numeroDePagina, paginaDe, POR_PAGINA } from "./paginas.ts";
 
@@ -32,21 +32,22 @@ export const planEditado = z.object({ version: z.number().int() });
 /** Cuerpo de PUT /abonos/planes/:id/sedes/:sedeId/precio. */
 export const pedidoDePrecioDeSede = z.object({ precio: pesos });
 
-/** AAAA-MM. */
-const mes = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "El mes va como AAAA-MM.");
+/** Un día del calendario, AAAA-MM-DD, en la zona del centro. */
+const dia = z.iso.date("El día va como AAAA-MM-DD.");
 
-/** Cuerpo de POST /abonos/cuotas. Sin período, el mes actual del centro. */
+/** Cuerpo de POST /abonos/cuotas: un ciclo de 4 semanas desde `desde` (sin él, hoy). */
 export const pedidoDeCuota = z.object({
   alumnoId: z.uuid("Ese alumno no existe."),
   planId: z.uuid("Ese plan no existe."),
   sedeId: z.uuid("Esa sede no existe."),
-  periodo: mes.optional(),
+  desde: dia.optional(),
 });
 
 export const cuotaGenerada = z.object({
   id: z.uuid(),
   monto: z.number().int(),
-  periodo: z.string(),
+  desde: z.string(),
+  hasta: z.string(),
 });
 
 export const cuota = z.object({
@@ -54,8 +55,10 @@ export const cuota = z.object({
   alumnoId: z.uuid(),
   planId: z.uuid(),
   sedeId: z.uuid(),
-  /** AAAA-MM. */
-  periodo: z.string(),
+  /** El primer día del ciclo de 4 semanas, AAAA-MM-DD. */
+  desde: z.string(),
+  /** El día en que termina y empieza el siguiente. */
+  hasta: z.string(),
   monto: z.number().int(),
   /** En UTC; null mientras no se pagó. */
   pagadaEn: z.iso.datetime().nullable(),
@@ -64,15 +67,10 @@ export const cuota = z.object({
 /** Respuesta de GET /alumnos/:id/cuotas: la más nueva primero. */
 export const paginaDeCuotas = paginaDe(cuota);
 
-/** Query de GET /abonos/cuotas/impagas: `?sede&periodo&pagina`. Sin período, todos los meses. */
+/** Query de GET /abonos/cuotas/impagas: `?sede&pagina`. */
 export const pedidoDeImpagas = z
-  .object({ pagina: numeroDePagina, sede: z.uuid("Esa sede no existe."), periodo: mes.optional() })
-  .transform(({ pagina, sede, periodo }) => ({
-    pagina,
-    porPagina: POR_PAGINA,
-    sedeId: sede,
-    ...(periodo === undefined ? {} : { periodo }),
-  }));
+  .object({ pagina: numeroDePagina, sede: z.uuid("Esa sede no existe.") })
+  .transform(({ pagina, sede }) => ({ pagina, porPagina: POR_PAGINA, sedeId: sede }));
 
 export const cuotaImpaga = cuota.omit({ pagadaEn: true }).extend({
   /** null si el alumno ya no está en el centro. */
@@ -82,17 +80,16 @@ export const cuotaImpaga = cuota.omit({ pagadaEn: true }).extend({
 /** Respuesta de GET /abonos/cuotas/impagas: la más vieja primero, y lo que suman todas. */
 export const paginaDeImpagas = paginaDe(cuotaImpaga).extend({ adeudado: z.number().int() });
 
-/** Cuerpo de POST /abonos/cuotas/mes. Sin período, el mes actual del centro. */
-export const pedidoDeCuotasDelMes = z.object({
+/** Cuerpo de POST /abonos/cuotas/renovacion: los ciclos que terminaron hasta `dia` (sin él, hoy). */
+export const pedidoDeRenovacion = z.object({
   sedeId: z.uuid("Esa sede no existe."),
-  periodo: mes.optional(),
+  dia: dia.optional(),
 });
 
-/** Respuesta de POST /abonos/cuotas/mes: cuántas se generaron y cuántas no, y por qué. */
-export const cuotasDelMes = z.object({
-  periodo: z.string(),
+/** Respuesta de POST /abonos/cuotas/renovacion: cuántas se generaron y cuántas no, y por qué. */
+export const renovacionHecha = z.object({
+  dia: z.string(),
   generadas: z.number().int(),
-  yaTenian: z.number().int(),
   alumnosDeBaja: z.number().int(),
   planesDeBaja: z.number().int(),
 });
@@ -106,5 +103,5 @@ export type Cuota = z.infer<typeof cuota>;
 export type PaginaDeCuotas = z.infer<typeof paginaDeCuotas>;
 export type CuotaImpaga = z.infer<typeof cuotaImpaga>;
 export type PaginaDeImpagas = z.infer<typeof paginaDeImpagas>;
-export type PedidoDeCuotasDelMes = z.infer<typeof pedidoDeCuotasDelMes>;
-export type CuotasDelMes = z.infer<typeof cuotasDelMes>;
+export type PedidoDeRenovacion = z.infer<typeof pedidoDeRenovacion>;
+export type RenovacionHecha = z.infer<typeof renovacionHecha>;

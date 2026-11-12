@@ -24,8 +24,8 @@ async function conDeudas() {
   if (!alta.ok) throw new Error(alta.error.mensaje);
   const planId = alta.valor.id;
   await abonos().fijarPrecioDeSede(ctx, { planId, sedeId: norte, precio: 28_000 });
-  const cuota = async (alumnoId: string, sedeId: string, periodo: string) => {
-    const hecha = await abonos().generarCuota(ctx, { alumnoId, planId, sedeId, periodo });
+  const cuota = async (alumnoId: string, sedeId: string, desde: string) => {
+    const hecha = await abonos().generarCuota(ctx, { alumnoId, planId, sedeId, desde });
     if (!hecha.ok) throw new Error(hecha.error.mensaje);
     return hecha.valor.id;
   };
@@ -35,14 +35,14 @@ async function conDeudas() {
     await alumno("Cami"),
     await alumno("Dani"),
   ];
-  const octubre = await cuota(ana, norte, "2026-10");
-  const noviembre = await cuota(ana, norte, "2026-11");
-  const pagada = await cuota(bea, norte, "2026-11");
+  const octubre = await cuota(ana, norte, "2026-10-05");
+  const noviembre = await cuota(ana, norte, "2026-11-02");
+  const pagada = await cuota(bea, norte, "2026-11-02");
   await enContexto(base, ctx, (tx) =>
     registrarPago(tx, { cuotaId: pagada, pagoId: randomUUID(), en: new Date() }),
   );
-  await cuota(cami, sur, "2026-11");
-  await abonos().anularCuota(ctx, { id: await cuota(dani, norte, "2026-11") });
+  await cuota(cami, sur, "2026-11-02");
+  await abonos().anularCuota(ctx, { id: await cuota(dani, norte, "2026-11-02") });
   return { ...centro, planId, ana, octubre, noviembre };
 }
 
@@ -60,25 +60,15 @@ describe("cuotas impagas de una sede", () => {
       alumnoId: ana,
       planId,
       sedeId: norte,
-      periodo: "2026-10",
+      desde: "2026-10-05",
+      hasta: "2026-11-02",
       monto: 28_000,
       alumno: { nombre: "Ana", apellido: "Prueba", activo: true },
     });
-    expect(elementos.map((c) => [c.id, c.periodo])).toEqual([
-      [octubre, "2026-10"],
-      [noviembre, "2026-11"],
+    expect(elementos.map((c) => [c.id, c.desde])).toEqual([
+      [octubre, "2026-10-05"],
+      [noviembre, "2026-11-02"],
     ]);
-  });
-
-  it("con período, solo las de ese mes", async () => {
-    const { ctx, norte, noviembre } = await conDeudas();
-    const lista = await abonos().cuotasImpagas(ctx, {
-      ...PRIMERA,
-      sedeId: norte,
-      periodo: "2026-11",
-    });
-    expect(lista.ok && lista.valor.elementos.map((c) => c.id)).toEqual([noviembre]);
-    expect(lista.ok && lista.valor.adeudado).toBe(28_000);
   });
 
   it("pide abonos.ver en esa sede", async () => {
