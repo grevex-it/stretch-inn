@@ -68,6 +68,7 @@ describe("respuestas de los abonos", () => {
           clases: 4,
           monto: 28_000,
           pagadaEn: null,
+          pagoId: null,
         },
       ],
     };

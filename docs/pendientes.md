@@ -90,9 +90,9 @@ Inn está en 0019; los supuestos menores de cada módulo, en su `AGENTS.md`.
   queda así y, en ese caso, actualizar 0003.
 - **Railway:** crear el servicio del worker (`pnpm --filter @app/worker start`) con la misma
   `DATABASE_URL` que la API.
-- **Panel:** el profe tiene que poder anular un cobro sin `caja.ver` (0019). Hoy se anula solo
-  desde la pantalla Caja, que muestra lo cobrado del día. Hace falta que la API exponga el pago de
-  una cuota (`abonos` o `caja`) para anularlo desde la ficha del alumno.
+- **Panel:** el profe anula un cobro desde la ficha del alumno, sin `caja.ver` (0019). La API
+  ya lo permite: cada cuota de `GET /alumnos/:id/cuotas` trae su `pagoId`, y se anula con
+  `POST /caja/pagos/:id/anulacion` (`caja.anular`). Falta la pantalla.
 
 ## Del repo
 

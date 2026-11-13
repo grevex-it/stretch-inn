@@ -40,7 +40,9 @@ congelados al generarla. Cada fecha del horario fijo del alumno gasta una clase.
     abono anterior; si no tiene, o ese abono no tiene todas sus fechas (sin horario fijo), hoy en
     el centro. Devuelve `{ id, monto, desde, clases }`. No puede empezar antes de que termine su
     abono anterior (`ya-tiene-cuota`).
-  - `anularCuota(quien, { id })` y `cuotasDeAlumno(quien, { alumnoId, pagina, porPagina })`.
+  - `anularCuota(quien, { id })` y `cuotasDeAlumno(quien, { alumnoId, pagina, porPagina })`. Cada
+    cuota trae `pagadaEn` y `pagoId`, el pago de caja que la saldó: con ese id el profe anula el
+    cobro desde la ficha, sin `caja.ver` (0019).
   - `abonoDelAlumno(quien, { alumnoId, sedeId })`: el abono que empezó más tarde hasta hoy en la
     sede (`{ cuotaId, desde, clases, usadas, restantes, fin, pagada }`), aunque ya haya usado
     todas sus clases; null si no tiene. Cada fecha del horario fijo que ya terminó cuenta como
