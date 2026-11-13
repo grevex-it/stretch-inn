@@ -63,6 +63,11 @@ Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContex
   `empiezaEn`, `terminaEn`). No cuentan las canceladas ni las de clases en las que no estaba
   inscripto en ese momento. Arma a pedido las fechas que falten, como `semana`. Para abonos:
   cada una gasta una clase del abono (0020).
+- `liberarLugares(tx, { alumnoId, ahora })`: la baja del alumno (0019). Da de baja sus
+  inscripciones vigentes con fecha `ahora`, descuenta cada lugar de su clase y devuelve cuántas
+  liberó; repetirla no tiene efecto doble. Escribe en las tablas de agenda, desde agenda: la
+  llama `personas` al dar de baja, en la misma transacción. Con RLS, libera los lugares de las
+  sedes visibles de quien da la baja.
 
 ## Eventos
 
@@ -108,5 +113,4 @@ _Ninguna por ahora._ La zona horaria es del centro (`centros`).
 - Los inscriptos salen por orden de inscripción: ordenarlos por apellido en la base exigiría
   leer la tabla de `personas` (regla 4). Una clase rara vez pasa de una página: el panel los
   puede ordenar.
-- Qué pasa con las inscripciones de un alumno que se da de baja: definirlo con Stretch Inn.
 - Reservas sueltas por fecha, si un centro trabaja sin horario fijo.
