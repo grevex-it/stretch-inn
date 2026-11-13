@@ -49,6 +49,8 @@ acuerdo.
   `planillaDeAsistencia` (la fecha y una página de sus inscriptos con su `estado` y su
   `avisoId`, `null` si no se marcó o no avisó), con sus tipos.
 - `pedidoDeAviso` (`{ alumnoId }`) y `avisoHecho` (`{ id }`: con el id se anula), con sus tipos.
+- `pedidoDeAusencias` (`{ sedeId, desde, hasta }`) y `ausenciasAvisadas` (`{ avisos }`): el
+  viaje, las ausencias de un período (0022).
 - `reglasDeRecuperacion` (`{ anticipacionMinutos, maximoPorAbono, sinAbono }`), las reglas de
   recuperación de una sede (0020), con su tipo.
 - `pedidoDeRecuperacion` (`{ alumnoId }`) y `recuperacionHecha` (`{ id }`), con sus tipos. La

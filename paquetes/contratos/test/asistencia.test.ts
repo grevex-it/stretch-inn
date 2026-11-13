@@ -1,8 +1,10 @@
 // Contratos de la asistencia: la planilla de una fecha y las marcas que se guardan.
 import { describe, expect, it } from "vitest";
 import {
+  ausenciasAvisadas,
   avisoHecho,
   pedidoDeAsistencia,
+  pedidoDeAusencias,
   pedidoDeAviso,
   pedidoDeRecuperacion,
   planillaDeAsistencia,
@@ -86,5 +88,14 @@ describe("recuperaciones", () => {
     expect(pedidoDeRecuperacion.parse({ alumnoId: UUID })).toEqual({ alumnoId: UUID });
     expect(pedidoDeRecuperacion.safeParse({}).success).toBe(false);
     expect(recuperacionHecha.parse({ id: UUID })).toEqual({ id: UUID });
+  });
+});
+
+describe("ausencias por período (viaje, 0022)", () => {
+  it("la sede y dos días; la respuesta, cuántos avisos hizo", () => {
+    const periodo = { sedeId: UUID, desde: "2026-12-01", hasta: "2026-12-20" };
+    expect(pedidoDeAusencias.parse(periodo)).toEqual(periodo);
+    expect(pedidoDeAusencias.safeParse({ ...periodo, hasta: "20/12/2026" }).success).toBe(false);
+    expect(ausenciasAvisadas.parse({ avisos: 3 })).toEqual({ avisos: 3 });
   });
 });

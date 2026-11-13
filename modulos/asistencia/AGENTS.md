@@ -39,6 +39,10 @@ sede (0020).
     (`{ alumnoId, estado }`) de inscriptos o de los que recuperan, todas o ninguna.
   - `avisar(quien, { fechaId, alumnoId })`: registra que no va y libera su lugar; devuelve el
     `id` del aviso.
+  - `avisarPeriodo(quien, { alumnoId, sedeId, desde, hasta })`: el viaje (0022). Avisa cada
+    fecha de su horario fijo en la sede entre los dos días (inclusive) que todavía no empezó, en
+    una sola consulta; las ya avisadas no cuentan. Devuelve `{ avisos }`. Falla con
+    `sin-fechas` si no hay ninguna.
   - `anularAviso(quien, { id })`: al final viene. No borra el aviso.
   - `recuperar(quien, { fechaId, alumnoId })`: reserva un lugar si hay, según las reglas de la
     sede. No hace falta un aviso previo (0020).
@@ -48,7 +52,7 @@ sede (0020).
     configurar, las de por defecto (las de Río Tercero: 0 minutos, 4 por abono, sin abono no).
 - `rutasDeAsistencia(asistencia)`: `GET /asistencia/fechas/:id?pagina` (`asistencia.ver`),
   `PUT /asistencia/fechas/:id` (`asistencia.tomar`), `POST /asistencia/fechas/:id/avisos` y
-  `DELETE /asistencia/avisos/:id` (`asistencia.avisar`),
+  `DELETE /asistencia/avisos/:id` y `POST /asistencia/alumnos/:id/ausencias` (`asistencia.avisar`),
   `POST /asistencia/fechas/:id/recuperaciones` y `DELETE /asistencia/recuperaciones/:id`
   (`asistencia.recuperar`), y
   `GET /asistencia/sedes/:id/reglas` (`asistencia.ver`) y `PUT /asistencia/sedes/:id/reglas`
@@ -100,6 +104,8 @@ sede (0020).
 - **Planilla:** los inscriptos de una fecha, con su marca.
 - **Marca:** presente o ausente de un alumno en una fecha.
 - **Aviso de ausencia:** el alumno (o la recepción por él) avisa antes de la clase que no va.
+- **Viaje:** el alumno avisa de una vez que no viene en un período. Paga como un mes común y
+  conserva su horario fijo; su lugar queda libre para recuperar en cada fecha (0022).
 - **Recuperación:** un lugar reservado en una fecha de otra clase de la sede.
 - **Lugares:** los que quedan para recuperar en una fecha.
 

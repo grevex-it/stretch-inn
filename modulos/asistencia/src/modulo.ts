@@ -33,6 +33,10 @@ export function crearAsistencia(base: Base, opciones: OpcionesAsistencia = {}): 
       enContexto(base, quien, (tx) =>
         planillas.tomar(repositorioAsistencia(tx), quien, ahora(), pedido),
       ),
+    avisarPeriodo: (quien, periodo) =>
+      enContexto(base, quien, (tx) =>
+        avisos.avisarPeriodo(repositorioAsistencia(tx), quien, ahora(), periodo),
+      ),
     avisar: (quien, aviso) =>
       enContexto(base, quien, (tx) =>
         avisos.avisar(repositorioAsistencia(tx), quien, ahora(), aviso),

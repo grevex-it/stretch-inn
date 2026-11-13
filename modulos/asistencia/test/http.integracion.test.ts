@@ -1,6 +1,7 @@
 // Rutas /asistencia sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // asistencia. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula.
 import {
+  ausenciasAvisadas,
   avisoHecho,
   planillaDeAsistencia,
   recuperacionHecha,
@@ -65,6 +66,7 @@ describe("rutas de la asistencia", () => {
       "PUT /asistencia/fechas/:id": "asistencia.tomar",
       "POST /asistencia/fechas/:id/avisos": "asistencia.avisar",
       "DELETE /asistencia/avisos/:id": "asistencia.avisar",
+      "POST /asistencia/alumnos/:id/ausencias": "asistencia.avisar",
       "GET /asistencia/sedes/:id/reglas": "asistencia.ver",
       "PUT /asistencia/sedes/:id/reglas": "asistencia.configurar",
       "POST /asistencia/fechas/:id/recuperaciones": "asistencia.recuperar",
@@ -119,6 +121,26 @@ describe("rutas de la asistencia", () => {
     const anular = { method: "DELETE" as const, url: `/asistencia/avisos/${id}` };
     expect((await servidor.inject(anular)).statusCode).toBe(204);
     expect((await servidor.inject(anular)).statusCode).toBe(404);
+  });
+
+  it("POST de ausencias por período avisa sus fechas (201) y valida el período (400)", async () => {
+    const { ctx, ana, norte, fecha } = await claseConFecha(base);
+    const { servidor } = await app(ctx, new Date(fecha.empiezaEn.getTime() - 60 * 60_000));
+    const url = `/asistencia/alumnos/${ana}/ausencias`;
+
+    const viaje = await servidor.inject({
+      method: "POST",
+      url,
+      payload: { sedeId: norte, desde: fecha.fecha, hasta: fecha.fecha },
+    });
+    expect(viaje.statusCode).toBe(201);
+    expect(ausenciasAvisadas.parse(viaje.json())).toEqual({ avisos: 1 });
+    const mal = await servidor.inject({
+      method: "POST",
+      url,
+      payload: { sedeId: norte, desde: fecha.fecha },
+    });
+    expect(mal.statusCode).toBe(400);
   });
 
   it("PUT guarda las marcas (204) y GET devuelve la planilla con el contrato", async () => {

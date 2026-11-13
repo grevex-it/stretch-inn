@@ -32,6 +32,19 @@ export const pedidoDeAviso = z.object({ alumnoId: z.uuid("Ese alumno no existe."
 /** Respuesta de POST /asistencia/fechas/:id/avisos: con este id se anula. */
 export const avisoHecho = z.object({ id: z.uuid() });
 
+/**
+ * Cuerpo de POST /asistencia/alumnos/:id/ausencias: el viaje (0022). Avisa cada fecha de su horario
+ * fijo en la sede entre los dos días, inclusive.
+ */
+export const pedidoDeAusencias = z.object({
+  sedeId: z.uuid("Esa sede no existe."),
+  desde: z.iso.date("Revisá el día de inicio."),
+  hasta: z.iso.date("Revisá el día de fin."),
+});
+
+/** Respuesta: cuántos avisos nuevos hizo (las fechas ya avisadas no cuentan). */
+export const ausenciasAvisadas = z.object({ avisos: z.number().int() });
+
 /** Cuerpo de POST /asistencia/fechas/:id/recuperaciones (0020: no hace falta un aviso previo). */
 export const pedidoDeRecuperacion = z.object({ alumnoId: z.uuid("Ese alumno no existe.") });
 
