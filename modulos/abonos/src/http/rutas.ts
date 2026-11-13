@@ -1,5 +1,11 @@
 // Rutas /abonos. El permiso en la sede (o en alguna sede, para los planes) lo controla el módulo.
-import { pedidoDeCuota, pedidoDeImpagas, pedidoDePagina } from "@app/contratos";
+import {
+  pedidoDeAbonoDelAlumno,
+  pedidoDeCuota,
+  pedidoDeImpagas,
+  pedidoDePagina,
+} from "@app/contratos";
+import { ok } from "@app/nucleo";
 import { contextoDe } from "@app/plataforma";
 import type { FastifyPluginCallback } from "fastify";
 import type { Abonos } from "../aplicacion/puertos.ts";
@@ -46,6 +52,18 @@ export function rutasDeAbonos(abonos: Abonos): FastifyPluginCallback {
         alumnoId: alumno.id,
       });
       return enviar(respuesta, resultado, 200);
+    });
+
+    // Las clases que le quedan del abono: para la ficha y para el profe (sin montos).
+    app.get("/alumnos/:id/abono", { config: ver }, async (pedido, respuesta) => {
+      const alumno = leer(conId, pedido.params, respuesta);
+      const sede = alumno && leer(pedidoDeAbonoDelAlumno, pedido.query, respuesta);
+      if (alumno === undefined || sede === undefined) return respuesta;
+      const resultado = await abonos.abonoDelAlumno(contextoDe(pedido), {
+        alumnoId: alumno.id,
+        sedeId: sede.sedeId,
+      });
+      return enviar(respuesta, resultado.ok ? ok({ abono: resultado.valor }) : resultado, 200);
     });
     listo();
   };

@@ -1,10 +1,12 @@
 // Contratos de los abonos: planes, precios por sede y cuotas.
 import { describe, expect, it } from "vitest";
 import {
+  abonoDelAlumno,
   edicionDePlan,
   fichaDePlan,
   paginaDeCuotas,
   paginaDePlanes,
+  pedidoDeAbonoDelAlumno,
   pedidoDeCuota,
   pedidoDePrecioDeSede,
 } from "../src/index.ts";
@@ -70,5 +72,24 @@ describe("respuestas de los abonos", () => {
       ],
     };
     expect(paginaDeCuotas.parse(cuotas)).toEqual(cuotas);
+  });
+});
+
+describe("el abono del alumno", () => {
+  it("se pide por sede y trae las clases que le quedan, sin montos, o null", () => {
+    expect(pedidoDeAbonoDelAlumno.parse({ sede: UUID })).toEqual({ sedeId: UUID });
+    expect(pedidoDeAbonoDelAlumno.safeParse({}).success).toBe(false);
+    const abono = {
+      cuotaId: UUID,
+      desde: "2026-11-15",
+      clases: 4,
+      usadas: 2,
+      restantes: 2,
+      fin: "2026-12-07T22:30:00.000Z",
+      pagada: false,
+    };
+    expect(abonoDelAlumno.parse({ abono })).toEqual({ abono });
+    expect(abonoDelAlumno.parse({ abono: { ...abono, fin: null } }).abono?.fin).toBeNull();
+    expect(abonoDelAlumno.parse({ abono: null })).toEqual({ abono: null });
   });
 });

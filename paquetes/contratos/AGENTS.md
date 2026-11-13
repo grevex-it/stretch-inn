@@ -56,6 +56,8 @@ acuerdo.
   lleva `clases` (1 a 100). Los montos van en pesos enteros.
 - `pedidoDeImpagas` (query `?sede&pagina`), `cuotaImpaga` y `paginaDeImpagas` (con `adeudado`),
   con sus tipos.
+- `pedidoDeAbonoDelAlumno` (query `?sede`) y `abonoDelAlumno` (`{ abono }`: `cuotaId`, `desde`,
+  `clases`, `usadas`, `restantes`, `fin` y `pagada`, o null), con su tipo.
 - `pedidoDeCobro` (cuota, medio y `claveIdempotencia`), `cobroHecho` (`{ id, monto, repetido }`),
   `pedidoDeAnulacion` (`{ motivo }`), `pedidoDelDia` (query `?sede&dia&pagina`), `pago` y
   `diaDeCaja` (una página de pagos más `cobrado`), con sus tipos.

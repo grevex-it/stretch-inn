@@ -1,5 +1,6 @@
 // Lo que los abonos necesitan de afuera (ver docs/decisiones/0003): la base, personas y centros.
 import type { ContextoCentro, Dinero, Resultado } from "@app/nucleo";
+import type { EstadoDelAbono } from "../dominio/estado.ts";
 import type { DatosDePlan, ErrorDePlan } from "../dominio/plan.ts";
 
 export interface Pagina {
@@ -35,6 +36,14 @@ export interface Cuota {
   clases: number;
   monto: Dinero;
   pagadaEn: Date | null;
+}
+
+/** El abono actual de un alumno en una sede (0020): cada fecha que terminó gastó una clase. */
+export interface AbonoDelAlumno extends EstadoDelAbono {
+  cuotaId: string;
+  desde: string;
+  clases: number;
+  pagada: boolean;
 }
 
 /** Una cuota sin pagar, con el alumno (null si personas no lo devuelve). */
@@ -81,6 +90,12 @@ export interface RepositorioAbonos {
     desde: string;
     cantidad: number;
   }): Promise<FechaDeClase[]>;
+  /** Su cuota vigente en la sede que empezó más tarde hasta `hoy` (AAAA-MM-DD), o undefined. */
+  cuotaEmpezada(pedido: {
+    alumnoId: string;
+    sedeId: string;
+    hoy: string;
+  }): Promise<Cuota | undefined>;
   /** El id de la cuota nueva, o undefined si ya tenía una vigente desde ese día. */
   generarCuota(cuota: Omit<Cuota, "id" | "pagadaEn">): Promise<string | undefined>;
   /** La cuota vigente (sin anular), tomada hasta el fin de la transacción si `bloquear`. */
@@ -152,6 +167,11 @@ export interface Abonos {
     quien: ContextoCentro,
     filtro: Pagina & { alumnoId: string },
   ): Promise<Resultado<PaginaDe<Cuota>, ErrorDeAbonos>>;
+  /** El abono que empezó más tarde en la sede, con las clases que le quedan; null si no hay. */
+  abonoDelAlumno(
+    quien: ContextoCentro,
+    pedido: { alumnoId: string; sedeId: string },
+  ): Promise<Resultado<AbonoDelAlumno | null, ErrorDeAbonos>>;
   /** Las impagas de la sede, la más vieja primero. */
   cuotasImpagas(
     quien: ContextoCentro,

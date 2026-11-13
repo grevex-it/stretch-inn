@@ -41,6 +41,10 @@ congelados al generarla. Cada fecha del horario fijo del alumno gasta una clase.
     el centro. Devuelve `{ id, monto, desde, clases }`. No puede empezar antes de que termine su
     abono anterior (`ya-tiene-cuota`).
   - `anularCuota(quien, { id })` y `cuotasDeAlumno(quien, { alumnoId, pagina, porPagina })`.
+  - `abonoDelAlumno(quien, { alumnoId, sedeId })`: el abono que empezó más tarde hasta hoy en la
+    sede (`{ cuotaId, desde, clases, usadas, restantes, fin, pagada }`), aunque ya haya usado
+    todas sus clases; null si no tiene. Cada fecha del horario fijo que ya terminó cuenta como
+    usada. `fin` es null si no le alcanzan las fechas. Sin montos: lo ve también el profe.
   - `cuotasImpagas(quien, { sedeId, pagina, porPagina })`: las impagas de la sede, la más vieja
     primero, con el nombre del alumno y `adeudado` (lo que suman todas, no solo la página).
 - Para otros módulos (`caja`, `asistencia`), con la `Transaccion` de `enContexto`:
@@ -53,8 +57,8 @@ congelados al generarla. Cada fecha del horario fijo del alumno gasta una clase.
     vigente en ese momento (`{ cuotaId, inicio, fin, clases }`: `inicio`, la medianoche del día
     en que empieza; `fin`, el final de su última clase), o undefined si no tiene o no le alcanzan
     las fechas del horario fijo. La API se lo pasa a `asistencia` (0020).
-- `rutasDeAbonos(abonos)`: `GET /abonos/planes`, `GET /abonos/cuotas/impagas?sede&pagina` y
-  `GET /alumnos/:id/cuotas` (`abonos.ver`);
+- `rutasDeAbonos(abonos)`: `GET /abonos/planes`, `GET /abonos/cuotas/impagas?sede&pagina`,
+  `GET /alumnos/:id/cuotas` y `GET /alumnos/:id/abono?sede` (`abonos.ver`);
   `POST /abonos/planes`, `PUT /abonos/planes/:id`, `PUT`/`DELETE /abonos/planes/:id/baja` y
   `PUT`/`DELETE /abonos/planes/:id/sedes/:sedeId/precio` (`abonos.gestionar`);
   `POST /abonos/cuotas` y `DELETE /abonos/cuotas/:id` (`abonos.asignar`).
