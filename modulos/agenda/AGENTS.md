@@ -43,12 +43,18 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
     alumnos en dos consultas (`obtenerAlumnos` de `personas`).
   - `clasesDeAlumno(quien, { alumnoId, pagina, porPagina })`: sus inscripciones vigentes en las
     sedes donde se puede ver la agenda.
+  - `camas(quien, { sedeId })` y `fijarCamas(quien, { sedeId, camas })`: las camas de la sede
+    (1 a 500, o null: sin tope), el tope del cupo de todas sus clases (pedido del 12/11). Al
+    bajarlas, las clases con más cupo bajan con ellas, todas o ninguna; no bajan si dejan afuera a
+    los fijos de una clase (`camas-menos-que-inscriptos`) o a las recuperaciones de una fecha
+    futura (`fecha-completa`). Subirlas no toca los cupos.
 - `rutasDeAgenda(agenda)`: `GET /agenda/clases?pagina&sede`,
   `GET /agenda/ocurrencias?sede&desde&pagina`, `GET /agenda/clases/:id/inscriptos?pagina` y
   `GET /alumnos/:id/clases?pagina` (`agenda.ver`); `POST /agenda/clases`, `PUT /agenda/clases/:id`,
   `PUT`/`DELETE /agenda/clases/:id/baja` y `PUT`/`DELETE /agenda/ocurrencias/:id/cancelada`
   (`agenda.gestionar`); `POST /agenda/clases/:id/inscriptos` y
-  `DELETE /agenda/inscripciones/:id` (`agenda.inscribir`).
+  `DELETE /agenda/inscripciones/:id` (`agenda.inscribir`); `GET /agenda/sedes/:id/camas`
+  (`agenda.ver`) y `PUT /agenda/sedes/:id/camas` (`agenda.gestionar`).
 - `PERMISOS_AGENDA`: la sección «Agenda» del catálogo (`agenda.ver`, `agenda.gestionar`,
   `agenda.inscribir`).
 
@@ -98,6 +104,9 @@ Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContex
   fijos más las recuperaciones de más de alguna pasan el cupo. Las fechas quedan tomadas con el
   bloqueo de `asistencia` hasta el fin de la transacción: una recuperación no gana el lugar en
   el medio.
+- **El cupo de una clase no pasa las camas de su sede** (`cupo-mayor-que-camas`), al crearla ni
+  al editarla. Cambiar las camas de una sede va de a uno (bloqueo por sede) y toma con
+  `for update` las clases que tiene que bajar.
 - Un alumno tiene a lo sumo una inscripción vigente por clase (índice único parcial). La baja
   no borra: marca `baja_en`.
 - Una inscripción está vigente en un momento si se creó antes (o en ese momento) y no tiene baja
@@ -113,7 +122,8 @@ Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContex
 
 ## Configuración por centro
 
-_Ninguna por ahora._ La zona horaria es del centro (`centros`).
+Por sede, desde el panel: las camas (`camas_de_sede`; sin fila, sin tope). La zona horaria es del
+centro (`centros`).
 
 ## Pendientes
 
@@ -121,3 +131,6 @@ _Ninguna por ahora._ La zona horaria es del centro (`centros`).
   leer la tabla de `personas` (regla 4). Una clase rara vez pasa de una página: el panel los
   puede ordenar.
 - Reservas sueltas por fecha, si un centro trabaja sin horario fijo.
+- Crear o editar una clase lee las camas sin tomarlas: si a la vez alguien baja las camas de esa
+  sede, la clase nueva puede quedar con más cupo que camas. Es una ventana chica; tomarlas
+  ahí cruza el orden de bloqueos con `fijarCamas` (clase y sede al revés).

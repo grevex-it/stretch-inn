@@ -1,6 +1,7 @@
 // Arma la agenda con sus adaptadores, a mano (ver docs/decisiones/0003). Cada operación corre en
 // su transacción con el contexto de quien la pide.
 import { enContexto, type Base, type Transaccion } from "@app/plataforma";
+import * as camas from "./aplicacion/camas.ts";
 import * as clases from "./aplicacion/clases.ts";
 import * as fechas from "./aplicacion/fechas.ts";
 import * as inscripciones from "./aplicacion/inscripciones.ts";
@@ -39,6 +40,10 @@ export function crearAgenda(base: Base, opciones: OpcionesAgenda = {}): Agenda {
       enContexto(base, quien, (tx) =>
         fechas.fijarCancelada(repositorioAgenda(tx), quien, ahora(), cambio),
       ),
+    camas: (quien, pedido) =>
+      enContexto(base, quien, (tx) => camas.camas(repositorioAgenda(tx), quien, pedido)),
+    fijarCamas: (quien, cambio) =>
+      enContexto(base, quien, (tx) => camas.fijar(repositorioAgenda(tx), quien, ahora(), cambio)),
     inscribir: (quien, inscripcion) =>
       enContexto(base, quien, (tx) =>
         inscripciones.inscribir(repos(tx), quien, ahora(), inscripcion),

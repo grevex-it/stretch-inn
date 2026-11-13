@@ -36,11 +36,11 @@ El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-impleme
   activo.
 - **Material para profesores:** alojar y reproducir hasta 150 clases en video necesita un servicio
   de almacenamiento y streaming. Su costo tiene que entrar en la mensualidad.
-- **Camas por sede** (pedido del 12/11): la cantidad de camas de cada sede tiene que ser
-  variable y ajustable desde el panel. Hoy el cupo es de cada clase (`agenda`), se edita desde el
-  panel y no puede quedar debajo de los inscriptos. Falta la cantidad de camas de la sede: el
-  cupo por defecto de sus clases nuevas y el tope de todas. Al bajarla, ninguna clase puede
-  quedar con más inscriptos que camas.
+- **Camas por sede** (pedido del 12/11): la API ya está (`agenda`, `GET`/`PUT
+/agenda/sedes/:id/camas`). Son el tope del cupo de todas las clases de la sede; al bajarlas,
+  las clases con más cupo bajan con ellas, salvo que dejen afuera a un fijo o a una recuperación.
+  Falta en el panel: el formulario de camas de la sede, y usarlas como cupo por defecto al crear
+  una clase. **[SUPUESTO]** Subir las camas no sube el cupo de las clases que ya existen.
 - **Licencias por sede** (0009): la mensualidad cambia por sede (base, sede nueva) y hay un alta
   por sede nueva.
 
@@ -76,15 +76,10 @@ Casi todo quedó respondido en 0019 y 0020. Falta:
 Lo que quedó abierto de la pila de asistencia, abonos, caja y worker. Lo que ya respondió Stretch
 Inn está en 0019; los supuestos menores de cada módulo, en su `AGENTS.md`.
 
-- **Rehacer `abonos` según 0020:** el abono pasa de ciclo de 28 días a paquete de clases, con la
-  clase suelta y el cambio entre las dos formas de pago. Afecta también el vencimiento del crédito
-  en `asistencia` y el panel.
 - **Actor de sistema en el `ContextoCentro`** (estructura): lo necesitan las tareas programadas
-  del worker, como renovar los ciclos que terminan y avisar el pago ese día (0019). Hoy el
-  contexto solo admite usuario y soporte.
-- **Una fecha suspendida tiene que dar crédito a sus inscriptos** (0019).
-- **`caja`:** la cuota se marca pagada en la transacción del cobro y no por el evento. Revisar si
-  queda así y, en ese caso, actualizar 0003.
+  del worker, como el aviso de pago cuando el alumno usa la última clase de su abono (0020). Hoy
+  el contexto solo admite usuario y soporte. Se hace junto con ese aviso, que espera la decisión
+  de WhatsApp (WAHA o la API de Meta, 0012).
 - **Railway:** crear el servicio del worker (`pnpm --filter @app/worker start`) con la misma
   `DATABASE_URL` que la API.
 - **Panel:** el profe anula un cobro desde la ficha del alumno, sin `caja.ver` (0019). La API

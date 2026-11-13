@@ -1,6 +1,7 @@
 // Contratos de la agenda: la forma de los pedidos y las respuestas.
 import { describe, expect, it } from "vitest";
 import {
+  camasDeSede,
   edicionDeClase,
   fichaDeClase,
   paginaDeClasesDeAlumno,
@@ -92,5 +93,15 @@ describe("pedidos de la agenda", () => {
       ],
     };
     expect(paginaDeOcurrencias.parse(pagina)).toEqual(pagina);
+  });
+});
+
+describe("camas de la sede", () => {
+  it("un entero de 1 a 500, o null sin tope", () => {
+    expect(camasDeSede.parse({ camas: 10 })).toEqual({ camas: 10 });
+    expect(camasDeSede.parse({ camas: null })).toEqual({ camas: null });
+    expect(camasDeSede.safeParse({ camas: 0 }).success).toBe(false);
+    expect(camasDeSede.safeParse({ camas: 1.5 }).success).toBe(false);
+    expect(camasDeSede.safeParse({}).success).toBe(false);
   });
 });

@@ -243,15 +243,29 @@
     {
       "idx": 34,
       "version": "7",
-      "when": 1794534863621,
-      "tag": "20261113015423_salud-de-alumnos",
+      "when": 1794534190169,
+      "tag": "20261113014310_camas-de-sede",
       "breakpoints": true
     },
     {
       "idx": 35,
       "version": "7",
-      "when": 1794534864996,
-      "tag": "20261113015424_rls-salud-de-alumnos",
+      "when": 1794534191489,
+      "tag": "20261113014311_rls-camas-de-sede",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1794535166642,
+      "tag": "20261113015926_salud-de-alumnos",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1794535168077,
+      "tag": "20261113015928_rls-salud-de-alumnos",
       "breakpoints": true
     }
   ]

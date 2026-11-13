@@ -21,7 +21,7 @@ Dos niveles según el módulo:
 - `modulo.ts`: conecta adaptadores con puertos **a mano**, verificado por el compilador.
 - `index.ts`: la API pública del módulo, lo único que pueden usar los demás.
 - **Regla de puertos:** solo para lo que sale del proceso o no es determinista: base de datos, WhatsApp, cola, reloj, dispositivos. El resto es código directo, sin interfaces.
-- Los módulos se comunican por su `index.ts` o por **eventos** (ej. `caja` emite `PagoRegistrado`, `abonos` lo escucha). Los efectos externos van por una cola persistente (outbox) con reintentos.
+- Los módulos se comunican por su `index.ts` o por **eventos** (ej. `caja` emite `PagoRegistrado` para lo que pasa después, como avisar por WhatsApp). Lo que tiene que quedar en la misma transacción va por el `index.ts`: `caja` marca la cuota pagada con `registrarPago` de `abonos` al cobrar, así no hay un momento con el pago hecho y la cuota impaga. Los efectos externos van por una cola persistente (outbox) con reintentos.
 - `dependency-cruiser` en el CI controla la dirección de las dependencias entre capas y módulos, y que no haya ciclos.
 
 ## Consecuencias

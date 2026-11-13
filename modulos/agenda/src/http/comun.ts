@@ -10,6 +10,7 @@ const ESTADOS: Record<ErrorDeAgenda, number> = {
   "hora-invalida": 400,
   "duracion-invalida": 400,
   "cupo-invalido": 400,
+  "camas-invalidas": 400,
   "sin-permiso": 403,
   "clase-inexistente": 404,
   "fecha-inexistente": 404,
@@ -23,6 +24,8 @@ const ESTADOS: Record<ErrorDeAgenda, number> = {
   "ya-inscripto": 409,
   "cupo-menor-que-inscriptos": 409,
   "fecha-completa": 409,
+  "cupo-mayor-que-camas": 409,
+  "camas-menos-que-inscriptos": 409,
 };
 
 /** El dato validado, o undefined si ya se respondió 400. */

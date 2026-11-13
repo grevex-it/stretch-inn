@@ -43,6 +43,7 @@ acuerdo.
   viajan en UTC como texto ISO.
 - `pedidoDeInscripcion`, `inscripcionHecha`, `inscripto`, `paginaDeInscriptos`, `claseDeAlumno`
   y `paginaDeClasesDeAlumno`, con sus tipos.
+- `camasDeSede` (`{ camas }`: de 1 a 500, o null sin tope), las camas de una sede, con su tipo.
 - `pedidoDeAsistencia` (de 1 a 100 marcas `{ alumnoId, estado }`, presente o ausente) y
   `planillaDeAsistencia` (la fecha y una página de sus inscriptos con su `estado` y su
   `avisoId`, `null` si no se marcó o no avisó), con sus tipos.
