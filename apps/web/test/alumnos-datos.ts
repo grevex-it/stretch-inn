@@ -20,7 +20,11 @@ export function alumno(id: string, nombre: string, apellido: string, activo = tr
     email: null,
     fechaNacimiento: null,
     notas: "",
+    numeroDeSocio: 54,
+    fechaDeInicio: null,
     activo,
+    bajaEn: activo ? null : "2026-11-01T00:00:00.000Z",
+    pendienteDeCompletar: false,
     version: 1,
   };
 }

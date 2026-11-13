@@ -20,12 +20,17 @@ export const alumnos = pgTable(
     centroId: uuid("centro_id").notNull(),
     nombre: text("nombre").notNull(),
     apellido: text("apellido").notNull(),
-    telefono: text("telefono").notNull(),
+    /** El celular. Sin él, el alumno queda pendiente de completar (0022). */
+    telefono: text("telefono"),
+    /** Único en el centro. Sin él, el alta toma el siguiente. */
+    numeroDeSocio: integer("numero_de_socio").notNull(),
     /** Sin puntos ni espacios. Si se carga, no se repite dentro del centro. */
     documento: text("documento"),
     email: text("email"),
     fechaNacimiento: date("fecha_nacimiento", { mode: "string" }),
     notas: text("notas").notNull().default(""),
+    /** La «primera clase» (0019): para el regalo del año. */
+    fechaDeInicio: date("fecha_de_inicio", { mode: "string" }),
     /**
      * Nombre, apellido, documento y dígitos del teléfono en minúsculas y sin acentos: lo que
      * compara el buscador. Lo arma la app en cada alta y edición.
@@ -33,6 +38,8 @@ export const alumnos = pgTable(
     busqueda: text("busqueda").notNull(),
     /** La baja no borra: oculta al alumno de la lista habitual y conserva su historia. */
     activo: boolean("activo").notNull().default(true),
+    /** Cuándo se dio de baja; null si está activo. */
+    bajaEn: timestamp("baja_en", { withTimezone: true }),
     creadoEn: timestamp("creado_en", { withTimezone: true }).notNull().defaultNow(),
     version: integer("version").notNull().default(1),
   },
@@ -40,6 +47,7 @@ export const alumnos = pgTable(
     uniqueIndex("alumnos_centro_documento")
       .on(tabla.centroId, tabla.documento)
       .where(sql`${tabla.documento} is not null`),
+    uniqueIndex("alumnos_centro_socio").on(tabla.centroId, tabla.numeroDeSocio),
     index("alumnos_centro_apellido").on(tabla.centroId, tabla.apellido, tabla.nombre),
   ],
 );

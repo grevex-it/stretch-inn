@@ -281,6 +281,13 @@
       "when": 1794540211746,
       "tag": "20261113032331_rls-gastos",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1794541474729,
+      "tag": "20261113034434_ficha-de-la-planilla",
+      "breakpoints": true
     }
   ]
 }

@@ -27,11 +27,22 @@ const opcional = <T extends z.ZodType<string>>(esquema: T) =>
 export const fichaDeAlumno = z.object({
   nombre: obligatorio("Escribí el nombre."),
   apellido: obligatorio("Escribí el apellido."),
-  telefono: z.string().trim().min(1, "Escribí el teléfono.").max(40, "Revisá el teléfono."),
+  /** El celular. Sin él, el alumno queda pendiente de completar (0022). */
+  telefono: opcional(z.string().trim().max(40, "Revisá el teléfono.")),
   documento: opcional(z.string().trim().max(20, "Revisá el documento.")),
   email: opcional(z.email("Revisá el email.")),
   fechaNacimiento: opcional(z.iso.date("Revisá la fecha de nacimiento.")),
   notas: z.string().max(2000, "Las notas son muy largas."),
+  /** Sin él, el alta toma el siguiente del centro y la edición conserva el que tenía. */
+  numeroDeSocio: z
+    .number("Revisá el número de socio.")
+    .int("Revisá el número de socio.")
+    .min(1, "El número de socio va de 1 a 999999.")
+    .max(999_999, "El número de socio va de 1 a 999999.")
+    .nullable()
+    .optional(),
+  /** La «primera clase» (0019). Sin ella, la edición conserva la que tenía. */
+  fechaDeInicio: opcional(z.iso.date("Revisá la fecha de inicio.")).optional(),
 });
 
 /** La edición lleva la versión que vio quien edita (0013). */
@@ -41,12 +52,18 @@ export const alumno = z.object({
   id: z.uuid(),
   nombre: z.string(),
   apellido: z.string(),
-  telefono: z.string(),
+  telefono: z.string().nullable(),
   documento: z.string().nullable(),
   email: z.string().nullable(),
   fechaNacimiento: z.string().nullable(),
   notas: z.string(),
+  numeroDeSocio: z.number().int(),
+  fechaDeInicio: z.string().nullable(),
   activo: z.boolean(),
+  /** En UTC: cuándo se dio de baja; null si está activo. */
+  bajaEn: z.iso.datetime().nullable(),
+  /** Le falta el celular: no recibe mensajes automáticos hasta que lo tenga (0022). */
+  pendienteDeCompletar: z.boolean(),
   version: z.number().int(),
 });
 
