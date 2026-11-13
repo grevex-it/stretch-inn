@@ -22,6 +22,7 @@ const ESTADOS: Record<ErrorDeAgenda, number> = {
   "alumno-de-baja": 409,
   "ya-inscripto": 409,
   "cupo-menor-que-inscriptos": 409,
+  "fecha-completa": 409,
 };
 
 /** El dato validado, o undefined si ya se respondió 400. */

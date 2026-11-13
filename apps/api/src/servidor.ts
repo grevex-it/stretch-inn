@@ -11,7 +11,7 @@ import { crearAcceso, crearEquipo, rutasDeEquipo, rutasDeSesion } from "@app/ide
 import { rutasDeAlumnos } from "@app/personas";
 import { abonoVigente, crearAbonos, rutasDeAbonos } from "@app/abonos";
 import { crearAgenda, liberarLugares, rutasDeAgenda } from "@app/agenda";
-import { crearAsistencia, rutasDeAsistencia } from "@app/asistencia";
+import { crearAsistencia, ocupadasDeMas, rutasDeAsistencia } from "@app/asistencia";
 import { crearCaja, EVENTO_PAGO_REGISTRADO, rutasDeCaja } from "@app/caja";
 import { construirApp } from "./app.ts";
 
@@ -58,7 +58,7 @@ const app = construirApp({
 await app.register(rutasDeSesion(acceso));
 await app.register(rutasDeEquipo(crearEquipo(base)));
 await app.register(rutasDeAlumnos(base, { alDarDeBaja: liberarLugares }));
-await app.register(rutasDeAgenda(crearAgenda(base)));
+await app.register(rutasDeAgenda(crearAgenda(base, { ocupadasDeMas })));
 // Se recupera dentro del abono vigente del alumno (0020): abonos se lo dice a asistencia.
 await app.register(rutasDeAsistencia(crearAsistencia(base, { abonoVigente })));
 await app.register(rutasDeAbonos(crearAbonos(base)));

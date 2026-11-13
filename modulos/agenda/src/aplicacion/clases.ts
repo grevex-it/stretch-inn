@@ -10,7 +10,7 @@ import {
 } from "@app/nucleo";
 import type { Resultado } from "@app/nucleo";
 import { limpiarClase } from "../dominio/clase.ts";
-import { cupoPosible } from "../dominio/inscripcion.ts";
+import { cupoPosible, entraEnLasFechas } from "../dominio/inscripcion.ts";
 import { cambioDeHorario } from "../dominio/ocurrencias.ts";
 import { GESTIONAR, VER } from "../dominio/permisos.ts";
 import type {
@@ -80,6 +80,11 @@ export async function editar(
   if (!clase.ok) return clase;
   const cupo = cupoPosible(clase.valor.cupo, actual.valor.inscriptos);
   if (!cupo.ok) return cupo;
+  if (clase.valor.cupo < actual.valor.cupo) {
+    const masOcupada = await repo.masOcupadaFutura(claseId, ahora);
+    const enLasFechas = entraEnLasFechas(clase.valor.cupo, actual.valor.inscriptos, masOcupada);
+    if (!enLasFechas.ok) return enLasFechas;
+  }
   const nueva = await repo.actualizarClase(claseId, version, clase.valor);
   if (nueva === undefined) {
     return falla("cambio-concurrente", "Esta clase cambió mientras la editabas. Volvé a cargarla.");

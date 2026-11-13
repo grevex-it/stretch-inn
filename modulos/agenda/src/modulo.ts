@@ -4,17 +4,24 @@ import { enContexto, type Base, type Transaccion } from "@app/plataforma";
 import * as clases from "./aplicacion/clases.ts";
 import * as fechas from "./aplicacion/fechas.ts";
 import * as inscripciones from "./aplicacion/inscripciones.ts";
-import type { Agenda } from "./aplicacion/puertos.ts";
+import type { Agenda, OcupadasDeMas } from "./aplicacion/puertos.ts";
 import { repositorioInscripciones } from "./infraestructura/repositorio-inscripciones.ts";
-import { repositorioAgenda } from "./infraestructura/repositorio.ts";
+import { repositorioAgenda as repositorioDeAgenda } from "./infraestructura/repositorio.ts";
 
 export interface OpcionesAgenda {
   /** Reloj; en los tests se adelanta a mano. */
   ahora?: () => Date;
+  /** Los lugares que ocupan de más las recuperaciones en cada fecha: la API le pasa el de asistencia. */
+  ocupadasDeMas?: OcupadasDeMas;
 }
 
 export function crearAgenda(base: Base, opciones: OpcionesAgenda = {}): Agenda {
   const ahora = opciones.ahora ?? (() => new Date());
+  const repositorioAgenda = (tx: Transaccion) => repositorioDeAgenda(tx, opciones.ocupadasDeMas);
+  const repos = (tx: Transaccion): inscripciones.Repositorios => ({
+    agenda: repositorioAgenda(tx),
+    inscripciones: repositorioInscripciones(tx),
+  });
   return {
     clases: (quien, filtro) =>
       enContexto(base, quien, (tx) => clases.listar(repositorioAgenda(tx), quien, filtro)),
@@ -33,7 +40,9 @@ export function crearAgenda(base: Base, opciones: OpcionesAgenda = {}): Agenda {
         fechas.fijarCancelada(repositorioAgenda(tx), quien, ahora(), cambio),
       ),
     inscribir: (quien, inscripcion) =>
-      enContexto(base, quien, (tx) => inscripciones.inscribir(repos(tx), quien, inscripcion)),
+      enContexto(base, quien, (tx) =>
+        inscripciones.inscribir(repos(tx), quien, ahora(), inscripcion),
+      ),
     darDeBajaInscripcion: (quien, inscripcion) =>
       enContexto(base, quien, (tx) =>
         inscripciones.darDeBaja(repos(tx), quien, ahora(), inscripcion),
@@ -44,8 +53,3 @@ export function crearAgenda(base: Base, opciones: OpcionesAgenda = {}): Agenda {
       enContexto(base, quien, (tx) => inscripciones.deAlumno(repos(tx), quien, filtro)),
   };
 }
-
-const repos = (tx: Transaccion): inscripciones.Repositorios => ({
-  agenda: repositorioAgenda(tx),
-  inscripciones: repositorioInscripciones(tx),
-});

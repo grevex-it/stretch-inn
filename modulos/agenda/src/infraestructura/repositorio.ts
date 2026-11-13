@@ -4,8 +4,9 @@ import { obtenerCentro } from "@app/centros";
 import type { Transaccion } from "@app/plataforma";
 import { and, asc, between, count, eq, gt, inArray, sql } from "drizzle-orm";
 import type { DatosDeClase } from "../dominio/clase.ts";
-import type { RepositorioAgenda } from "../aplicacion/puertos.ts";
+import type { OcupadasDeMas, RepositorioAgenda } from "../aplicacion/puertos.ts";
 import { clases, ocurrencias } from "./esquema.ts";
+import { lugaresFuturos } from "./lugares-futuros.ts";
 
 const ZONA_POR_DEFECTO = "America/Argentina/Buenos_Aires";
 
@@ -174,11 +175,15 @@ function escriturasDeFechas(
   };
 }
 
-export function repositorioAgenda(tx: Transaccion): RepositorioAgenda {
+export function repositorioAgenda(
+  tx: Transaccion,
+  ocupadasDeMas?: OcupadasDeMas,
+): RepositorioAgenda {
   return {
     ...lecturas(tx),
     ...escriturasDeClases(tx),
     ...lecturasDeFechas(tx),
     ...escriturasDeFechas(tx),
+    ...lugaresFuturos(tx, ocupadasDeMas),
   };
 }
