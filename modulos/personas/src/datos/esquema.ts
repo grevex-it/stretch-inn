@@ -43,3 +43,16 @@ export const alumnos = pgTable(
     index("alumnos_centro_apellido").on(tabla.centroId, tabla.apellido, tabla.nombre),
   ],
 );
+
+/**
+ * Los datos de salud de un alumno (patologías), aparte de su ficha: se ven y se editan con
+ * permisos propios (0019). Son datos sensibles (Ley 25.326): nunca van a un log.
+ */
+export const saludDeAlumnos = pgTable("salud_de_alumnos", {
+  alumnoId: uuid("alumno_id")
+    .primaryKey()
+    .references(() => alumnos.id),
+  centroId: uuid("centro_id").notNull(),
+  patologias: text("patologias").notNull().default(""),
+  version: integer("version").notNull().default(1),
+});

@@ -253,6 +253,20 @@
       "when": 1794534191489,
       "tag": "20261113014311_rls-camas-de-sede",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1794535166642,
+      "tag": "20261113015926_salud-de-alumnos",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1794535168077,
+      "tag": "20261113015928_rls-salud-de-alumnos",
+      "breakpoints": true
     }
   ]
 }

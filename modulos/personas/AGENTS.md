@@ -5,15 +5,14 @@ Nivel: liviano (`src/datos/`, `src/http/`). Ver `docs/decisiones/0003-hexagonal-
 ## Alcance
 
 Los alumnos del centro: ficha (nombre, apellido, teléfono y, opcionales, documento, email,
-fecha de nacimiento y notas), lista con buscador, alta, edición, baja y reactivación.
+fecha de nacimiento y notas), lista con buscador, alta, edición, baja y reactivación. Sus datos de
+salud (patologías), aparte de la ficha y con permisos propios (0019).
 
 ## Fuera de alcance
 
 - En qué clases está cada alumno y en qué sede: `agenda` (inscripciones).
 - Abonos, cobros y asistencia: `abonos`, `caja` y `asistencia`.
 - El acceso del alumno al portal (Fase 4).
-- Datos de salud (lesiones, contraindicaciones): son datos sensibles (Ley 25.326). Se suman
-  después, con un permiso propio y el consentimiento del alumno.
 
 ## Depende de
 
@@ -37,7 +36,12 @@ algo puede fallar por una regla.
   baja libera el horario fijo del alumno (0019). Rutas: `GET /alumnos?pagina&buscar&bajas=si` y `GET /alumnos/:id`
   (`personas.ver`); `POST /alumnos`, `PUT /alumnos/:id` y `PUT`/`DELETE /alumnos/:id/baja`
   (`personas.editar`).
-- `PERMISOS_PERSONAS`: la sección «Alumnos» del catálogo (0007).
+- `obtenerSalud(tx, alumnoId)` y `fijarSalud(tx, { alumnoId, patologias, version })`: los datos
+  de salud (hasta 4000 caracteres), con su versión (0 si nunca se cargaron).
+- `GET /alumnos/:id/salud` (`personas.ver-salud`) y `PUT /alumnos/:id/salud`
+  (`personas.editar-salud`), en `rutasDeAlumnos`.
+- `PERMISOS_PERSONAS`: la sección «Alumnos» del catálogo (0007): `personas.ver`,
+  `personas.editar`, `personas.ver-salud` y `personas.editar-salud`.
 
 ## Eventos
 
@@ -56,6 +60,10 @@ algo puede fallar por una regla.
 - La columna `busqueda` (nombre, apellido, documento y dígitos del teléfono, en minúsculas y sin
   acentos) la arma la app en cada alta y edición: nunca se escribe a mano.
 - Nunca se escriben en un log datos de contacto completos de un alumno (0015).
+- **Los datos de salud van aparte de la ficha** (`salud_de_alumnos`, una fila por alumno, RLS por
+  centro): ver la ficha no alcanza para verlos (0019: los ven los profes, la contadora no). Son
+  datos sensibles (Ley 25.326): nunca van a un log. El consentimiento es la ficha médica firmada
+  en papel.
 
 ## Glosario
 
@@ -68,7 +76,6 @@ _Ninguna por ahora._ `recuperarEnOtraSede` (0011) llega con `asistencia`.
 
 ## Pendientes
 
-- Datos de salud con permiso propio y consentimiento.
 - Exportar o borrar los datos de un alumno que lo pida (Ley 25.326, derecho de supresión).
 - Si un centro llega a decenas de miles de alumnos, el buscador (`like` sobre `busqueda`) va a
   necesitar un índice de trigramas.

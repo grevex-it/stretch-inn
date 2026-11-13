@@ -32,11 +32,14 @@ export {
   fichaDeAlumno,
   paginaDeAlumnos,
   pedidoDeAlumnos,
+  saludDeAlumno,
+  saludGuardada,
   type Alumno,
   type EdicionDeAlumno,
   type FichaDeAlumno,
   type PaginaDeAlumnos,
   type PedidoDeAlumnos,
+  type SaludDeAlumno,
 } from "./alumnos.ts";
 export {
   camasDeSede,

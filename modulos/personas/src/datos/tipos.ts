@@ -39,4 +39,5 @@ export type ErrorDeAlumno =
   | "fecha-invalida"
   | "documento-repetido"
   | "alumno-inexistente"
-  | "cambio-concurrente";
+  | "cambio-concurrente"
+  | "salud-muy-larga";
