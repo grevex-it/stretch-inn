@@ -36,8 +36,8 @@ acuerdo.
   `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
 - `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,
   `alumno` y `paginaDeAlumnos`, con sus tipos. El celular es opcional; `numeroDeSocio` y
-  `fechaDeInicio` también, y si no vienen en la edición se conservan. El alumno trae
-  `numeroDeSocio`, `fechaDeInicio`, `bajaEn` y `pendienteDeCompletar` (0022).
+  `fechaDeInicio` y `profeId` también, y si no vienen en la edición se conservan. El alumno trae
+  `numeroDeSocio`, `fechaDeInicio`, `profeId`, `bajaEn` y `pendienteDeCompletar` (0022).
 - `saludDeAlumno` (`{ patologias, version }`, hasta 4000 caracteres) y `saludGuardada`
   (`{ version }`): los datos de salud del alumno, aparte de la ficha (0019), con su tipo.
 - `pedidoDeClases` (query `?pagina&sede`), `fichaDeClase`, `edicionDeClase`, `clase`,

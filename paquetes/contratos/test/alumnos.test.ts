@@ -68,6 +68,12 @@ describe("fichaDeAlumno", () => {
     expect(fichaDeAlumno.safeParse({ ...ficha, fechaDeInicio: "01/03/2024" }).success).toBe(false);
   });
 
+  it("el profe asignado es opcional: un uuid o null", () => {
+    expect(fichaDeAlumno.parse({ ...ficha, profeId: UUID }).profeId).toBe(UUID);
+    expect(fichaDeAlumno.parse({ ...ficha, profeId: null }).profeId).toBeNull();
+    expect(fichaDeAlumno.safeParse({ ...ficha, profeId: "lore" }).success).toBe(false);
+  });
+
   it("la edición lleva la versión que se vio", () => {
     expect(edicionDeAlumno.safeParse(ficha).success).toBe(false);
     expect(edicionDeAlumno.parse({ ...ficha, version: 3 })).toEqual({ ...ficha, version: 3 });
@@ -81,6 +87,7 @@ describe("alumno", () => {
       id: UUID,
       numeroDeSocio: 283,
       fechaDeInicio: null,
+      profeId: null,
       activo: true,
       bajaEn: null,
       pendienteDeCompletar: false,

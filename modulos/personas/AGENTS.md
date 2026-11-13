@@ -19,6 +19,7 @@ salud (patologías), aparte de la ficha y con permisos propios (0019).
 
 - `@app/nucleo`
 - `@app/plataforma`
+- `@app/identidad` (el profe asignado es un usuario del equipo: `obtenerUsuarios`, 0022)
 - `@app/contratos` (rutas HTTP)
 
 ## API pública
@@ -33,7 +34,9 @@ algo puede fallar por una regla.
 - `crearAlumno(tx, ficha)` y `editarAlumno(tx, { ...ficha, id, version })`. Sin
   `numeroDeSocio`, el alta toma el siguiente del centro y la edición conserva el que tenía; sin
   `fechaDeInicio`, la edición conserva la que tenía (así el formulario que todavía no los manda no
-  los borra). Cada alumno trae además `bajaEn` y `pendienteDeCompletar` (sin celular).
+  los borra). Lo mismo con `profeId`, el profe asignado: un usuario activo del equipo del centro
+  (`profe-invalido` si no). Cada alumno trae además `bajaEn` y `pendienteDeCompletar` (sin
+  celular).
 - `fijarActivo(tx, { id, activo }, alDarDeBaja?)`: baja y reactivación. Al dar de baja corre
   `alDarDeBaja(tx, { alumnoId, ahora })` en la misma transacción: si falla, la baja no queda.
 - `rutasDeAlumnos(base, { alDarDeBaja? })`: la API le pasa `liberarLugares` de `agenda`, así la
@@ -86,7 +89,6 @@ _Ninguna por ahora._ `recuperarEnOtraSede` (0011) llega con `asistencia`.
 
 ## Pendientes
 
-- El profe asignado a cada alumno (lo trae la planilla): cuando exista la ficha del profe (0022).
 - Importar la planilla de los 277 alumnos (0022).
 
 - Exportar o borrar los datos de un alumno que lo pida (Ley 25.326, derecho de supresión).

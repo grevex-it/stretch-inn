@@ -33,9 +33,10 @@ function normalizarFicha(datos: DatosDeAlumno): DatosDeAlumno {
 }
 
 /** Lo que no vino queda sin venir; la fecha de inicio vacía, en null. */
-function normalizarPlanilla({ numeroDeSocio, fechaDeInicio }: DatosDeAlumno) {
+function normalizarPlanilla({ numeroDeSocio, fechaDeInicio, profeId }: DatosDeAlumno) {
   return {
     ...(numeroDeSocio === undefined ? {} : { numeroDeSocio }),
+    ...(profeId === undefined ? {} : { profeId }),
     ...(fechaDeInicio === undefined ? {} : { fechaDeInicio: vacioANull(fechaDeInicio) }),
   };
 }

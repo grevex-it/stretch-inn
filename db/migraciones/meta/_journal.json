@@ -302,6 +302,20 @@
       "when": 1794607761240,
       "tag": "20261113220921_rls-profes-de-sede",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1794609041637,
+      "tag": "20261113223041_profe-asignado",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1794609043097,
+      "tag": "20261113223043_fk-profe-asignado",
+      "breakpoints": true
     }
   ]
 }
