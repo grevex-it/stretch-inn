@@ -36,11 +36,11 @@ El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-impleme
   activo.
 - **Material para profesores:** alojar y reproducir hasta 150 clases en video necesita un servicio
   de almacenamiento y streaming. Su costo tiene que entrar en la mensualidad.
-- **Camas por sede** (pedido del 12/11): la cantidad de camas de cada sede tiene que ser
-  variable y ajustable desde el panel. Hoy el cupo es de cada clase (`agenda`), se edita desde el
-  panel y no puede quedar debajo de los inscriptos. Falta la cantidad de camas de la sede: el
-  cupo por defecto de sus clases nuevas y el tope de todas. Al bajarla, ninguna clase puede
-  quedar con más inscriptos que camas.
+- **Camas por sede** (pedido del 12/11): la API ya está (`agenda`, `GET`/`PUT
+/agenda/sedes/:id/camas`). Son el tope del cupo de todas las clases de la sede; al bajarlas,
+  las clases con más cupo bajan con ellas, salvo que dejen afuera a un fijo o a una recuperación.
+  Falta en el panel: el formulario de camas de la sede, y usarlas como cupo por defecto al crear
+  una clase. **[SUPUESTO]** Subir las camas no sube el cupo de las clases que ya existen.
 - **Licencias por sede** (0009): la mensualidad cambia por sede (base, sede nueva) y hay un alta
   por sede nueva.
 

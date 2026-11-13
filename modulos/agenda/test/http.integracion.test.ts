@@ -1,5 +1,6 @@
 // Rutas /agenda sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // agenda. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula con una real.
+import { camasDeSede } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearAlumno } from "@app/personas";
 import { crearBase, enContexto, type Base } from "@app/plataforma";
@@ -69,7 +70,28 @@ describe("rutas de la agenda", () => {
       "GET /agenda/clases/:id/inscriptos": "agenda.ver",
       "DELETE /agenda/inscripciones/:id": "agenda.inscribir",
       "GET /alumnos/:id/clases": "agenda.ver",
+      "GET /agenda/sedes/:id/camas": "agenda.ver",
+      "PUT /agenda/sedes/:id/camas": "agenda.gestionar",
     });
+  });
+
+  it("las camas de la sede: se leen y se cambian con el contrato; pasarlas da 409", async () => {
+    const centro = await centroConDosSedes(base, { norte: TODO, sur: [] });
+    const { servidor } = await app(centro.ctx);
+    const url = `/agenda/sedes/${centro.norte}/camas`;
+
+    expect(camasDeSede.parse((await servidor.inject({ url })).json())).toEqual({ camas: null });
+    const fijar = await servidor.inject({ method: "PUT", url, payload: { camas: 10 } });
+    expect(fijar.statusCode).toBe(204);
+    expect(camasDeSede.parse((await servidor.inject({ url })).json())).toEqual({ camas: 10 });
+    const grande = await servidor.inject({
+      method: "POST",
+      url: "/agenda/clases",
+      payload: { ...STRETCHING, cupo: 11, sedeId: centro.norte },
+    });
+    expect(grande.statusCode).toBe(409);
+    const mal = await servidor.inject({ method: "PUT", url, payload: { camas: 1.5 } });
+    expect(mal.statusCode).toBe(400);
   });
 
   it("inscribir con 201, la clase completa con 409, las clases del alumno y la baja con 204", async () => {

@@ -9,6 +9,7 @@ import {
   type Permiso,
 } from "@app/nucleo";
 import type { Resultado } from "@app/nucleo";
+import { cupoEnCamas } from "../dominio/camas.ts";
 import { limpiarClase } from "../dominio/clase.ts";
 import { cupoPosible, entraEnLasFechas } from "../dominio/inscripcion.ts";
 import { cambioDeHorario } from "../dominio/ocurrencias.ts";
@@ -51,6 +52,8 @@ export async function crear(
   if (!puedeEn(quien, GESTIONAR, sedeId)) return SIN_PERMISO;
   const clase = limpiarClase(datos);
   if (!clase.ok) return clase;
+  const enCamas = cupoEnCamas(clase.valor.cupo, await repo.camas(sedeId));
+  if (!enCamas.ok) return enCamas;
   return ok(await repo.crearClase(sedeId, clase.valor));
 }
 
@@ -62,6 +65,24 @@ async function claseGestionable(repo: RepositorioAgenda, quien: ContextoCentro, 
   const clase = await repo.clase(claseId, true);
   if (clase === undefined) return CLASE_INEXISTENTE;
   return puedeEn(quien, GESTIONAR, clase.sedeId) ? ok(clase) : SIN_PERMISO;
+}
+
+/**
+ * El cupo nuevo no deja afuera a los fijos, no pasa las camas de la sede y, si baja, no deja
+ * afuera a las recuperaciones de una fecha futura.
+ */
+async function cupoNuevo(
+  repo: RepositorioAgenda,
+  ahora: Date,
+  actual: Clase,
+  cupo: number,
+): Promise<Resultado<null, ErrorDeAgenda>> {
+  const fijos = cupoPosible(cupo, actual.inscriptos);
+  if (!fijos.ok) return fijos;
+  const enCamas = cupoEnCamas(cupo, await repo.camas(actual.sedeId));
+  if (!enCamas.ok || cupo >= actual.cupo) return enCamas;
+  const masOcupada = await repo.masOcupadaFutura([actual.id], ahora);
+  return entraEnLasFechas(cupo, actual.inscriptos, masOcupada);
 }
 
 /**
@@ -78,13 +99,8 @@ export async function editar(
   if (!actual.ok) return actual;
   const clase = limpiarClase(datos);
   if (!clase.ok) return clase;
-  const cupo = cupoPosible(clase.valor.cupo, actual.valor.inscriptos);
+  const cupo = await cupoNuevo(repo, ahora, actual.valor, clase.valor.cupo);
   if (!cupo.ok) return cupo;
-  if (clase.valor.cupo < actual.valor.cupo) {
-    const masOcupada = await repo.masOcupadaFutura(claseId, ahora);
-    const enLasFechas = entraEnLasFechas(clase.valor.cupo, actual.valor.inscriptos, masOcupada);
-    if (!enLasFechas.ok) return enLasFechas;
-  }
   const nueva = await repo.actualizarClase(claseId, version, clase.valor);
   if (nueva === undefined) {
     return falla("cambio-concurrente", "Esta clase cambió mientras la editabas. Volvé a cargarla.");
