@@ -7,7 +7,8 @@ export type ErrorDeInscripcion =
   | "clase-inactiva"
   | "alumno-inexistente"
   | "alumno-de-baja"
-  | "cupo-menor-que-inscriptos";
+  | "cupo-menor-que-inscriptos"
+  | "fecha-completa";
 
 export function puedeInscribirse(
   clase: { activa: boolean; cupo: number; inscriptos: number },
@@ -30,4 +31,21 @@ export function cupoPosible(cupo: number, inscriptos: number): Resultado<null, E
     );
   }
   return ok(null);
+}
+
+/**
+ * Los fijos más las recuperaciones de más de la fecha futura más ocupada no pueden pasar el cupo:
+ * la recuperación ya tiene su lugar reservado en esa fecha.
+ */
+export function entraEnLasFechas(
+  cupo: number,
+  fijos: number,
+  masOcupada: { fecha: string; deMas: number } | undefined,
+): Resultado<null, ErrorDeInscripcion> {
+  if (masOcupada === undefined || fijos + masOcupada.deMas <= cupo) return ok(null);
+  const [anio, mes, dia] = masOcupada.fecha.split("-");
+  return falla(
+    "fecha-completa",
+    `El ${dia ?? ""}/${mes ?? ""}/${anio ?? ""} no queda lugar: lo ocupan recuperaciones.`,
+  );
 }

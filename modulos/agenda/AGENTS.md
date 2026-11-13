@@ -26,8 +26,10 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 
 ## API pública
 
-- `crearAgenda(base, { ahora? })`: devuelve `Agenda`. Cada operación recibe el `ContextoCentro`
-  de quien la pide y corre en su propia transacción:
+- `crearAgenda(base, { ahora?, ocupadasDeMas? })`: devuelve `Agenda`. `ocupadasDeMas` dice
+  cuántos lugares ocupan de más las recuperaciones en cada fecha; lo conecta la API con
+  `asistencia` (sin él, no se cuentan). Cada operación recibe el `ContextoCentro` de quien la
+  pide y corre en su propia transacción:
   - `clases(quien, { pagina, porPagina, sedeId? })`: las de las sedes donde puede ver la agenda.
   - `crearClase(quien, { sedeId, nombre, dia, hora, duracionMinutos, cupo })`.
   - `editarClase(quien, { id, version, … })`: la sede no se cambia.
@@ -91,6 +93,11 @@ Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContex
   `for update`; el contador `inscriptos` se mueve en la misma transacción, y la restricción
   `clases_inscriptos` (0 ≤ inscriptos ≤ cupo) es la última barrera. Bajar el cupo por debajo de
   los inscriptos se rechaza.
+- **Tampoco con recuperaciones:** inscribir y bajar el cupo miran las fechas futuras no
+  canceladas de la clase (las primeras 100) y rechazan (`fecha-completa`, con la fecha) si los
+  fijos más las recuperaciones de más de alguna pasan el cupo. Las fechas quedan tomadas con el
+  bloqueo de `asistencia` hasta el fin de la transacción: una recuperación no gana el lugar en
+  el medio.
 - Un alumno tiene a lo sumo una inscripción vigente por clase (índice único parcial). La baja
   no borra: marca `baja_en`.
 - Una inscripción está vigente en un momento si se creó antes (o en ese momento) y no tiene baja

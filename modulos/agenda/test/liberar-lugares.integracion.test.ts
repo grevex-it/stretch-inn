@@ -88,16 +88,19 @@ describe("liberarLugares", () => {
 
   it("no toca a los demás alumnos y conserva la historia anterior a la baja", async () => {
     const { ctx, lunes, ana, bea } = await escenario();
+    // La baja, un segundo después de `antes`: con dos new Date() seguidos pueden caer en el mismo
+    // milisegundo, y una baja en ese mismo momento ya no la deja vigente.
     const antes = new Date();
+    const baja = new Date(antes.getTime() + 1000);
 
-    await enContexto(base, ctx, (tx) => liberarLugares(tx, { alumnoId: ana, ahora: new Date() }));
+    await enContexto(base, ctx, (tx) => liberarLugares(tx, { alumnoId: ana, ahora: baja }));
 
     const enAquelMomento = await enContexto(base, ctx, (tx) =>
       inscriptosEnFecha(tx, { claseId: lunes, momento: antes, ...PRIMERA }),
     );
     expect(enAquelMomento.elementos.map((i) => i.alumnoId)).toEqual([ana, bea]);
     const ahora = await enContexto(base, ctx, (tx) =>
-      inscriptosEnFecha(tx, { claseId: lunes, momento: new Date(), ...PRIMERA }),
+      inscriptosEnFecha(tx, { claseId: lunes, momento: baja, ...PRIMERA }),
     );
     expect(ahora.elementos.map((i) => i.alumnoId)).toEqual([bea]);
   });

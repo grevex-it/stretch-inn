@@ -115,7 +115,4 @@ por defecto, `src/dominio/reglas.ts`).
   límite después. Si Stretch Inn quiere cerrar la planilla, va como configuración por centro.
 - Borrar la tabla `creditos` y la columna `recuperaciones.credito_id`, en desuso desde 0020 (dos
   pasos, `db/AGENTS.md`).
-- **Hueco conocido:** si `agenda` inscribe a alguien en una clase que ya tiene recuperaciones
-  en una fecha futura, esa fecha puede pasarse del cupo. `ocupadasDeMas` ya está; falta que
-  `agenda` la consulte al inscribir y al bajar el cupo.
 - El alumno avisando y recuperando desde el portal (Fase 4): otro actor, con sus propias reglas.

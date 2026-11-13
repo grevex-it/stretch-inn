@@ -1,5 +1,6 @@
 // Lo que la agenda necesita de afuera (ver docs/decisiones/0003): la base y el reloj.
 import type { ContextoCentro, Resultado } from "@app/nucleo";
+import type { Transaccion } from "@app/plataforma";
 import type { DatosDeClase, ErrorDeClase } from "../dominio/clase.ts";
 import type { ErrorDeInscripcion } from "../dominio/inscripcion.ts";
 
@@ -66,7 +67,24 @@ export interface RepositorioAgenda {
   borrarFechas(ids: readonly string[]): Promise<void>;
   fecha(id: string): Promise<{ sedeId: string; empiezaEn: Date } | undefined>;
   fijarCancelada(id: string, cancelada: boolean): Promise<void>;
+  /**
+   * La fecha futura no cancelada de la clase con más lugares ocupados de más por recuperaciones,
+   * con las fechas tomadas; undefined si no hay ninguna (o la agenda no tiene el puerto).
+   */
+  masOcupadaFutura(
+    claseId: string,
+    ahora: Date,
+  ): Promise<{ fecha: string; deMas: number } | undefined>;
 }
+
+/**
+ * Cuántos lugares ocupan de más las recuperaciones en cada fecha (hasta 100), con las fechas
+ * tomadas hasta el fin de la transacción. Es de asistencia: lo conecta la API.
+ */
+export type OcupadasDeMas = (
+  tx: Transaccion,
+  pedido: { ocurrenciaIds: readonly string[] },
+) => Promise<Map<string, number>>;
 
 export type ErrorDeAgenda =
   | ErrorDeClase

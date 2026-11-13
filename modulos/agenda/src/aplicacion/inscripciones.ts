@@ -1,7 +1,7 @@
 // Casos de uso de las inscripciones fijas. El cupo se protege con la clase bloqueada (`for
 // update`) y con la restricción clases_inscriptos de la base, la última barrera (0013).
 import { falla, ok, sedesVisibles, type ContextoCentro, type Resultado } from "@app/nucleo";
-import { puedeInscribirse } from "../dominio/inscripcion.ts";
+import { entraEnLasFechas, puedeInscribirse } from "../dominio/inscripcion.ts";
 import { INSCRIBIR, VER } from "../dominio/permisos.ts";
 import { puedeEn, SIN_PERMISO } from "./clases.ts";
 import type {
@@ -28,6 +28,7 @@ const INEXISTENTE = falla("inscripcion-inexistente", "Esa inscripción no existe
 export async function inscribir(
   repos: Repositorios,
   quien: ContextoCentro,
+  ahora: Date,
   { claseId, alumnoId }: { claseId: string; alumnoId: string },
 ): Promise<Resultado<{ id: string }, ErrorDeAgenda>> {
   const clase = await repos.agenda.clase(claseId, true);
@@ -35,6 +36,9 @@ export async function inscribir(
   if (!puedeEn(quien, INSCRIBIR, clase.sedeId)) return SIN_PERMISO;
   const regla = puedeInscribirse(clase, await repos.inscripciones.alumno(alumnoId));
   if (!regla.ok) return regla;
+  const masOcupada = await repos.agenda.masOcupadaFutura(claseId, ahora);
+  const enLasFechas = entraEnLasFechas(clase.cupo, clase.inscriptos + 1, masOcupada);
+  if (!enLasFechas.ok) return enLasFechas;
   const id = await repos.inscripciones.inscribir({ claseId, sedeId: clase.sedeId, alumnoId });
   if (id === undefined) return falla("ya-inscripto", "Ese alumno ya está inscripto en esta clase.");
   await repos.inscripciones.sumarInscriptos(claseId, 1);
