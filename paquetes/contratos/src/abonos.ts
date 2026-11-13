@@ -67,6 +67,8 @@ export const cuota = z.object({
   monto: z.number().int(),
   /** En UTC; null mientras no se pagó. */
   pagadaEn: z.iso.datetime().nullable(),
+  /** El pago de caja que la saldó: con ese id se anula desde la ficha (0019). */
+  pagoId: z.uuid().nullable(),
 });
 
 /** Respuesta de GET /alumnos/:id/cuotas: la más nueva primero. */
@@ -77,7 +79,7 @@ export const pedidoDeImpagas = z
   .object({ pagina: numeroDePagina, sede: z.uuid("Esa sede no existe.") })
   .transform(({ pagina, sede }) => ({ pagina, porPagina: POR_PAGINA, sedeId: sede }));
 
-export const cuotaImpaga = cuota.omit({ pagadaEn: true }).extend({
+export const cuotaImpaga = cuota.omit({ pagadaEn: true, pagoId: true }).extend({
   /** null si el alumno ya no está en el centro. */
   alumno: z.object({ nombre: z.string(), apellido: z.string(), activo: z.boolean() }).nullable(),
 });

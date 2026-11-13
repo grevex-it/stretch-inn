@@ -9,10 +9,11 @@ import {
   planCreado,
 } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
-import { crearBase, type Base } from "@app/plataforma";
+import { crearBase, enContexto, type Base } from "@app/plataforma";
+import { randomUUID } from "node:crypto";
 import Fastify, { type FastifyContextConfig } from "fastify";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
-import { crearAbonos, rutasDeAbonos } from "../src/index.ts";
+import { crearAbonos, registrarPago, rutasDeAbonos } from "../src/index.ts";
 import { centroConDosSedes } from "./ayudas.ts";
 
 let base: Base;
@@ -104,17 +105,29 @@ describe("rutas de los abonos", () => {
     expect(repetida.statusCode).toBe(409);
     const lista = await servidor.inject({ url: `/alumnos/${ana}/cuotas` });
     expect(paginaDeCuotas.parse(lista.json()).total).toBe(1);
+    expect(paginaDeCuotas.parse(lista.json()).elementos[0]?.pagoId).toBeNull();
+
+    // Pagada, trae su pago: con ese id se anula desde la ficha, sin ver la caja (0019).
+    const { id: cuotaId } = cuotaGenerada.parse(cuota.json());
+    const pagoId = randomUUID();
+    await enContexto(base, ctx, (tx) =>
+      registrarPago(tx, { cuotaId, pagoId, en: new Date("2026-11-15T13:00:00Z") }),
+    );
+    const pagada = paginaDeCuotas.parse(
+      (await servidor.inject({ url: `/alumnos/${ana}/cuotas` })).json(),
+    );
+    expect(pagada.elementos[0]).toMatchObject({ pagoId, pagadaEn: "2026-11-15T13:00:00.000Z" });
 
     const abono = await servidor.inject({ url: `/alumnos/${ana}/abono?sede=${norte}` });
     expect(abono.statusCode).toBe(200);
-    // Sin horario fijo, no se usó ninguna clase y no se sabe cuándo termina.
+    // Sin horario fijo, no se usó ninguna clase y no se sabe cuándo termina. Ya se pagó arriba.
     expect(abonoDelAlumno.parse(abono.json()).abono).toMatchObject({
       desde: "2026-11-15",
       clases: 4,
       usadas: 0,
       restantes: 4,
       fin: null,
-      pagada: false,
+      pagada: true,
     });
     const sinSede = await servidor.inject({ url: `/alumnos/${ana}/abono` });
     expect(sinSede.statusCode).toBe(400);

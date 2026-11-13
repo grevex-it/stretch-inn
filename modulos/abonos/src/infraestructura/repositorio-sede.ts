@@ -18,6 +18,7 @@ const columnas = {
   clases: cuotas.clases,
   monto: cuotas.monto,
   pagadaEn: cuotas.pagadaEn,
+  pagoId: cuotas.pagoId,
 };
 
 export function repositorioSede(tx: Transaccion): RepositorioSede {

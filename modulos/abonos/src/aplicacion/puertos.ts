@@ -36,6 +36,8 @@ export interface Cuota {
   clases: number;
   monto: Dinero;
   pagadaEn: Date | null;
+  /** El pago de caja que la saldó: con ese id se anula desde la ficha (0019). */
+  pagoId: string | null;
 }
 
 /** El abono actual de un alumno en una sede (0020): cada fecha que terminó gastó una clase. */
@@ -47,7 +49,7 @@ export interface AbonoDelAlumno extends EstadoDelAbono {
 }
 
 /** Una cuota sin pagar, con el alumno (null si personas no lo devuelve). */
-interface CuotaImpaga extends Omit<Cuota, "pagadaEn"> {
+interface CuotaImpaga extends Omit<Cuota, "pagadaEn" | "pagoId"> {
   alumno: { nombre: string; apellido: string; activo: boolean } | null;
 }
 
@@ -97,7 +99,7 @@ export interface RepositorioAbonos {
     hoy: string;
   }): Promise<Cuota | undefined>;
   /** El id de la cuota nueva, o undefined si ya tenía una vigente desde ese día. */
-  generarCuota(cuota: Omit<Cuota, "id" | "pagadaEn">): Promise<string | undefined>;
+  generarCuota(cuota: Omit<Cuota, "id" | "pagadaEn" | "pagoId">): Promise<string | undefined>;
   /** La cuota vigente (sin anular), tomada hasta el fin de la transacción si `bloquear`. */
   cuota(id: string, bloquear?: boolean): Promise<Cuota | undefined>;
   anularCuota(id: string, ahora: Date): Promise<void>;

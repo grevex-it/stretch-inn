@@ -55,6 +55,7 @@ it("muestra el inicio y las clases de la cuota, y cobra con efectivo o transfere
             clases: 4,
             monto: 28_000,
             pagadaEn: null,
+            pagoId: null,
           },
         ],
       },

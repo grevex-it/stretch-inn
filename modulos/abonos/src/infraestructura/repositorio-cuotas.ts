@@ -30,6 +30,7 @@ const columnas = {
   clases: cuotas.clases,
   monto: cuotas.monto,
   pagadaEn: cuotas.pagadaEn,
+  pagoId: cuotas.pagoId,
 };
 
 const vigente = (id: string) => and(eq(cuotas.id, id), isNull(cuotas.anuladaEn));

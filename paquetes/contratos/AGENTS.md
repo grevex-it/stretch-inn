@@ -52,7 +52,8 @@ acuerdo.
   `recuperacionId` para anularla) y `lugares`.
 - `fichaDePlan`, `edicionDePlan`, `plan`, `paginaDePlanes`, `planCreado`, `planEditado`,
   `pedidoDePrecioDeSede`, `pedidoDeCuota` (día de inicio opcional `desde`, AAAA-MM-DD),
-  `cuotaGenerada`, `cuota` (con `desde` y `clases`) y `paginaDeCuotas`, con sus tipos. El plan
+  `cuotaGenerada`, `cuota` (con `desde`, `clases` y `pagoId`, el pago que la saldó: con él se anula
+  desde la ficha) y `paginaDeCuotas`, con sus tipos. El plan
   lleva `clases` (1 a 100). Los montos van en pesos enteros.
 - `pedidoDeImpagas` (query `?sede&pagina`), `cuotaImpaga` y `paginaDeImpagas` (con `adeudado`),
   con sus tipos.
