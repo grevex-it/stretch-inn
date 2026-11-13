@@ -18,6 +18,8 @@ export interface PaginaDe<T> extends Pagina {
 export interface Clase extends DatosDeClase {
   id: string;
   sedeId: string;
+  /** El profe (un usuario del equipo, 0022), o null. */
+  profeId: string | null;
   activa: boolean;
   /** Inscripciones vigentes: nunca más que el cupo. */
   inscriptos: number;
@@ -37,6 +39,8 @@ export interface FechaDeClase {
   empiezaEn: Date;
   terminaEn: Date;
   cancelada: boolean;
+  /** Quién la da: el reemplazo de la fecha, o el profe de la clase. */
+  profeId: string | null;
 }
 
 /** Corre dentro de enContexto: RLS limita al centro y a las sedes visibles. */
@@ -46,9 +50,26 @@ export interface RepositorioAgenda {
   /** Con `bloquear`, la fila queda tomada hasta el fin de la transacción (`for update`). */
   clase(id: string, bloquear?: boolean): Promise<(Clase & { creadaEn: Date }) | undefined>;
   clasesActivasDeSede(sedeId: string): Promise<(Clase & { creadaEn: Date })[]>;
-  crearClase(sedeId: string, datos: DatosDeClase): Promise<{ id: string }>;
-  /** La versión nueva, o undefined si la clase cambió en el medio. */
-  actualizarClase(id: string, version: number, datos: DatosDeClase): Promise<number | undefined>;
+  crearClase(sedeId: string, datos: DatosDeClase, profeId: string | null): Promise<{ id: string }>;
+  /** La versión nueva, o undefined si la clase cambió en el medio. Sin profe, lo conserva. */
+  actualizarClase(
+    id: string,
+    version: number,
+    datos: DatosDeClase,
+    profeId?: string | null,
+  ): Promise<number | undefined>;
+  /** Si es un usuario activo del centro (identidad). */
+  profeValido(id: string): Promise<boolean>;
+  /** El profe fijo de la sede, o undefined. */
+  profeDeSede(sedeId: string): Promise<string | undefined>;
+  guardarProfeDeSede(sedeId: string, profeId: string | null): Promise<void>;
+  /** Con null, la fecha vuelve a ser del profe de la clase. */
+  fijarProfeDeFecha(id: string, profeId: string | null): Promise<void>;
+  /**
+   * Las fechas que ya empezaron y no tenían profe propio quedan con ese (el que tenía la clase):
+   * cambiar el profe de la clase no cambia quién dio las pasadas.
+   */
+  congelarProfe(claseId: string, profeId: string | null, ahora: Date): Promise<void>;
   fijarActiva(id: string, activa: boolean): Promise<void>;
   /** Las que falten; las que ya están no se tocan (sin efecto doble). */
   guardarFechas(
@@ -110,10 +131,17 @@ export type ErrorDeAgenda =
   | "clase-inexistente"
   | "fecha-inexistente"
   | "fecha-pasada"
-  | "cambio-concurrente";
+  | "cambio-concurrente"
+  | "profe-invalido";
 
-export type NuevaClase = DatosDeClase & { sedeId: string };
-export type EdicionDeClase = DatosDeClase & { id: string; version: number };
+/** Sin `profeId`, la clase toma el profe fijo de la sede; con null, queda sin profe. */
+export type NuevaClase = DatosDeClase & { sedeId: string; profeId?: string | null | undefined };
+/** Sin `profeId`, conserva el que tenía. */
+export type EdicionDeClase = DatosDeClase & {
+  id: string;
+  version: number;
+  profeId?: string | null | undefined;
+};
 
 /** Lo que exporta el módulo: cada operación corre en su transacción con el contexto. */
 export interface Agenda {
@@ -166,6 +194,21 @@ export interface Agenda {
   fijarCamas(
     quien: ContextoCentro,
     cambio: { sedeId: string; camas: number | null },
+  ): Promise<Resultado<null, ErrorDeAgenda>>;
+  /** El profe fijo de la sede (0022), o null. */
+  profeDeSede(
+    quien: ContextoCentro,
+    pedido: { sedeId: string },
+  ): Promise<Resultado<string | null, ErrorDeAgenda>>;
+  /** Con null, la sede queda sin profe fijo. */
+  fijarProfeDeSede(
+    quien: ContextoCentro,
+    cambio: { sedeId: string; profeId: string | null },
+  ): Promise<Resultado<null, ErrorDeAgenda>>;
+  /** Un reemplazo en una fecha; con null, vuelve a ser del profe de la clase. */
+  fijarProfeDeFecha(
+    quien: ContextoCentro,
+    cambio: { id: string; profeId: string | null },
   ): Promise<Resultado<null, ErrorDeAgenda>>;
   /** Las inscripciones vigentes del alumno, en las sedes donde se puede ver la agenda. */
   clasesDeAlumno(

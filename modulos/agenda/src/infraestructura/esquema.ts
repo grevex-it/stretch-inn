@@ -36,6 +36,8 @@ export const clases = pgTable(
      * clase bloqueada; la restricción `clases_inscriptos` es la última barrera del cupo (0013).
      */
     inscriptos: integer("inscriptos").notNull().default(0),
+    /** El profe (un usuario del equipo, 0022): null si no tiene. */
+    profeId: uuid("profe_id"),
     /** La baja no borra: deja de tener fechas nuevas y conserva las pasadas. */
     activa: boolean("activa").notNull().default(true),
     creadoEn: timestamp("creado_en", { withTimezone: true }).notNull().defaultNow(),
@@ -93,6 +95,11 @@ export const ocurrencias = pgTable(
     terminaEn: timestamp("termina_en", { withTimezone: true }).notNull(),
     /** Feriado, profesor enfermo: queda marcada, no se borra. */
     cancelada: boolean("cancelada").notNull().default(false),
+    /**
+     * Quién la dio, si no es el profe de la clase: un reemplazo, o el profe que tenía la clase
+     * cuando se cambió (0022). null: el de la clase.
+     */
+    profeId: uuid("profe_id"),
   },
   (tabla) => [
     uniqueIndex("ocurrencias_clase_fecha").on(tabla.claseId, tabla.fecha),
@@ -119,3 +126,10 @@ export const camasDeSede = pgTable(
   },
   (tabla) => [check("camas_de_sede_camas", sql`${tabla.camas} between 1 and 500`)],
 );
+
+/** El profe fijo de una sede (0022): el de sus clases nuevas. Sin fila, no tiene. */
+export const profesDeSede = pgTable("profes_de_sede", {
+  sedeId: uuid("sede_id").primaryKey(),
+  centroId: uuid("centro_id").notNull(),
+  profeId: uuid("profe_id").notNull(),
+});

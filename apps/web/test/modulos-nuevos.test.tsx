@@ -30,6 +30,7 @@ it("abre Agenda y muestra los inscriptos de la clase elegida", async () => {
             hora: "09:00",
             duracionMinutos: 45,
             cupo: 8,
+            profeId: null,
             inscriptos: 1,
             activa: true,
             version: 1,

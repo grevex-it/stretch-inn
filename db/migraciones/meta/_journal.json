@@ -288,6 +288,20 @@
       "when": 1794541474729,
       "tag": "20261113034434_ficha-de-la-planilla",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1794607759629,
+      "tag": "20261113220919_profes-de-la-agenda",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1794607761240,
+      "tag": "20261113220921_rls-profes-de-sede",
+      "breakpoints": true
     }
   ]
 }

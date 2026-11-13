@@ -59,6 +59,7 @@ export {
   pedidoDeClases,
   pedidoDeInscripcion,
   pedidoDeOcurrencias,
+  profeDeSede,
   type CamasDeSede,
   type Clase,
   type ClaseDeAlumno,

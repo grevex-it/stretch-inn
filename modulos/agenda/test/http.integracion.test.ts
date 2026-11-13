@@ -1,6 +1,6 @@
 // Rutas /agenda sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // agenda. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula con una real.
-import { camasDeSede } from "@app/contratos";
+import { camasDeSede, profeDeSede } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearAlumno } from "@app/personas";
 import { crearBase, enContexto, type Base } from "@app/plataforma";
@@ -72,7 +72,34 @@ describe("rutas de la agenda", () => {
       "GET /alumnos/:id/clases": "agenda.ver",
       "GET /agenda/sedes/:id/camas": "agenda.ver",
       "PUT /agenda/sedes/:id/camas": "agenda.gestionar",
+      "GET /agenda/sedes/:id/profe": "agenda.ver",
+      "PUT /agenda/sedes/:id/profe": "agenda.gestionar",
+      "PUT /agenda/ocurrencias/:id/profe": "agenda.gestionar",
     });
+  });
+
+  it("el profe fijo de la sede y el de una fecha, con el contrato; uno inválido da 400", async () => {
+    const centro = await centroConDosSedes(base, { norte: TODO, sur: [] });
+    const { servidor } = await app(centro.ctx);
+    const url = `/agenda/sedes/${centro.norte}/profe`;
+    const yo = centro.ctx.actor.tipo === "usuario" ? centro.ctx.actor.usuarioId : "";
+
+    expect(profeDeSede.parse((await servidor.inject({ url })).json())).toEqual({ profeId: null });
+    const fijar = await servidor.inject({ method: "PUT", url, payload: { profeId: yo } });
+    expect(fijar.statusCode).toBe(204);
+    expect(profeDeSede.parse((await servidor.inject({ url })).json())).toEqual({ profeId: yo });
+    const invalido = await servidor.inject({
+      method: "PUT",
+      url,
+      payload: { profeId: randomUUID() },
+    });
+    expect(invalido.statusCode).toBe(400);
+    const sinFecha = await servidor.inject({
+      method: "PUT",
+      url: `/agenda/ocurrencias/${randomUUID()}/profe`,
+      payload: { profeId: null },
+    });
+    expect(sinFecha.statusCode).toBe(404);
   });
 
   it("las camas de la sede: se leen y se cambian con el contrato; pasarlas da 409", async () => {

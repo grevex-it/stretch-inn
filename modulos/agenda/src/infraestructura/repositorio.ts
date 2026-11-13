@@ -8,6 +8,7 @@ import type { OcupadasDeMas, RepositorioAgenda } from "../aplicacion/puertos.ts"
 import { clases, ocurrencias } from "./esquema.ts";
 import { lugaresFuturos } from "./lugares-futuros.ts";
 import { repositorioCamas } from "./repositorio-camas.ts";
+import { repositorioProfes } from "./repositorio-profes.ts";
 
 const ZONA_POR_DEFECTO = "America/Argentina/Buenos_Aires";
 
@@ -19,6 +20,7 @@ const columnasDeClase = {
   hora: clases.hora,
   duracionMinutos: clases.duracionMinutos,
   cupo: clases.cupo,
+  profeId: clases.profeId,
   inscriptos: clases.inscriptos,
   activa: clases.activa,
   version: clases.version,
@@ -68,18 +70,22 @@ function escriturasDeClases(
   tx: Transaccion,
 ): Pick<RepositorioAgenda, "crearClase" | "actualizarClase" | "fijarActiva"> {
   return {
-    async crearClase(sedeId, datos: DatosDeClase) {
+    async crearClase(sedeId, datos: DatosDeClase, profeId) {
       const [fila] = await tx
         .insert(clases)
-        .values({ ...datos, sedeId, centroId: sql`app_centro_actual()` })
+        .values({ ...datos, profeId, sedeId, centroId: sql`app_centro_actual()` })
         .returning({ id: clases.id });
       if (fila === undefined) throw new Error("La clase no se guardó.");
       return fila;
     },
-    async actualizarClase(id, version, datos) {
+    async actualizarClase(id, version, datos, profeId) {
       const [fila] = await tx
         .update(clases)
-        .set({ ...datos, version: sql`${clases.version} + 1` })
+        .set({
+          ...datos,
+          ...(profeId === undefined ? {} : { profeId }),
+          version: sql`${clases.version} + 1`,
+        })
         .where(and(eq(clases.id, id), eq(clases.version, version)))
         .returning({ version: clases.version });
       return fila?.version;
@@ -110,6 +116,7 @@ function lecturasDeFechas(
           empiezaEn: ocurrencias.empiezaEn,
           terminaEn: ocurrencias.terminaEn,
           cancelada: ocurrencias.cancelada,
+          profeId: sql<string | null>`coalesce(${ocurrencias.profeId}, ${clases.profeId})`,
         })
         .from(ocurrencias)
         .innerJoin(clases, eq(clases.id, ocurrencias.claseId))
@@ -187,5 +194,6 @@ export function repositorioAgenda(
     ...escriturasDeFechas(tx),
     ...lugaresFuturos(tx, ocupadasDeMas),
     ...repositorioCamas(tx),
+    ...repositorioProfes(tx),
   };
 }

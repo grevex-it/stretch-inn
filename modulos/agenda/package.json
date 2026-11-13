@@ -12,6 +12,7 @@
   "dependencies": {
     "@app/centros": "workspace:*",
     "@app/contratos": "workspace:*",
+    "@app/identidad": "workspace:*",
     "@app/nucleo": "workspace:*",
     "@app/personas": "workspace:*",
     "@app/plataforma": "workspace:*",
@@ -21,7 +22,6 @@
   },
   "devDependencies": {
     "@app/db": "workspace:*",
-    "@app/identidad": "workspace:*",
     "@types/pg": "^8.23.1",
     "pg": "^8.23.1"
   }

@@ -12,7 +12,7 @@ const CLAVE = "una clave bien larga";
 
 export const TODO = ["agenda.ver", "agenda.gestionar", "agenda.inscribir"];
 
-async function comoDueno(consulta: string, valores: unknown[] = []): Promise<void> {
+export async function comoDueno(consulta: string, valores: unknown[] = []): Promise<void> {
   const cliente = new pg.Client({ connectionString: inject("urlDueno") });
   await cliente.connect();
   try {

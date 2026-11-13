@@ -38,6 +38,7 @@ describe("clases", () => {
             ...STRETCHING,
             id: creada.valor.id,
             sedeId: norte,
+            profeId: null,
             activa: true,
             inscriptos: 0,
             version: 1,

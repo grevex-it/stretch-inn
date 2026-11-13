@@ -38,14 +38,25 @@ const datosDeClase = z.object({
   cupo: z.number("Revisá el cupo.").int("Revisá el cupo."),
 });
 
-export const fichaDeClase = datosDeClase.extend({ sedeId: sede });
+/** Un usuario del equipo (0022), o null: sin profe. */
+const profe = z.uuid("Ese profe no existe.").nullable();
 
-/** La edición lleva la versión que vio quien edita (0013). La sede no se cambia. */
-export const edicionDeClase = datosDeClase.extend({ version: z.number().int() });
+/** Sin `profeId`, la clase toma el profe fijo de la sede. */
+export const fichaDeClase = datosDeClase.extend({ sedeId: sede, profeId: profe.optional() });
+
+/**
+ * La edición lleva la versión que vio quien edita (0013). La sede no se cambia; sin `profeId`, el
+ * profe queda como estaba.
+ */
+export const edicionDeClase = datosDeClase.extend({
+  version: z.number().int(),
+  profeId: profe.optional(),
+});
 
 export const clase = datosDeClase.extend({
   id: z.uuid(),
   sedeId: z.uuid(),
+  profeId: z.uuid().nullable(),
   activa: z.boolean(),
   /** Inscripciones vigentes: nunca más que el cupo. */
   inscriptos: z.number().int(),
@@ -73,6 +84,8 @@ export const ocurrencia = z.object({
   empiezaEn: z.iso.datetime(),
   terminaEn: z.iso.datetime(),
   cancelada: z.boolean(),
+  /** Quién la da: el reemplazo de la fecha, o el profe de la clase. */
+  profeId: z.uuid().nullable(),
 });
 
 export const paginaDeOcurrencias = paginaDe(ocurrencia);
@@ -117,6 +130,12 @@ export const camasDeSede = z.object({
     .max(500, "Las camas van de 1 a 500.")
     .nullable(),
 });
+
+/**
+ * Cuerpo de PUT y respuesta de GET /agenda/sedes/:id/profe (el profe fijo de la sede), y cuerpo de
+ * PUT /agenda/ocurrencias/:id/profe (el reemplazo de una fecha; null vuelve al de la clase).
+ */
+export const profeDeSede = z.object({ profeId: profe });
 
 export type PedidoDeClases = z.infer<typeof pedidoDeClases>;
 export type PedidoDeOcurrencias = z.infer<typeof pedidoDeOcurrencias>;
