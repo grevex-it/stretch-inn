@@ -1,6 +1,7 @@
 // Rutas /asistencia. El permiso en la sede de la fecha lo controla el módulo (0007).
 import {
   pedidoDeAsistencia,
+  pedidoDeAusencias,
   pedidoDeAviso,
   pedidoDePagina,
   pedidoDeRecuperacion,
@@ -18,6 +19,7 @@ const avisar = { permiso: "asistencia.avisar" } as const;
 const recuperar = { permiso: "asistencia.recuperar" } as const;
 const conId = z.object({ id: z.uuid("Esa fecha no existe.") });
 const avisoConId = z.object({ id: z.uuid("Ese aviso no existe.") });
+const alumnoConId = z.object({ id: z.uuid("Ese alumno no existe.") });
 const sedeConId = z.object({ id: z.uuid("Esa sede no existe.") });
 const configurar = { permiso: "asistencia.configurar" } as const;
 const recuperacionConId = z.object({ id: z.uuid("Esa recuperación no existe.") });
@@ -64,6 +66,18 @@ function rutasDeAvisos(app: FastifyInstance, asistencia: Asistencia): void {
     const resultado = await asistencia.avisar(contextoDe(pedido), {
       fechaId: fecha.id,
       alumnoId: datos.alumnoId,
+    });
+    return enviar(respuesta, resultado, 201);
+  });
+
+  // El viaje (0022): avisa de una vez las fechas de su horario fijo en un período.
+  app.post("/asistencia/alumnos/:id/ausencias", { config: avisar }, async (pedido, respuesta) => {
+    const alumno = leer(alumnoConId, pedido.params, respuesta);
+    const periodo = alumno && leer(pedidoDeAusencias, pedido.body, respuesta);
+    if (alumno === undefined || periodo === undefined) return respuesta;
+    const resultado = await asistencia.avisarPeriodo(contextoDe(pedido), {
+      ...periodo,
+      alumnoId: alumno.id,
     });
     return enviar(respuesta, resultado, 201);
   });

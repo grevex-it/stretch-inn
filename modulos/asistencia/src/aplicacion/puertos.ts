@@ -93,6 +93,21 @@ export interface RepositorioAsistencia {
     alumnoId: string,
     registro: Registro,
   ): Promise<string | undefined>;
+  /**
+   * Las primeras fechas del horario fijo del alumno en la sede desde ese día (agenda, hasta 100):
+   * sin las canceladas ni las de clases en las que no estaba inscripto.
+   */
+  fechasDeAlumno(pedido: {
+    alumnoId: string;
+    sedeId: string;
+    desde: string;
+  }): Promise<{ id: string; fecha: string; empiezaEn: Date }[]>;
+  /** Avisa todas esas fechas de la sede en una sola consulta; las ya avisadas no cuentan. */
+  avisarVarias(
+    fechas: readonly { id: string; sedeId: string }[],
+    alumnoId: string,
+    registro: Registro,
+  ): Promise<number>;
   /** El aviso vigente, o undefined si no existe o ya se anuló. */
   aviso(id: string): Promise<{ ocurrenciaId: string } | undefined>;
   /** false si ya estaba anulado (otra anulación ganó la carrera). */
@@ -151,6 +166,8 @@ export type ErrorDeAsistencia =
   | "sin-permiso"
   | "no-inscripto"
   | "ya-avisado"
+  | "periodo-invalido"
+  | "sin-fechas"
   | "aviso-inexistente"
   | ErrorDeRecuperacion
   | "ya-recupera"
@@ -177,6 +194,14 @@ export interface Asistencia {
     quien: ContextoCentro,
     aviso: { fechaId: string; alumnoId: string },
   ): Promise<Resultado<{ id: string }, ErrorDeAsistencia>>;
+  /**
+   * El viaje (0022): avisa cada fecha de su horario fijo en la sede entre dos días (inclusive)
+   * que todavía no empezó. Devuelve cuántos avisos nuevos hizo.
+   */
+  avisarPeriodo(
+    quien: ContextoCentro,
+    periodo: { alumnoId: string; sedeId: string; desde: string; hasta: string },
+  ): Promise<Resultado<{ avisos: number }, ErrorDeAsistencia>>;
   /** Anula un aviso (al final viene), antes de que empiece la fecha. No lo borra. */
   anularAviso(
     quien: ContextoCentro,

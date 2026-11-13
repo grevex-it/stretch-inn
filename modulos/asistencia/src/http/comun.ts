@@ -24,6 +24,8 @@ const ESTADOS: Record<ErrorDeAsistencia, number> = {
   "clase-empezada": 409,
   "no-inscripto": 409,
   "ya-avisado": 409,
+  "periodo-invalido": 400,
+  "sin-fechas": 409,
 };
 
 /** El dato validado, o undefined si ya se respondió 400. */
