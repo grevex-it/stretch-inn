@@ -10,3 +10,4 @@ export type {
 export type { Estado, Marca } from "./dominio/planilla.ts";
 export { PERMISOS_ASISTENCIA } from "./dominio/permisos.ts";
 export { rutasDeAsistencia } from "./http/rutas.ts";
+export { ocupadasDeMas } from "./infraestructura/para-otros.ts";

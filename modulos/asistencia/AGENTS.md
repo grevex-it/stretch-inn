@@ -53,6 +53,11 @@ sede (0020).
   (`asistencia.recuperar`), y
   `GET /asistencia/sedes/:id/reglas` (`asistencia.ver`) y `PUT /asistencia/sedes/:id/reglas`
   (`asistencia.configurar`).
+- Para otros módulos (`agenda`), con la `Transaccion` de `enContexto`:
+  - `ocupadasDeMas(tx, { ocurrenciaIds })`: hasta 100 fechas; cuántos lugares ocupan de más las
+    recuperaciones en cada una (recuperaciones menos avisos vigentes), solo donde sobran. Toma
+    cada fecha con el mismo bloqueo que recuperar, así agenda inscribe a un fijo sin que una
+    recuperación le gane el lugar en el medio. La API se lo pasa a `agenda`.
 - `PERMISOS_ASISTENCIA`: la sección «Asistencia» del catálogo (`asistencia.ver`,
   `asistencia.tomar`, `asistencia.avisar`, `asistencia.recuperar`, `asistencia.configurar`).
 
@@ -111,6 +116,6 @@ por defecto, `src/dominio/reglas.ts`).
 - Borrar la tabla `creditos` y la columna `recuperaciones.credito_id`, en desuso desde 0020 (dos
   pasos, `db/AGENTS.md`).
 - **Hueco conocido:** si `agenda` inscribe a alguien en una clase que ya tiene recuperaciones
-  en una fecha futura, esa fecha puede pasarse del cupo: `agenda` no sabe de recuperaciones.
-  Resolverlo con un evento de agenda o con que agenda consulte los lugares a asistencia.
+  en una fecha futura, esa fecha puede pasarse del cupo. `ocupadasDeMas` ya está; falta que
+  `agenda` la consulte al inscribir y al bajar el cupo.
 - El alumno avisando y recuperando desde el portal (Fase 4): otro actor, con sus propias reglas.
