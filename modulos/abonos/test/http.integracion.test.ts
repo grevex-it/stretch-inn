@@ -1,6 +1,7 @@
 // Rutas /abonos sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // abonos. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula.
 import {
+  abonoDelAlumno,
   cuotaGenerada,
   paginaDeCuotas,
   paginaDeImpagas,
@@ -64,6 +65,7 @@ describe("rutas de los abonos", () => {
       "GET /abonos/cuotas/impagas": "abonos.ver",
       "DELETE /abonos/cuotas/:id": "abonos.asignar",
       "GET /alumnos/:id/cuotas": "abonos.ver",
+      "GET /alumnos/:id/abono": "abonos.ver",
     });
   });
 
@@ -102,6 +104,20 @@ describe("rutas de los abonos", () => {
     expect(repetida.statusCode).toBe(409);
     const lista = await servidor.inject({ url: `/alumnos/${ana}/cuotas` });
     expect(paginaDeCuotas.parse(lista.json()).total).toBe(1);
+
+    const abono = await servidor.inject({ url: `/alumnos/${ana}/abono?sede=${norte}` });
+    expect(abono.statusCode).toBe(200);
+    // Sin horario fijo, no se usó ninguna clase y no se sabe cuándo termina.
+    expect(abonoDelAlumno.parse(abono.json()).abono).toMatchObject({
+      desde: "2026-11-15",
+      clases: 4,
+      usadas: 0,
+      restantes: 4,
+      fin: null,
+      pagada: false,
+    });
+    const sinSede = await servidor.inject({ url: `/alumnos/${ana}/abono` });
+    expect(sinSede.statusCode).toBe(400);
   });
 
   it("las impagas de la sede, con el contrato", async () => {

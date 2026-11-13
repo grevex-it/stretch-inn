@@ -85,6 +85,30 @@ export const cuotaImpaga = cuota.omit({ pagadaEn: true }).extend({
 /** Respuesta de GET /abonos/cuotas/impagas: la más vieja primero, y lo que suman todas. */
 export const paginaDeImpagas = paginaDe(cuotaImpaga).extend({ adeudado: z.number().int() });
 
+/** Query de GET /alumnos/:id/abono: `?sede`. */
+export const pedidoDeAbonoDelAlumno = z
+  .object({ sede: z.uuid("Esa sede no existe.") })
+  .transform(({ sede }) => ({ sedeId: sede }));
+
+/**
+ * Respuesta de GET /alumnos/:id/abono: el abono que empezó más tarde en la sede, con las clases
+ * que le quedan (cada fecha que terminó gastó una, 0020). Sin montos: lo ve también el profe.
+ */
+export const abonoDelAlumno = z.object({
+  abono: z
+    .object({
+      cuotaId: z.uuid(),
+      desde: z.string(),
+      clases: z.number().int(),
+      usadas: z.number().int(),
+      restantes: z.number().int(),
+      /** En UTC: el final de su última clase; null si no le alcanzan las fechas del horario fijo. */
+      fin: z.iso.datetime().nullable(),
+      pagada: z.boolean(),
+    })
+    .nullable(),
+});
+
 export type FichaDePlan = z.infer<typeof fichaDePlan>;
 export type EdicionDePlan = z.infer<typeof edicionDePlan>;
 export type Plan = z.infer<typeof plan>;
@@ -94,3 +118,4 @@ export type Cuota = z.infer<typeof cuota>;
 export type PaginaDeCuotas = z.infer<typeof paginaDeCuotas>;
 export type CuotaImpaga = z.infer<typeof cuotaImpaga>;
 export type PaginaDeImpagas = z.infer<typeof paginaDeImpagas>;
+export type AbonoDelAlumno = z.infer<typeof abonoDelAlumno>;

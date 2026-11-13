@@ -3,7 +3,7 @@
 import { fechasDeAlumno } from "@app/agenda";
 import { obtenerAlumno } from "@app/personas";
 import type { Transaccion } from "@app/plataforma";
-import { and, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, inArray, isNull, lte, sql } from "drizzle-orm";
 import type { RepositorioAbonos } from "../aplicacion/puertos.ts";
 import { cuotas } from "./esquema.ts";
 
@@ -12,6 +12,7 @@ type RepositorioCuotas = Pick<
   | "alumno"
   | "bloquearAlumno"
   | "ultimaCuota"
+  | "cuotaEmpezada"
   | "fechasDeAlumno"
   | "generarCuota"
   | "cuota"
@@ -36,7 +37,7 @@ const vigente = (id: string) => and(eq(cuotas.id, id), isNull(cuotas.anuladaEn))
 /** Lo que hace falta para que las cuotas de un alumno no se pisen (0020). */
 function delAlumno(
   tx: Transaccion,
-): Pick<RepositorioAbonos, "bloquearAlumno" | "ultimaCuota" | "fechasDeAlumno"> {
+): Pick<RepositorioAbonos, "bloquearAlumno" | "ultimaCuota" | "cuotaEmpezada" | "fechasDeAlumno"> {
   return {
     async bloquearAlumno(alumnoId) {
       await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`cuotas:${alumnoId}`}))`);
@@ -46,6 +47,22 @@ function delAlumno(
         .select(columnas)
         .from(cuotas)
         .where(and(eq(cuotas.alumnoId, alumnoId), isNull(cuotas.anuladaEn)))
+        .orderBy(desc(cuotas.desde))
+        .limit(1);
+      return fila;
+    },
+    async cuotaEmpezada({ alumnoId, sedeId, hoy }) {
+      const [fila] = await tx
+        .select(columnas)
+        .from(cuotas)
+        .where(
+          and(
+            eq(cuotas.alumnoId, alumnoId),
+            eq(cuotas.sedeId, sedeId),
+            isNull(cuotas.anuladaEn),
+            lte(cuotas.desde, hoy),
+          ),
+        )
         .orderBy(desc(cuotas.desde))
         .limit(1);
       return fila;

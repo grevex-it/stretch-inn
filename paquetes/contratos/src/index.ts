@@ -84,6 +84,7 @@ export {
   type ReglasDeRecuperacion,
 } from "./asistencia.ts";
 export {
+  abonoDelAlumno,
   cuota,
   cuotaGenerada,
   cuotaImpaga,
@@ -92,12 +93,14 @@ export {
   paginaDeCuotas,
   paginaDeImpagas,
   paginaDePlanes,
+  pedidoDeAbonoDelAlumno,
   pedidoDeCuota,
   pedidoDeImpagas,
   pedidoDePrecioDeSede,
   plan,
   planCreado,
   planEditado,
+  type AbonoDelAlumno,
   type Cuota,
   type CuotaImpaga,
   type EdicionDePlan,
