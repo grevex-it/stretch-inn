@@ -10,6 +10,7 @@ import {
   editarAlumno,
   fijarActivo,
   listarAlumnos,
+  type AlDarDeBaja,
   obtenerAlumno,
 } from "../datos/alumnos.ts";
 import { enviar, leer } from "./traducir.ts";
@@ -43,7 +44,7 @@ function lecturas(app: FastifyInstance, enElCentro: EnElCentro): void {
   });
 }
 
-function escrituras(app: FastifyInstance, enElCentro: EnElCentro): void {
+function escrituras(app: FastifyInstance, enElCentro: EnElCentro, alDarDeBaja?: AlDarDeBaja): void {
   app.post("/alumnos", { config: editar }, async (pedido, respuesta) => {
     const ficha = leer(fichaDeAlumno, pedido.body, respuesta);
     if (ficha === undefined) return respuesta;
@@ -73,7 +74,7 @@ function escrituras(app: FastifyInstance, enElCentro: EnElCentro): void {
         const alumno = leer(conId, pedido.params, respuesta);
         if (alumno === undefined) return respuesta;
         const resultado = await enElCentro(pedido, (tx) =>
-          fijarActivo(tx, { id: alumno.id, activo }),
+          fijarActivo(tx, { id: alumno.id, activo }, alDarDeBaja),
         );
         return enviar(respuesta, resultado, 204);
       },
@@ -81,11 +82,19 @@ function escrituras(app: FastifyInstance, enElCentro: EnElCentro): void {
   }
 }
 
-export function rutasDeAlumnos(base: Base): FastifyPluginCallback {
+interface OpcionesDeAlumnos {
+  /** Lo que corre en la transacción de la baja: la API le pasa `liberarLugares` de agenda. */
+  alDarDeBaja?: AlDarDeBaja;
+}
+
+export function rutasDeAlumnos(
+  base: Base,
+  { alDarDeBaja }: OpcionesDeAlumnos = {},
+): FastifyPluginCallback {
   const enElCentro: EnElCentro = (pedido, trabajo) => enContexto(base, contextoDe(pedido), trabajo);
   return (app, _opciones, listo) => {
     lecturas(app, enElCentro);
-    escrituras(app, enElCentro);
+    escrituras(app, enElCentro, alDarDeBaja);
     listo();
   };
 }

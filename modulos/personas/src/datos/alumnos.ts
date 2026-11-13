@@ -148,14 +148,27 @@ export async function editarAlumno(
     : falla("cambio-concurrente", "Esta ficha cambió mientras la editabas. Volvé a cargarla.");
 }
 
+/**
+ * Lo que tiene que pasar en la misma transacción cuando un alumno se da de baja: la API le pasa
+ * `liberarLugares` de agenda (0019). Si falla, la baja tampoco queda.
+ */
+export type AlDarDeBaja = (
+  tx: Transaccion,
+  baja: { alumnoId: string; ahora: Date },
+) => Promise<unknown>;
+
 export async function fijarActivo(
   tx: Transaccion,
   { id, activo }: { id: string; activo: boolean },
+  alDarDeBaja?: AlDarDeBaja,
 ): Promise<Resultado<null, ErrorDeAlumno>> {
   const filas = await tx
     .update(alumnos)
     .set({ activo, version: sql`${alumnos.version} + 1` })
     .where(eq(alumnos.id, id))
     .returning({ id: alumnos.id });
-  return filas.length === 0 ? INEXISTENTE : ok(null);
+  if (filas.length === 0) return INEXISTENTE;
+  if (!activo && alDarDeBaja !== undefined)
+    await alDarDeBaja(tx, { alumnoId: id, ahora: new Date() });
+  return ok(null);
 }
