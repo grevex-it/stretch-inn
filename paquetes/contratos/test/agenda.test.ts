@@ -71,6 +71,8 @@ describe("pedidos de la agenda", () => {
       ],
     };
     expect(paginaDeInscriptos.parse(pagina)).toEqual(pagina);
+    const sinCelular = { ...pagina, elementos: [{ ...pagina.elementos[0], telefono: null }] };
+    expect(paginaDeInscriptos.parse(sinCelular)).toEqual(sinCelular);
   });
 
   it("las fechas viajan en UTC, como texto ISO", () => {

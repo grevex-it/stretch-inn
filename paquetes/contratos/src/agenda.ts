@@ -89,7 +89,8 @@ export const inscripto = z.object({
   alumnoId: z.uuid(),
   nombre: z.string(),
   apellido: z.string(),
-  telefono: z.string(),
+  /** null si el alumno no tiene celular cargado (pendiente de completar, 0022). */
+  telefono: z.string().nullable(),
   /** El alumno puede estar de baja en personas aunque siga inscripto. */
   activo: z.boolean(),
   creadaEn: z.iso.datetime(),

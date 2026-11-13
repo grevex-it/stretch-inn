@@ -39,7 +39,7 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
   - `fijarCancelada(quien, { id, cancelada })`.
   - `inscribir(quien, { claseId, alumnoId })` y `darDeBajaInscripcion(quien, { id })`.
   - `inscriptos(quien, { claseId, pagina, porPagina })`: los vigentes por orden de inscripción,
-    con nombre, apellido, teléfono y si el alumno está activo. Una página de inscripciones y sus
+    con nombre, apellido, teléfono (null si no lo tiene cargado) y si el alumno está activo. Una página de inscripciones y sus
     alumnos en dos consultas (`obtenerAlumnos` de `personas`).
   - `clasesDeAlumno(quien, { alumnoId, pagina, porPagina })`: sus inscripciones vigentes en las
     sedes donde se puede ver la agenda.
