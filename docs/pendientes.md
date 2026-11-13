@@ -85,7 +85,6 @@ Inn está en 0019; los supuestos menores de cada módulo, en su `AGENTS.md`.
 - **`agenda` puede pasarse del cupo de una fecha con recuperaciones:** si inscribe a alguien en
   una clase con recuperaciones reservadas en una fecha futura. Un evento de `agenda` o un puerto
   para que consulte los lugares a `asistencia`.
-- **La baja de un alumno tiene que liberar sus inscripciones fijas** (0019). Hoy siguen vigentes.
 - **Una fecha suspendida tiene que dar crédito a sus inscriptos** (0019).
 - **`caja`:** la cuota se marca pagada en la transacción del cobro y no por el evento. Revisar si
   queda así y, en ese caso, actualizar 0003.

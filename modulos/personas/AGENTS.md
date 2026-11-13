@@ -31,8 +31,10 @@ algo puede fallar por una regla.
   que otro módulo muestre una página con sus alumnos (los inscriptos de una clase) sin N+1. Los
   ids que no son del centro no vuelven.
 - `crearAlumno(tx, ficha)` y `editarAlumno(tx, { ...ficha, id, version })`.
-- `fijarActivo(tx, { id, activo })`: baja y reactivación.
-- `rutasDeAlumnos(base)`: `GET /alumnos?pagina&buscar&bajas=si` y `GET /alumnos/:id`
+- `fijarActivo(tx, { id, activo }, alDarDeBaja?)`: baja y reactivación. Al dar de baja corre
+  `alDarDeBaja(tx, { alumnoId, ahora })` en la misma transacción: si falla, la baja no queda.
+- `rutasDeAlumnos(base, { alDarDeBaja? })`: la API le pasa `liberarLugares` de `agenda`, así la
+  baja libera el horario fijo del alumno (0019). Rutas: `GET /alumnos?pagina&buscar&bajas=si` y `GET /alumnos/:id`
   (`personas.ver`); `POST /alumnos`, `PUT /alumnos/:id` y `PUT`/`DELETE /alumnos/:id/baja`
   (`personas.editar`).
 - `PERMISOS_PERSONAS`: la sección «Alumnos» del catálogo (0007).
@@ -46,7 +48,8 @@ algo puede fallar por una regla.
 
 - El alumno es del **centro**, no de una sede (0011): RLS aísla solo por centro y cualquier
   usuario con `personas.ver` en alguna sede ve a todos los alumnos del centro.
-- La baja no borra: oculta al alumno de la lista habitual y conserva su historia.
+- La baja no borra: oculta al alumno de la lista habitual y conserva su historia. Libera su
+  horario fijo en `agenda` (la reactivación no lo devuelve: hay que volver a inscribirlo).
 - Si se carga el documento, no se repite dentro del centro (índice único parcial). Se guarda sin
   puntos ni espacios.
 - Toda edición compara la `version` que vio quien edita (0013).
