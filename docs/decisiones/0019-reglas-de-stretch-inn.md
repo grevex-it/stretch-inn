@@ -32,7 +32,7 @@ _Reemplazado por 0020: el abono es un paquete de 4 clases, no un período de 4 s
 - Además existen:
   - **la clase suelta**, para 2 o 3 alumnos sin horario fijo que vienen cuando hay lugar;
   - **la clase de prueba paga**.
-- **Alumno de viaje:** paga la mitad del abono y conserva su lugar fijo, sin tiempo máximo.
+- **Alumno de viaje** (reemplazado por 0022: paga como un mes común): paga la mitad del abono y conserva su lugar fijo, sin tiempo máximo.
   Mientras tanto, ese lugar se usa para recuperaciones o para otro alumno, avisándole por cuánto
   tiempo.
 - **Precios distintos por sede** (ya previsto en 0011). Sin descuentos ni promociones, y sin

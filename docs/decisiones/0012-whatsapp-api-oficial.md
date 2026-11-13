@@ -1,6 +1,6 @@
 # 0012 — WhatsApp con la API oficial de Meta
 
-**Fecha:** 29/10/2026 · **Estado:** aceptada
+**Fecha:** 29/10/2026 · **Estado:** reemplazada por 0021
 
 ## Contexto
 

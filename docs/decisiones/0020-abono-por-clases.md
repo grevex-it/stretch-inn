@@ -81,6 +81,4 @@ Además:
 
 ## Pendiente
 
-- **Viaje:** el alumno paga la mitad para guardar su lugar y otro puede ocuparlo mientras tanto.
-  Entendemos que las semanas de viaje gastan clases del abono y que la media cuota es para
-  conservar el lugar del mes siguiente. Confirmarlo con Stretch Inn.
+- **Viaje:** resuelto en 0022: paga como un mes común, y las semanas de viaje gastan clases.

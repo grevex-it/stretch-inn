@@ -15,7 +15,7 @@ Una decisión por archivo, con su contexto y su porqué. Una decisión aceptada 
 | [0009](0009-montos-en-pesos-enteros.md)            | Montos en pesos enteros                                     |
 | [0010](0010-idioma.md)                             | Idioma: español argentino                                   |
 | [0011](0011-flexibilidad-por-configuracion.md)     | Flexibilidad por configuración, no por código               |
-| [0012](0012-whatsapp-api-oficial.md)               | WhatsApp con la API oficial de Meta                         |
+| [0012](0012-whatsapp-api-oficial.md)               | WhatsApp con la API oficial de Meta (reemplazada por 0021)  |
 | [0013](0013-rendimiento-y-robustez.md)             | Rendimiento y robustez                                      |
 | [0014](0014-portal-sin-conexion.md)                | Portal de alumnos con funcionamiento sin conexión           |
 | [0015](0015-logs-y-alertas.md)                     | Logs y alertas                                              |
@@ -24,5 +24,7 @@ Una decisión por archivo, con su contexto y su porqué. Una decisión aceptada 
 | [0018](0018-identidad-visual.md)                   | Identidad visual                                            |
 | [0019](0019-reglas-de-stretch-inn.md)              | Abonos, recuperaciones, sedes y permisos según Stretch Inn  |
 | [0020](0020-abono-por-clases.md)                   | El abono es un paquete de clases, no un período             |
+| [0021](0021-whatsapp-con-waha.md)                  | WhatsApp con WAHA                                           |
+| [0022](0022-viaje-gastos-y-pago-a-profes.md)       | Viaje, gastos y pago a los profes                           |
 
 Temas abiertos: [`../pendientes.md`](../pendientes.md).
