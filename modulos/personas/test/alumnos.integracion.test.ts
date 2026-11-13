@@ -47,7 +47,11 @@ describe("crearAlumno", () => {
       documento: "30123456",
       email: "ana@ejemplo.com",
       fechaNacimiento: "1990-04-12",
+      numeroDeSocio: 1,
+      fechaDeInicio: null,
       activo: true,
+      bajaEn: null,
+      pendienteDeCompletar: false,
       version: 1,
     });
   });

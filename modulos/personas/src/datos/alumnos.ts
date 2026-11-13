@@ -22,11 +22,16 @@ const columnas = {
   email: alumnos.email,
   fechaNacimiento: alumnos.fechaNacimiento,
   notas: alumnos.notas,
+  numeroDeSocio: alumnos.numeroDeSocio,
+  fechaDeInicio: alumnos.fechaDeInicio,
   activo: alumnos.activo,
+  bajaEn: alumnos.bajaEn,
+  pendienteDeCompletar: sql<boolean>`${alumnos.telefono} is null`,
   version: alumnos.version,
 };
 
 const REPETIDO = falla("documento-repetido", "Ya hay un alumno con ese documento en el centro.");
+const SOCIO_REPETIDO = falla("socio-repetido", "Ya hay un alumno con ese número de socio.");
 const INEXISTENTE = falla("alumno-inexistente", "Ese alumno no existe en el centro.");
 
 function filtro({ buscar, conBajas }: BusquedaDeAlumnos): SQL | undefined {
@@ -79,57 +84,88 @@ export async function obtenerAlumnos(tx: Transaccion, ids: readonly string[]): P
     .where(inArray(alumnos.id, [...ids]));
 }
 
+/** El índice único con el que chocó el error de Postgres (o el que envuelve Drizzle). */
+function indiceDelChoque(error: unknown): string | undefined {
+  const causa = error instanceof Error && error.cause !== undefined ? error.cause : error;
+  if (typeof causa !== "object" || causa === null || !("constraint" in causa)) return undefined;
+  return typeof causa.constraint === "string" ? causa.constraint : undefined;
+}
+
+/**
+ * Corre la escritura con un punto de guardado: si choca con el documento o el número de socio de
+ * otro alumno (también si otro los carga a la vez), se deshace y se avisa.
+ */
+async function sinRepetir<T>(
+  tx: Transaccion,
+  escritura: () => Promise<T>,
+): Promise<Resultado<T, ErrorDeAlumno>> {
+  try {
+    return await conPuntoDeGuardado(tx, async () => ok(await escritura()));
+  } catch (error) {
+    const indice = indiceDelChoque(error);
+    if (indice === "alumnos_centro_documento") return REPETIDO;
+    if (indice === "alumnos_centro_socio") return SOCIO_REPETIDO;
+    throw error;
+  }
+}
+
+/** El siguiente número de socio del centro. Las altas sin número van de a una (bloqueo). */
+async function siguienteNumero(tx: Transaccion): Promise<number> {
+  await tx.execute(
+    sql`select pg_advisory_xact_lock(hashtextextended('socios:' || app_centro_actual()::text, 0))`,
+  );
+  const [fila] = await tx
+    .select({ ultimo: sql<number>`coalesce(max(${alumnos.numeroDeSocio}), 0)`.mapWith(Number) })
+    .from(alumnos);
+  return (fila?.ultimo ?? 0) + 1;
+}
+
 export async function crearAlumno(
   tx: Transaccion,
   datos: DatosDeAlumno,
 ): Promise<Resultado<{ id: string }, ErrorDeAlumno>> {
   const ficha = limpiarFicha(datos);
   if (!ficha.ok) return ficha;
-  // El índice único del documento es la barrera: si choca, no se inserta y no hay fila.
-  const [fila] = await tx
-    .insert(alumnos)
-    .values({
-      ...ficha.valor,
-      busqueda: textoDeBusqueda(ficha.valor),
-      centroId: sql`app_centro_actual()`,
-    })
-    .onConflictDoNothing()
-    .returning({ id: alumnos.id });
-  return fila === undefined ? REPETIDO : ok(fila);
+  const numeroDeSocio = ficha.valor.numeroDeSocio ?? (await siguienteNumero(tx));
+  const guardado = await sinRepetir(tx, async () => {
+    const [fila] = await tx
+      .insert(alumnos)
+      .values({
+        ...ficha.valor,
+        numeroDeSocio,
+        busqueda: textoDeBusqueda(ficha.valor, numeroDeSocio),
+        centroId: sql`app_centro_actual()`,
+      })
+      .returning({ id: alumnos.id });
+    return fila;
+  });
+  if (!guardado.ok) return guardado;
+  if (guardado.valor === undefined) throw new Error("El alta del alumno no devolvió su id.");
+  return ok(guardado.valor);
 }
 
-/** El error de Postgres (o el que envuelve Drizzle) es el choque con el índice del documento. */
-function chocaConElDocumento(error: unknown): boolean {
-  const causa = error instanceof Error && error.cause !== undefined ? error.cause : error;
-  return (
-    typeof causa === "object" &&
-    causa !== null &&
-    "constraint" in causa &&
-    causa.constraint === "alumnos_centro_documento"
-  );
-}
-
-/**
- * Guarda la ficha si la versión coincide. El índice único del documento es la barrera, también
- * si otro lo carga a la vez: el choque se deshace con un punto de guardado y se avisa.
- */
+/** Guarda la ficha si la versión coincide; lo que no vino (número, inicio) queda como estaba. */
 async function guardarFicha(
   tx: Transaccion,
   { id, version, ficha }: { id: string; version: number; ficha: DatosDeAlumno },
 ): Promise<Resultado<{ version: number } | undefined, ErrorDeAlumno>> {
-  try {
-    return await conPuntoDeGuardado(tx, async () => {
-      const [fila] = await tx
-        .update(alumnos)
-        .set({ ...ficha, busqueda: textoDeBusqueda(ficha), version: sql`${alumnos.version} + 1` })
-        .where(and(eq(alumnos.id, id), eq(alumnos.version, version)))
-        .returning({ version: alumnos.version });
-      return ok(fila);
-    });
-  } catch (error) {
-    if (chocaConElDocumento(error)) return REPETIDO;
-    throw error;
-  }
+  const actual = await obtenerAlumno(tx, id);
+  if (actual === undefined) return ok(undefined);
+  const { numeroDeSocio, ...resto } = ficha;
+  const numero = numeroDeSocio ?? actual.numeroDeSocio;
+  return sinRepetir(tx, async () => {
+    const [fila] = await tx
+      .update(alumnos)
+      .set({
+        ...resto,
+        numeroDeSocio: numero,
+        busqueda: textoDeBusqueda(ficha, numero),
+        version: sql`${alumnos.version} + 1`,
+      })
+      .where(and(eq(alumnos.id, id), eq(alumnos.version, version)))
+      .returning({ version: alumnos.version });
+    return fila;
+  });
 }
 
 /** Compara la versión que vio quien edita (0013): si cambió en el medio, no pisa nada. */
@@ -162,13 +198,13 @@ export async function fijarActivo(
   { id, activo }: { id: string; activo: boolean },
   alDarDeBaja?: AlDarDeBaja,
 ): Promise<Resultado<null, ErrorDeAlumno>> {
+  const ahora = new Date();
   const filas = await tx
     .update(alumnos)
-    .set({ activo, version: sql`${alumnos.version} + 1` })
+    .set({ activo, bajaEn: activo ? null : ahora, version: sql`${alumnos.version} + 1` })
     .where(eq(alumnos.id, id))
     .returning({ id: alumnos.id });
   if (filas.length === 0) return INEXISTENTE;
-  if (!activo && alDarDeBaja !== undefined)
-    await alDarDeBaja(tx, { alumnoId: id, ahora: new Date() });
+  if (!activo && alDarDeBaja !== undefined) await alDarDeBaja(tx, { alumnoId: id, ahora });
   return ok(null);
 }

@@ -28,11 +28,11 @@ const VACIA: Ficha = {
 
 function fichaDe(alumno: Alumno | undefined): Ficha {
   if (alumno === undefined) return VACIA;
-  const { nombre, apellido, telefono, notas } = alumno;
+  const { nombre, apellido, notas } = alumno;
   return {
     nombre,
     apellido,
-    telefono,
+    telefono: alumno.telefono ?? "",
     notas,
     documento: alumno.documento ?? "",
     email: alumno.email ?? "",
@@ -82,7 +82,9 @@ export function FichaDeAlumno({ alumno, alGuardar, alCancelar }: Props) {
   const titulo = useId();
   const [ficha, setFicha] = useState(() => fichaDe(alumno));
   const { enviando, error, guardar } = useGuardar(alumno);
-  const campo = (clave: keyof Ficha) => ({
+  // El número de socio y la fecha de inicio todavía no están en el formulario: la API los
+  // conserva al editar si no vienen.
+  const campo = (clave: Exclude<keyof Ficha, "numeroDeSocio" | "fechaDeInicio">) => ({
     valor: ficha[clave] ?? "",
     alCambiar: (valor: string) => {
       setFicha((actual) => ({ ...actual, [clave]: valor }));

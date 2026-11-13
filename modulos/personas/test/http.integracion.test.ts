@@ -1,6 +1,6 @@
 // Rutas /alumnos sobre Postgres real: lo que declara cada ruta y la traducción HTTP ↔ datos. La
 // sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula con una real.
-import { saludDeAlumno, saludGuardada } from "@app/contratos";
+import { alumno, saludDeAlumno, saludGuardada } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
 import Fastify, { type FastifyContextConfig } from "fastify";
@@ -93,7 +93,16 @@ describe("rutas de alumnos", () => {
     const { id } = alta.json<{ id: string }>();
 
     const ficha = await servidor.inject({ url: `/alumnos/${id}` });
-    expect(ficha.json()).toEqual({ ...ANA, id, activo: true, version: 1 });
+    expect(alumno.parse(ficha.json())).toEqual({
+      ...ANA,
+      id,
+      numeroDeSocio: 1,
+      fechaDeInicio: null,
+      activo: true,
+      bajaEn: null,
+      pendienteDeCompletar: false,
+      version: 1,
+    });
     const lista = await servidor.inject({ url: "/alumnos?buscar=perez" });
     expect(lista.json()).toMatchObject({ pagina: 1, porPagina: 50, total: 1 });
   });

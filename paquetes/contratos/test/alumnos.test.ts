@@ -46,14 +46,26 @@ describe("fichaDeAlumno", () => {
     ).toEqual({ ...ficha, documento: "", email: "", fechaNacimiento: "" });
   });
 
-  it("pide nombre, apellido y teléfono; revisa email y fecha", () => {
+  it("pide nombre y apellido; revisa email y fecha", () => {
     expect(fichaDeAlumno.safeParse({ ...ficha, nombre: " " }).success).toBe(false);
     expect(fichaDeAlumno.safeParse({ ...ficha, apellido: "" }).success).toBe(false);
-    expect(fichaDeAlumno.safeParse({ ...ficha, telefono: "" }).success).toBe(false);
     expect(fichaDeAlumno.safeParse({ ...ficha, email: "ana" }).success).toBe(false);
     expect(fichaDeAlumno.safeParse({ ...ficha, fechaNacimiento: "12/04/1990" }).success).toBe(
       false,
     );
+  });
+
+  it("el celular es opcional (pendiente de completar, 0022)", () => {
+    expect(fichaDeAlumno.parse({ ...ficha, telefono: null }).telefono).toBeNull();
+    expect(fichaDeAlumno.parse({ ...ficha, telefono: "" }).telefono).toBe("");
+  });
+
+  it("el número de socio y la fecha de inicio son opcionales; si vienen, se revisan", () => {
+    const completa = { ...ficha, numeroDeSocio: 283, fechaDeInicio: "2024-03-01" };
+    expect(fichaDeAlumno.parse(completa)).toEqual(completa);
+    expect(fichaDeAlumno.safeParse({ ...ficha, numeroDeSocio: 0 }).success).toBe(false);
+    expect(fichaDeAlumno.safeParse({ ...ficha, numeroDeSocio: 1.5 }).success).toBe(false);
+    expect(fichaDeAlumno.safeParse({ ...ficha, fechaDeInicio: "01/03/2024" }).success).toBe(false);
   });
 
   it("la edición lleva la versión que se vio", () => {
@@ -63,8 +75,17 @@ describe("fichaDeAlumno", () => {
 });
 
 describe("alumno", () => {
-  it("la respuesta trae la ficha con id, estado y versión", () => {
-    const respuesta = { ...ficha, id: UUID, activo: true, version: 1 };
+  it("la respuesta trae la ficha con id, número de socio, estado, baja y versión", () => {
+    const respuesta = {
+      ...ficha,
+      id: UUID,
+      numeroDeSocio: 283,
+      fechaDeInicio: null,
+      activo: true,
+      bajaEn: null,
+      pendienteDeCompletar: false,
+      version: 1,
+    };
     expect(alumno.parse(respuesta)).toEqual(respuesta);
     expect(alumno.safeParse({ ...respuesta, version: undefined }).success).toBe(false);
   });

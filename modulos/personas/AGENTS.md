@@ -4,8 +4,9 @@ Nivel: liviano (`src/datos/`, `src/http/`). Ver `docs/decisiones/0003-hexagonal-
 
 ## Alcance
 
-Los alumnos del centro: ficha (nombre, apellido, teléfono y, opcionales, documento, email,
-fecha de nacimiento y notas), lista con buscador, alta, edición, baja y reactivación. Sus datos de
+Los alumnos del centro: ficha (nombre, apellido, número de socio y, opcionales, celular,
+documento, email, fecha de nacimiento, fecha de inicio y notas), lista con buscador, alta, edición,
+baja (con su fecha) y reactivación. La ficha sigue la planilla de Stretch Inn (0022). Sus datos de
 salud (patologías), aparte de la ficha y con permisos propios (0019).
 
 ## Fuera de alcance
@@ -29,7 +30,10 @@ algo puede fallar por una regla.
 - `obtenerAlumno(tx, id)` y `obtenerAlumnos(tx, ids)`: hasta 100 ids en una sola consulta, para
   que otro módulo muestre una página con sus alumnos (los inscriptos de una clase) sin N+1. Los
   ids que no son del centro no vuelven.
-- `crearAlumno(tx, ficha)` y `editarAlumno(tx, { ...ficha, id, version })`.
+- `crearAlumno(tx, ficha)` y `editarAlumno(tx, { ...ficha, id, version })`. Sin
+  `numeroDeSocio`, el alta toma el siguiente del centro y la edición conserva el que tenía; sin
+  `fechaDeInicio`, la edición conserva la que tenía (así el formulario que todavía no los manda no
+  los borra). Cada alumno trae además `bajaEn` y `pendienteDeCompletar` (sin celular).
 - `fijarActivo(tx, { id, activo }, alDarDeBaja?)`: baja y reactivación. Al dar de baja corre
   `alDarDeBaja(tx, { alumnoId, ahora })` en la misma transacción: si falla, la baja no queda.
 - `rutasDeAlumnos(base, { alDarDeBaja? })`: la API le pasa `liberarLugares` de `agenda`, así la
@@ -56,9 +60,15 @@ algo puede fallar por una regla.
   horario fijo en `agenda` (la reactivación no lo devuelve: hay que volver a inscribirlo).
 - Si se carga el documento, no se repite dentro del centro (índice único parcial). Se guarda sin
   puntos ni espacios.
+- **El número de socio no se repite dentro del centro** (índice único). Las altas sin número van
+  de a una (bloqueo por centro) y toman el último más uno.
+- **Sin celular, el alumno queda pendiente de completar** (0022): se carga igual (la planilla
+  tiene alumnos sin celular) y no recibe mensajes automáticos hasta que lo tenga. Si se carga,
+  tiene al menos 6 números.
+- La baja guarda `baja_en`; la reactivación lo borra. La fecha de inicio no puede ser futura.
 - Toda edición compara la `version` que vio quien edita (0013).
-- La columna `busqueda` (nombre, apellido, documento y dígitos del teléfono, en minúsculas y sin
-  acentos) la arma la app en cada alta y edición: nunca se escribe a mano.
+- La columna `busqueda` (nombre, apellido, documento, dígitos del teléfono y número de socio, en
+  minúsculas y sin acentos) la arma la app en cada alta y edición: nunca se escribe a mano.
 - Nunca se escriben en un log datos de contacto completos de un alumno (0015).
 - **Los datos de salud van aparte de la ficha** (`salud_de_alumnos`, una fila por alumno, RLS por
   centro): ver la ficha no alcanza para verlos (0019: los ven los profes, la contadora no). Son
@@ -75,6 +85,9 @@ algo puede fallar por una regla.
 _Ninguna por ahora._ `recuperarEnOtraSede` (0011) llega con `asistencia`.
 
 ## Pendientes
+
+- El profe asignado a cada alumno (lo trae la planilla): cuando exista la ficha del profe (0022).
+- Importar la planilla de los 277 alumnos (0022).
 
 - Exportar o borrar los datos de un alumno que lo pida (Ley 25.326, derecho de supresión).
 - Si un centro llega a decenas de miles de alumnos, el buscador (`like` sobre `busqueda`) va a
