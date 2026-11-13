@@ -82,9 +82,9 @@ export function FichaDeAlumno({ alumno, alGuardar, alCancelar }: Props) {
   const titulo = useId();
   const [ficha, setFicha] = useState(() => fichaDe(alumno));
   const { enviando, error, guardar } = useGuardar(alumno);
-  // El número de socio y la fecha de inicio todavía no están en el formulario: la API los
-  // conserva al editar si no vienen.
-  const campo = (clave: Exclude<keyof Ficha, "numeroDeSocio" | "fechaDeInicio">) => ({
+  // El número de socio, la fecha de inicio y el profe todavía no están en el formulario: la API
+  // los conserva al editar si no vienen.
+  const campo = (clave: Exclude<keyof Ficha, "numeroDeSocio" | "fechaDeInicio" | "profeId">) => ({
     valor: ficha[clave] ?? "",
     alCambiar: (valor: string) => {
       setFicha((actual) => ({ ...actual, [clave]: valor }));

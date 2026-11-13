@@ -31,6 +31,8 @@ export const alumnos = pgTable(
     notas: text("notas").notNull().default(""),
     /** La «primera clase» (0019): para el regalo del año. */
     fechaDeInicio: date("fecha_de_inicio", { mode: "string" }),
+    /** El profe asignado: un usuario del equipo (0022). */
+    profeId: uuid("profe_id"),
     /**
      * Nombre, apellido, documento y dígitos del teléfono en minúsculas y sin acentos: lo que
      * compara el buscador. Lo arma la app en cada alta y edición.

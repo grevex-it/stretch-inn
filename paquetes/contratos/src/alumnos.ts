@@ -43,6 +43,8 @@ export const fichaDeAlumno = z.object({
     .optional(),
   /** La «primera clase» (0019). Sin ella, la edición conserva la que tenía. */
   fechaDeInicio: opcional(z.iso.date("Revisá la fecha de inicio.")).optional(),
+  /** Su profe asignado, un usuario del equipo (0022). Sin él, la edición lo conserva. */
+  profeId: z.uuid("Ese profe no existe.").nullable().optional(),
 });
 
 /** La edición lleva la versión que vio quien edita (0013). */
@@ -59,6 +61,7 @@ export const alumno = z.object({
   notas: z.string(),
   numeroDeSocio: z.number().int(),
   fechaDeInicio: z.string().nullable(),
+  profeId: z.uuid().nullable(),
   activo: z.boolean(),
   /** En UTC: cuándo se dio de baja; null si está activo. */
   bajaEn: z.iso.datetime().nullable(),

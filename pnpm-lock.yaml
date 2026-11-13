@@ -470,6 +470,9 @@ importers:
       '@app/contratos':
         specifier: workspace:*
         version: link:../../paquetes/contratos
+      '@app/identidad':
+        specifier: workspace:*
+        version: link:../identidad
       '@app/nucleo':
         specifier: workspace:*
         version: link:../../paquetes/nucleo
@@ -489,9 +492,6 @@ importers:
       '@app/db':
         specifier: workspace:*
         version: link:../../db
-      '@app/identidad':
-        specifier: workspace:*
-        version: link:../identidad
       '@types/pg':
         specifier: ^8.23.1
         version: 8.23.1

@@ -9,6 +9,7 @@ const ESTADOS: Record<ErrorDeAlumno, number> = {
   "telefono-invalido": 400,
   "fecha-invalida": 400,
   "salud-muy-larga": 400,
+  "profe-invalido": 400,
   "socio-invalido": 400,
   "documento-repetido": 409,
   "socio-repetido": 409,

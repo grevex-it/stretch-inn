@@ -98,6 +98,7 @@ describe("rutas de alumnos", () => {
       id,
       numeroDeSocio: 1,
       fechaDeInicio: null,
+      profeId: null,
       activo: true,
       bajaEn: null,
       pendienteDeCompletar: false,
