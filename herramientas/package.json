@@ -11,6 +11,7 @@
     "@app/agenda": "workspace:*",
     "@app/asistencia": "workspace:*",
     "@app/caja": "workspace:*",
+    "@app/gastos": "workspace:*",
     "@app/identidad": "workspace:*",
     "@app/personas": "workspace:*",
     "pg": "^8.23.1"

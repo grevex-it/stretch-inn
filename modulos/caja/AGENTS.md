@@ -11,7 +11,7 @@ el día de caja de cada sede con lo cobrado.
 
 - Qué se cobra y cuánto: la cuota y su monto son de `abonos`.
 - Facturación electrónica (AFIP/ARCA), cobros online y conciliación bancaria.
-- Gastos y movimientos que no son cobros de cuotas.
+- Gastos: `gastos` (0022). Otros movimientos que no son cobros de cuotas, cuando hagan falta.
 
 ## Depende de
 

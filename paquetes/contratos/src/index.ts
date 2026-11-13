@@ -127,3 +127,14 @@ export {
   type Pago,
   type PedidoDeCobro,
 } from "./caja.ts";
+export {
+  CATEGORIAS_DE_GASTO,
+  gasto,
+  gastoCargado,
+  paginaDeGastos,
+  pedidoDeGasto,
+  pedidoDeGastos,
+  type Gasto,
+  type PaginaDeGastos,
+  type PedidoDeGasto,
+} from "./gastos.ts";
