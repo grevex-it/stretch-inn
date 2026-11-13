@@ -75,6 +75,7 @@ Las carpetas que todavía no existen se crean a medida que se construyen.
     pnpm db:migrar                      # aplica las migraciones (ver db/AGENTS.md)
     pnpm db:migracion <nombre>          # crea una migración (ver db/AGENTS.md)
     pnpm db:semilla                     # centro de prueba local con un admin (ver apps/web/AGENTS.md)
+    pnpm importar-alumnos <planilla.xlsx> [--cargar]   # importa la planilla de Stretch Inn (0022)
 
 `pnpm check` controla automáticamente formato, tamaños, límites entre módulos y capas,
 tipos estrictos, código muerto y que cada `AGENTS.md` esté completo. No hace falta

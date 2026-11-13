@@ -23,7 +23,8 @@
     "tipos": "turbo run tipos",
     "test": "turbo run test",
     "check": "pnpm formato && pnpm lint && pnpm tamanos && pnpm agentes && pnpm arquitectura && pnpm muerto && pnpm tipos && pnpm test",
-    "nuevo-modulo": "node herramientas/src/nuevo-modulo-cli.ts"
+    "nuevo-modulo": "node herramientas/src/nuevo-modulo-cli.ts",
+    "importar-alumnos": "node --env-file-if-exists=.env herramientas/src/importar-alumnos-cli.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
