@@ -47,6 +47,12 @@ Casos de uso (reciben la `Transaccion` de `enContexto`):
 - `quitarAsignacion(tx, asignacion, catalogo)` y `ajustarPermiso(tx, quien, ajuste, catalogo)`:
   si el centro se quedaría sin nadie con acceso total, devuelven falla y no cambian nada.
 
+Para otros módulos (reciben la `Transaccion` de `enContexto`):
+
+- `obtenerUsuarios(tx, ids)`: hasta 100 usuarios del centro en una sola consulta
+  (`{ id, nombre, activo }`), para que `agenda` y `personas` muestren y validen un profe (0022).
+  Los ids que no son del centro no vuelven.
+
 Login y sesiones (0017):
 
 - `crearAcceso(base, { ahora?, limite? })`: una instancia por proceso, porque el límite de

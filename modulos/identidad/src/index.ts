@@ -35,3 +35,4 @@ export { rutasDeEquipo } from "./http/rutas-equipo.ts";
 export type { Equipo, ErrorDeEquipo } from "./aplicacion/puertos-equipo.ts";
 /** Para cargar cuentas fuera de la app (datos de prueba locales, alta desde soporte). */
 export { hashearClave } from "./infraestructura/claves.ts";
+export { obtenerUsuarios, type UsuarioDelCentro } from "./infraestructura/para-otros.ts";
