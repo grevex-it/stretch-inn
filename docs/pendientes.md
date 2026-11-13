@@ -76,15 +76,10 @@ Casi todo quedó respondido en 0019 y 0020. Falta:
 Lo que quedó abierto de la pila de asistencia, abonos, caja y worker. Lo que ya respondió Stretch
 Inn está en 0019; los supuestos menores de cada módulo, en su `AGENTS.md`.
 
-- **Rehacer `abonos` según 0020:** el abono pasa de ciclo de 28 días a paquete de clases, con la
-  clase suelta y el cambio entre las dos formas de pago. Afecta también el vencimiento del crédito
-  en `asistencia` y el panel.
 - **Actor de sistema en el `ContextoCentro`** (estructura): lo necesitan las tareas programadas
-  del worker, como renovar los ciclos que terminan y avisar el pago ese día (0019). Hoy el
-  contexto solo admite usuario y soporte.
-- **Una fecha suspendida tiene que dar crédito a sus inscriptos** (0019).
-- **`caja`:** la cuota se marca pagada en la transacción del cobro y no por el evento. Revisar si
-  queda así y, en ese caso, actualizar 0003.
+  del worker, como el aviso de pago cuando el alumno usa la última clase de su abono (0020). Hoy
+  el contexto solo admite usuario y soporte. Se hace junto con ese aviso, que espera la decisión
+  de WhatsApp (WAHA o la API de Meta, 0012).
 - **Railway:** crear el servicio del worker (`pnpm --filter @app/worker start`) con la misma
   `DATABASE_URL` que la API.
 - **Panel:** el profe anula un cobro desde la ficha del alumno, sin `caja.ver` (0019). La API
