@@ -2,6 +2,7 @@
 import { describe, expect, it } from "vitest";
 import {
   camasDeSede,
+  clase,
   edicionDeClase,
   fichaDeClase,
   paginaDeClasesDeAlumno,
@@ -10,6 +11,7 @@ import {
   pedidoDeClases,
   pedidoDeInscripcion,
   pedidoDeOcurrencias,
+  profeDeSede,
 } from "../src/index.ts";
 
 const SEDE = "7b0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f67";
@@ -48,7 +50,15 @@ describe("pedidos de la agenda", () => {
   it("inscribir pide el alumno; las clases de un alumno van paginadas", () => {
     expect(pedidoDeInscripcion.parse({ alumnoId: SEDE })).toEqual({ alumnoId: SEDE });
     expect(pedidoDeInscripcion.safeParse({ alumnoId: "x" }).success).toBe(false);
-    const clase = { ...CLASE, id: SEDE, sedeId: SEDE, activa: true, inscriptos: 3, version: 1 };
+    const clase = {
+      ...CLASE,
+      id: SEDE,
+      sedeId: SEDE,
+      profeId: null,
+      activa: true,
+      inscriptos: 3,
+      version: 1,
+    };
     const pagina = { pagina: 1, porPagina: 50, total: 1, elementos: [{ id: SEDE, clase }] };
     expect(paginaDeClasesDeAlumno.parse(pagina)).toEqual(pagina);
   });
@@ -91,6 +101,7 @@ describe("pedidos de la agenda", () => {
           empiezaEn: "2026-11-09T21:30:00.000Z",
           terminaEn: "2026-11-09T22:30:00.000Z",
           cancelada: false,
+          profeId: null,
         },
       ],
     };
@@ -105,5 +116,29 @@ describe("camas de la sede", () => {
     expect(camasDeSede.safeParse({ camas: 0 }).success).toBe(false);
     expect(camasDeSede.safeParse({ camas: 1.5 }).success).toBe(false);
     expect(camasDeSede.safeParse({}).success).toBe(false);
+  });
+});
+
+describe("profes de la agenda (0022)", () => {
+  it("el profe fijo de la sede es un uuid o null", () => {
+    expect(profeDeSede.parse({ profeId: SEDE })).toEqual({ profeId: SEDE });
+    expect(profeDeSede.parse({ profeId: null })).toEqual({ profeId: null });
+    expect(profeDeSede.safeParse({ profeId: "lore" }).success).toBe(false);
+  });
+
+  it("la clase lleva su profe; al crearla es opcional", () => {
+    const datos = { nombre: "Stretching", dia: 1, hora: "18:30", duracionMinutos: 60, cupo: 12 };
+    expect(fichaDeClase.parse({ ...datos, sedeId: SEDE })).toEqual({ ...datos, sedeId: SEDE });
+    expect(fichaDeClase.parse({ ...datos, sedeId: SEDE, profeId: null }).profeId).toBeNull();
+    const respuesta = {
+      ...datos,
+      id: SEDE,
+      sedeId: SEDE,
+      profeId: null,
+      activa: true,
+      inscriptos: 0,
+      version: 1,
+    };
+    expect(clase.parse(respuesta)).toEqual(respuesta);
   });
 });

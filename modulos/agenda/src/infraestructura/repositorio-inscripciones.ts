@@ -64,6 +64,7 @@ const columnasDeClase = {
   hora: clases.hora,
   duracionMinutos: clases.duracionMinutos,
   cupo: clases.cupo,
+  profeId: clases.profeId,
   inscriptos: clases.inscriptos,
   activa: clases.activa,
   version: clases.version,

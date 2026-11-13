@@ -6,6 +6,7 @@ import {
   fichaDeClase,
   pedidoDeClases,
   pedidoDeOcurrencias,
+  profeDeSede,
 } from "@app/contratos";
 import { ok } from "@app/nucleo";
 import { contextoDe } from "@app/plataforma";
@@ -104,11 +105,45 @@ function camas(app: FastifyInstance, agenda: Agenda): void {
   });
 }
 
+/** El profe fijo de la sede y el reemplazo de una fecha (0022). */
+function profes(app: FastifyInstance, agenda: Agenda): void {
+  const url = "/agenda/sedes/:id/profe";
+  app.get(url, { config: ver }, async (pedido, respuesta) => {
+    const sede = leer(conId, pedido.params, respuesta);
+    if (sede === undefined) return respuesta;
+    const resultado = await agenda.profeDeSede(contextoDe(pedido), { sedeId: sede.id });
+    return enviar(respuesta, resultado.ok ? ok({ profeId: resultado.valor }) : resultado, 200);
+  });
+
+  app.put(url, { config: gestionar }, async (pedido, respuesta) => {
+    const sede = leer(conId, pedido.params, respuesta);
+    const cambio = sede && leer(profeDeSede, pedido.body, respuesta);
+    if (sede === undefined || cambio === undefined) return respuesta;
+    const resultado = await agenda.fijarProfeDeSede(contextoDe(pedido), {
+      sedeId: sede.id,
+      ...cambio,
+    });
+    return enviar(respuesta, resultado, 204);
+  });
+
+  app.put("/agenda/ocurrencias/:id/profe", { config: gestionar }, async (pedido, respuesta) => {
+    const fecha = leer(conId, pedido.params, respuesta);
+    const cambio = fecha && leer(profeDeSede, pedido.body, respuesta);
+    if (fecha === undefined || cambio === undefined) return respuesta;
+    const resultado = await agenda.fijarProfeDeFecha(contextoDe(pedido), {
+      id: fecha.id,
+      ...cambio,
+    });
+    return enviar(respuesta, resultado, 204);
+  });
+}
+
 export function rutasDeAgenda(agenda: Agenda): FastifyPluginCallback {
   return (app, _opciones, listo) => {
     clases(app, agenda);
     ocurrencias(app, agenda);
     camas(app, agenda);
+    profes(app, agenda);
     rutasDeInscripciones(app, agenda);
     listo();
   };

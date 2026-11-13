@@ -5,6 +5,7 @@ import * as camas from "./aplicacion/camas.ts";
 import * as clases from "./aplicacion/clases.ts";
 import * as fechas from "./aplicacion/fechas.ts";
 import * as inscripciones from "./aplicacion/inscripciones.ts";
+import * as profes from "./aplicacion/profes.ts";
 import type { Agenda, OcupadasDeMas } from "./aplicacion/puertos.ts";
 import { repositorioInscripciones } from "./infraestructura/repositorio-inscripciones.ts";
 import { repositorioAgenda as repositorioDeAgenda } from "./infraestructura/repositorio.ts";
@@ -40,6 +41,12 @@ export function crearAgenda(base: Base, opciones: OpcionesAgenda = {}): Agenda {
       enContexto(base, quien, (tx) =>
         fechas.fijarCancelada(repositorioAgenda(tx), quien, ahora(), cambio),
       ),
+    profeDeSede: (quien, pedido) =>
+      enContexto(base, quien, (tx) => profes.deSede(repositorioAgenda(tx), quien, pedido)),
+    fijarProfeDeSede: (quien, cambio) =>
+      enContexto(base, quien, (tx) => profes.fijarDeSede(repositorioAgenda(tx), quien, cambio)),
+    fijarProfeDeFecha: (quien, cambio) =>
+      enContexto(base, quien, (tx) => profes.fijarDeFecha(repositorioAgenda(tx), quien, cambio)),
     camas: (quien, pedido) =>
       enContexto(base, quien, (tx) => camas.camas(repositorioAgenda(tx), quien, pedido)),
     fijarCamas: (quien, cambio) =>

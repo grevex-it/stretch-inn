@@ -13,7 +13,7 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 - Los datos de cada alumno: `personas` (se leen por su `index.ts`).
 - Asistencia, ausencias avisadas y recuperaciones: `asistencia`.
 - Avisos de una fecha cancelada por WhatsApp: `mensajeria`.
-- Profesores asignados a clases y `agenda.ver-propias` (0007): cuando exista la plantilla
+- `agenda.ver-propias` (0007), que el profe vea solo sus clases: cuando exista la plantilla
   Profesor.
 
 ## Depende de
@@ -21,6 +21,7 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 - `@app/nucleo`
 - `@app/plataforma`
 - `@app/centros` (zona horaria del centro)
+- `@app/identidad` (el profe es un usuario del equipo: `obtenerUsuarios`, 0022)
 - `@app/personas` (si el alumno existe y está activo, y los datos de los inscriptos)
 - `@app/contratos` (rutas HTTP)
 
@@ -31,8 +32,10 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
   `asistencia` (sin él, no se cuentan). Cada operación recibe el `ContextoCentro` de quien la
   pide y corre en su propia transacción:
   - `clases(quien, { pagina, porPagina, sedeId? })`: las de las sedes donde puede ver la agenda.
-  - `crearClase(quien, { sedeId, nombre, dia, hora, duracionMinutos, cupo })`.
-  - `editarClase(quien, { id, version, … })`: la sede no se cambia.
+  - `crearClase(quien, { sedeId, nombre, dia, hora, duracionMinutos, cupo, profeId? })`: sin
+    `profeId`, el profe fijo de la sede; con null, sin profe.
+  - `editarClase(quien, { id, version, …, profeId? })`: la sede no se cambia; sin `profeId`, el
+    profe queda como estaba.
   - `fijarActiva(quien, { id, activa })`: baja y reactivación.
   - `semana(quien, { sedeId, desde, pagina, porPagina })`: las fechas de los 7 días desde
     `desde`, armadas a pedido.
@@ -43,6 +46,10 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
     alumnos en dos consultas (`obtenerAlumnos` de `personas`).
   - `clasesDeAlumno(quien, { alumnoId, pagina, porPagina })`: sus inscripciones vigentes en las
     sedes donde se puede ver la agenda.
+  - `profeDeSede(quien, { sedeId })` y `fijarProfeDeSede(quien, { sedeId, profeId })`: el profe
+    fijo de la sede (0022), el de sus clases nuevas.
+  - `fijarProfeDeFecha(quien, { id, profeId })`: el reemplazo en una fecha (también pasada, para
+    corregir quién la dio); con null, vuelve a ser del profe de la clase.
   - `camas(quien, { sedeId })` y `fijarCamas(quien, { sedeId, camas })`: las camas de la sede
     (1 a 500, o null: sin tope), el tope del cupo de todas sus clases (pedido del 12/11). Al
     bajarlas, las clases con más cupo bajan con ellas, todas o ninguna; no bajan si dejan afuera a
@@ -54,7 +61,9 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
   `PUT`/`DELETE /agenda/clases/:id/baja` y `PUT`/`DELETE /agenda/ocurrencias/:id/cancelada`
   (`agenda.gestionar`); `POST /agenda/clases/:id/inscriptos` y
   `DELETE /agenda/inscripciones/:id` (`agenda.inscribir`); `GET /agenda/sedes/:id/camas`
-  (`agenda.ver`) y `PUT /agenda/sedes/:id/camas` (`agenda.gestionar`).
+  (`agenda.ver`) y `PUT /agenda/sedes/:id/camas` (`agenda.gestionar`); `GET /agenda/sedes/:id/profe`
+  (`agenda.ver`), `PUT /agenda/sedes/:id/profe` y `PUT /agenda/ocurrencias/:id/profe`
+  (`agenda.gestionar`).
 - `PERMISOS_AGENDA`: la sección «Agenda» del catálogo (`agenda.ver`, `agenda.gestionar`,
   `agenda.inscribir`).
 
@@ -107,6 +116,9 @@ Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContex
 - **El cupo de una clase no pasa las camas de su sede** (`cupo-mayor-que-camas`), al crearla ni
   al editarla. Cambiar las camas de una sede va de a uno (bloqueo por sede) y toma con
   `for update` las clases que tiene que bajar.
+- **El profe es un usuario activo del equipo del centro** (0022), leído con RLS por la API de
+  `identidad`. La fecha muestra su reemplazo, si tiene, o el profe de la clase. Cambiar el profe
+  de la clase deja las fechas que ya empezaron con el que tenían: cambia solo de ahí en adelante.
 - Un alumno tiene a lo sumo una inscripción vigente por clase (índice único parcial). La baja
   no borra: marca `baja_en`.
 - Una inscripción está vigente en un momento si se creó antes (o en ese momento) y no tiene baja
@@ -122,7 +134,8 @@ Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContex
 
 ## Configuración por centro
 
-Por sede, desde el panel: las camas (`camas_de_sede`; sin fila, sin tope). La zona horaria es del
+Por sede, desde el panel: las camas (`camas_de_sede`; sin fila, sin tope) y el profe fijo
+(`profes_de_sede`; sin fila, ninguno). La zona horaria es del
 centro (`centros`).
 
 ## Pendientes
