@@ -14,5 +14,6 @@ export type {
   ErrorDeAlumno,
   PaginaDeAlumnos,
 } from "./datos/tipos.ts";
+export { fijarSalud, obtenerSalud } from "./datos/salud.ts";
 export { rutasDeAlumnos } from "./http/rutas.ts";
 export { PERMISOS_PERSONAS } from "./datos/permisos.ts";

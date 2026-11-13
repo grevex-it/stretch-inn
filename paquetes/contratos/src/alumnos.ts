@@ -58,8 +58,21 @@ export const alumnoCreado = z.object({ id: z.uuid() });
 /** Respuesta de PUT /alumnos/:id: la versión nueva. */
 export const alumnoEditado = z.object({ version: z.number().int() });
 
+/**
+ * Cuerpo de PUT y respuesta de GET /alumnos/:id/salud: las patologías, aparte de la ficha y con
+ * permisos propios (0019). La versión es la que vio quien edita (0013): la primera vez, 0.
+ */
+export const saludDeAlumno = z.object({
+  patologias: z.string().max(4000, "Las patologías son muy largas: hasta 4000 caracteres."),
+  version: z.number().int().min(0),
+});
+
+/** Respuesta de PUT /alumnos/:id/salud: la versión nueva. */
+export const saludGuardada = z.object({ version: z.number().int() });
+
 export type PedidoDeAlumnos = z.infer<typeof pedidoDeAlumnos>;
 export type FichaDeAlumno = z.infer<typeof fichaDeAlumno>;
 export type EdicionDeAlumno = z.infer<typeof edicionDeAlumno>;
 export type PaginaDeAlumnos = z.infer<typeof paginaDeAlumnos>;
 export type Alumno = z.infer<typeof alumno>;
+export type SaludDeAlumno = z.infer<typeof saludDeAlumno>;

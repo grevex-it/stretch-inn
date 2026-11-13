@@ -13,6 +13,7 @@ import {
   type AlDarDeBaja,
   obtenerAlumno,
 } from "../datos/alumnos.ts";
+import { rutasDeSalud } from "./rutas-salud.ts";
 import { enviar, leer } from "./traducir.ts";
 
 const ver = { permiso: "personas.ver" } as const;
@@ -95,6 +96,7 @@ export function rutasDeAlumnos(
   return (app, _opciones, listo) => {
     lecturas(app, enElCentro);
     escrituras(app, enElCentro, alDarDeBaja);
+    rutasDeSalud(app, enElCentro);
     listo();
   };
 }

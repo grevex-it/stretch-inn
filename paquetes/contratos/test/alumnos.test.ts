@@ -1,6 +1,12 @@
 // Contratos de alumnos (ver docs/decisiones/0011): lo que el panel manda y la API acepta.
 import { describe, expect, it } from "vitest";
-import { alumno, edicionDeAlumno, fichaDeAlumno, pedidoDeAlumnos } from "../src/index.ts";
+import {
+  alumno,
+  edicionDeAlumno,
+  fichaDeAlumno,
+  pedidoDeAlumnos,
+  saludDeAlumno,
+} from "../src/index.ts";
 
 const UUID = "0b0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f60";
 const ficha = {
@@ -61,5 +67,18 @@ describe("alumno", () => {
     const respuesta = { ...ficha, id: UUID, activo: true, version: 1 };
     expect(alumno.parse(respuesta)).toEqual(respuesta);
     expect(alumno.safeParse({ ...respuesta, version: undefined }).success).toBe(false);
+  });
+});
+
+describe("datos de salud", () => {
+  it("las patologías con su versión; hasta 4000 caracteres", () => {
+    expect(saludDeAlumno.parse({ patologias: "Escoliosis.", version: 0 })).toEqual({
+      patologias: "Escoliosis.",
+      version: 0,
+    });
+    expect(saludDeAlumno.safeParse({ patologias: "x".repeat(4001), version: 0 }).success).toBe(
+      false,
+    );
+    expect(saludDeAlumno.safeParse({ patologias: "x" }).success).toBe(false);
   });
 });

@@ -239,6 +239,20 @@
       "when": 1794513114958,
       "tag": "20261112195154_rls-reglas-de-recuperacion",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794534863621,
+      "tag": "20261113015423_salud-de-alumnos",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1794534864996,
+      "tag": "20261113015424_rls-salud-de-alumnos",
+      "breakpoints": true
     }
   ]
 }

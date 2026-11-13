@@ -35,6 +35,8 @@ acuerdo.
   `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
 - `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,
   `alumno` y `paginaDeAlumnos`, con sus tipos.
+- `saludDeAlumno` (`{ patologias, version }`, hasta 4000 caracteres) y `saludGuardada`
+  (`{ version }`): los datos de salud del alumno, aparte de la ficha (0019), con su tipo.
 - `pedidoDeClases` (query `?pagina&sede`), `fichaDeClase`, `edicionDeClase`, `clase`,
   `paginaDeClases`, `claseCreada`, `claseEditada`, `pedidoDeOcurrencias`
   (query `?sede&desde&pagina`), `ocurrencia` y `paginaDeOcurrencias`, con sus tipos. Las fechas

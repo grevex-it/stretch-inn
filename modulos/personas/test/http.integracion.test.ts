@@ -1,5 +1,6 @@
 // Rutas /alumnos sobre Postgres real: lo que declara cada ruta y la traducción HTTP ↔ datos. La
 // sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula con una real.
+import { saludDeAlumno, saludGuardada } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearBase, type Base } from "@app/plataforma";
 import Fastify, { type FastifyContextConfig } from "fastify";
@@ -56,7 +57,33 @@ describe("rutas de alumnos", () => {
       "PUT /alumnos/:id": "personas.editar",
       "PUT /alumnos/:id/baja": "personas.editar",
       "DELETE /alumnos/:id/baja": "personas.editar",
+      "GET /alumnos/:id/salud": "personas.ver-salud",
+      "PUT /alumnos/:id/salud": "personas.editar-salud",
     });
+  });
+
+  it("los datos de salud: se leen y se guardan con el contrato y la versión", async () => {
+    const ctx = await contextoConPermisos(base, [
+      "personas.ver",
+      "personas.editar",
+      "personas.ver-salud",
+      "personas.editar-salud",
+    ]);
+    const { servidor } = await app(ctx);
+    const id = await crear(servidor);
+    const url = `/alumnos/${id}/salud`;
+
+    expect(saludDeAlumno.parse((await servidor.inject({ url })).json())).toEqual({
+      patologias: "",
+      version: 0,
+    });
+    const guardar = (version: number) =>
+      servidor.inject({ method: "PUT", url, payload: { patologias: "Escoliosis.", version } });
+    const guardada = await guardar(0);
+    expect(guardada.statusCode).toBe(200);
+    expect(saludGuardada.parse(guardada.json())).toEqual({ version: 1 });
+    expect((await guardar(0)).statusCode).toBe(409);
+    expect((await servidor.inject({ url: `/alumnos/${randomUUID()}/salud` })).statusCode).toBe(404);
   });
 
   it("alta, ficha y búsqueda", async () => {
