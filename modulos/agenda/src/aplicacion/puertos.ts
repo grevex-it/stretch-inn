@@ -181,7 +181,8 @@ export interface Inscripto {
   alumnoId: string;
   nombre: string;
   apellido: string;
-  telefono: string;
+  /** null si el alumno no tiene celular cargado (pendiente de completar, 0022). */
+  telefono: string | null;
   /** El alumno puede estar de baja en personas aunque siga inscripto. */
   activo: boolean;
   creadaEn: Date;
