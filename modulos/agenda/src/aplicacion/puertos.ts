@@ -2,6 +2,7 @@
 import type { ContextoCentro, Resultado } from "@app/nucleo";
 import type { Transaccion } from "@app/plataforma";
 import type { DatosDeClase, ErrorDeClase } from "../dominio/clase.ts";
+import type { ErrorDeCamas } from "../dominio/camas.ts";
 import type { ErrorDeInscripcion } from "../dominio/inscripcion.ts";
 
 export interface Pagina {
@@ -68,13 +69,26 @@ export interface RepositorioAgenda {
   fecha(id: string): Promise<{ sedeId: string; empiezaEn: Date } | undefined>;
   fijarCancelada(id: string, cancelada: boolean): Promise<void>;
   /**
-   * La fecha futura no cancelada de la clase con más lugares ocupados de más por recuperaciones,
-   * con las fechas tomadas; undefined si no hay ninguna (o la agenda no tiene el puerto).
+   * La fecha futura no cancelada de esas clases con más lugares ocupados de más por
+   * recuperaciones, con las fechas tomadas; undefined si no hay ninguna (o la agenda no tiene el
+   * puerto).
    */
   masOcupadaFutura(
-    claseId: string,
+    claseIds: readonly string[],
     ahora: Date,
-  ): Promise<{ fecha: string; deMas: number } | undefined>;
+  ): Promise<{ claseId: string; fecha: string; deMas: number } | undefined>;
+  /** Las camas de la sede, o undefined si no tiene tope. */
+  camas(sedeId: string): Promise<number | undefined>;
+  /** Los cambios de camas de una sede van de a uno hasta el fin de la transacción. */
+  bloquearCamas(sedeId: string): Promise<void>;
+  /** Con null, la sede queda sin tope. */
+  guardarCamas(sedeId: string, camas: number | null): Promise<void>;
+  /** Las clases de la sede con más cupo que esas camas, tomadas con `for update`. */
+  clasesPorEncimaDe(
+    sedeId: string,
+    camas: number,
+  ): Promise<{ id: string; nombre: string; inscriptos: number }[]>;
+  bajarCupos(ids: readonly string[], camas: number): Promise<void>;
 }
 
 /**
@@ -88,6 +102,7 @@ export type OcupadasDeMas = (
 
 export type ErrorDeAgenda =
   | ErrorDeClase
+  | ErrorDeCamas
   | ErrorDeInscripcion
   | "ya-inscripto"
   | "inscripcion-inexistente"
@@ -139,6 +154,19 @@ export interface Agenda {
     quien: ContextoCentro,
     filtro: Pagina & { claseId: string },
   ): Promise<Resultado<PaginaDe<Inscripto>, ErrorDeAgenda>>;
+  /** Las camas de la sede (el tope del cupo de sus clases), o null si no tiene tope. */
+  camas(
+    quien: ContextoCentro,
+    pedido: { sedeId: string },
+  ): Promise<Resultado<number | null, ErrorDeAgenda>>;
+  /**
+   * Con null, sin tope. Al bajarlas, las clases con más cupo bajan con ellas, salvo que eso deje
+   * afuera a un fijo o a una recuperación de una fecha futura.
+   */
+  fijarCamas(
+    quien: ContextoCentro,
+    cambio: { sedeId: string; camas: number | null },
+  ): Promise<Resultado<null, ErrorDeAgenda>>;
   /** Las inscripciones vigentes del alumno, en las sedes donde se puede ver la agenda. */
   clasesDeAlumno(
     quien: ContextoCentro,

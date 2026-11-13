@@ -104,6 +104,19 @@ export const claseDeAlumno = z.object({ id: z.uuid(), clase });
 /** Respuesta de GET /alumnos/:id/clases. */
 export const paginaDeClasesDeAlumno = paginaDe(claseDeAlumno);
 
+/**
+ * Cuerpo de PUT y respuesta de GET /agenda/sedes/:id/camas: las camas de la sede, el tope del cupo
+ * de sus clases. null: sin tope.
+ */
+export const camasDeSede = z.object({
+  camas: z
+    .number("Escribí la cantidad de camas.")
+    .int("Las camas son un número entero.")
+    .min(1, "Las camas van de 1 a 500.")
+    .max(500, "Las camas van de 1 a 500.")
+    .nullable(),
+});
+
 export type PedidoDeClases = z.infer<typeof pedidoDeClases>;
 export type PedidoDeOcurrencias = z.infer<typeof pedidoDeOcurrencias>;
 export type FichaDeClase = z.infer<typeof fichaDeClase>;
@@ -117,3 +130,4 @@ export type ClaseDeAlumno = z.infer<typeof claseDeAlumno>;
 export type Inscripto = z.infer<typeof inscripto>;
 export type PaginaDeInscriptos = z.infer<typeof paginaDeInscriptos>;
 export type PaginaDeClasesDeAlumno = z.infer<typeof paginaDeClasesDeAlumno>;
+export type CamasDeSede = z.infer<typeof camasDeSede>;

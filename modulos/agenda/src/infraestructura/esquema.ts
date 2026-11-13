@@ -105,3 +105,17 @@ export const ocurrencias = pgTable(
     check("ocurrencias_termina_despues", sql`${tabla.terminaEn} > ${tabla.empiezaEn}`),
   ],
 );
+
+/**
+ * Las camas de una sede: el tope del cupo de sus clases. Sin fila, la sede no tiene tope. Una por
+ * sede (clave primaria).
+ */
+export const camasDeSede = pgTable(
+  "camas_de_sede",
+  {
+    sedeId: uuid("sede_id").primaryKey(),
+    centroId: uuid("centro_id").notNull(),
+    camas: integer("camas").notNull(),
+  },
+  (tabla) => [check("camas_de_sede_camas", sql`${tabla.camas} between 1 and 500`)],
+);

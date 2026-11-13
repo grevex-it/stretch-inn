@@ -1,6 +1,13 @@
 // Rutas de la agenda. Solo traducen HTTP ↔ Agenda: la API ya resolvió la sesión y exigió el
 // permiso en alguna sede; el permiso en la sede puntual lo controla el módulo (0007).
-import { edicionDeClase, fichaDeClase, pedidoDeClases, pedidoDeOcurrencias } from "@app/contratos";
+import {
+  camasDeSede,
+  edicionDeClase,
+  fichaDeClase,
+  pedidoDeClases,
+  pedidoDeOcurrencias,
+} from "@app/contratos";
+import { ok } from "@app/nucleo";
 import { contextoDe } from "@app/plataforma";
 import type { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { z } from "zod";
@@ -78,10 +85,30 @@ function ocurrencias(app: FastifyInstance, agenda: Agenda): void {
   }
 }
 
+/** Las camas de la sede: el tope del cupo de sus clases. */
+function camas(app: FastifyInstance, agenda: Agenda): void {
+  const url = "/agenda/sedes/:id/camas";
+  app.get(url, { config: ver }, async (pedido, respuesta) => {
+    const sede = leer(conId, pedido.params, respuesta);
+    if (sede === undefined) return respuesta;
+    const resultado = await agenda.camas(contextoDe(pedido), { sedeId: sede.id });
+    return enviar(respuesta, resultado.ok ? ok({ camas: resultado.valor }) : resultado, 200);
+  });
+
+  app.put(url, { config: gestionar }, async (pedido, respuesta) => {
+    const sede = leer(conId, pedido.params, respuesta);
+    const cambio = sede && leer(camasDeSede, pedido.body, respuesta);
+    if (sede === undefined || cambio === undefined) return respuesta;
+    const resultado = await agenda.fijarCamas(contextoDe(pedido), { sedeId: sede.id, ...cambio });
+    return enviar(respuesta, resultado, 204);
+  });
+}
+
 export function rutasDeAgenda(agenda: Agenda): FastifyPluginCallback {
   return (app, _opciones, listo) => {
     clases(app, agenda);
     ocurrencias(app, agenda);
+    camas(app, agenda);
     rutasDeInscripciones(app, agenda);
     listo();
   };

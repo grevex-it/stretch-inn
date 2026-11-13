@@ -36,7 +36,7 @@ export async function inscribir(
   if (!puedeEn(quien, INSCRIBIR, clase.sedeId)) return SIN_PERMISO;
   const regla = puedeInscribirse(clase, await repos.inscripciones.alumno(alumnoId));
   if (!regla.ok) return regla;
-  const masOcupada = await repos.agenda.masOcupadaFutura(claseId, ahora);
+  const masOcupada = await repos.agenda.masOcupadaFutura([claseId], ahora);
   const enLasFechas = entraEnLasFechas(clase.cupo, clase.inscriptos + 1, masOcupada);
   if (!enLasFechas.ok) return enLasFechas;
   const id = await repos.inscripciones.inscribir({ claseId, sedeId: clase.sedeId, alumnoId });

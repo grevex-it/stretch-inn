@@ -239,6 +239,20 @@
       "when": 1794513114958,
       "tag": "20261112195154_rls-reglas-de-recuperacion",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794534190169,
+      "tag": "20261113014310_camas-de-sede",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1794534191489,
+      "tag": "20261113014311_rls-camas-de-sede",
+      "breakpoints": true
     }
   ]
 }

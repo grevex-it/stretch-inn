@@ -7,6 +7,7 @@ import type { DatosDeClase } from "../dominio/clase.ts";
 import type { OcupadasDeMas, RepositorioAgenda } from "../aplicacion/puertos.ts";
 import { clases, ocurrencias } from "./esquema.ts";
 import { lugaresFuturos } from "./lugares-futuros.ts";
+import { repositorioCamas } from "./repositorio-camas.ts";
 
 const ZONA_POR_DEFECTO = "America/Argentina/Buenos_Aires";
 
@@ -185,5 +186,6 @@ export function repositorioAgenda(
     ...lecturasDeFechas(tx),
     ...escriturasDeFechas(tx),
     ...lugaresFuturos(tx, ocupadasDeMas),
+    ...repositorioCamas(tx),
   };
 }

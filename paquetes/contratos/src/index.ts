@@ -39,6 +39,7 @@ export {
   type PedidoDeAlumnos,
 } from "./alumnos.ts";
 export {
+  camasDeSede,
   clase,
   claseCreada,
   claseDeAlumno,
@@ -55,6 +56,7 @@ export {
   pedidoDeClases,
   pedidoDeInscripcion,
   pedidoDeOcurrencias,
+  type CamasDeSede,
   type Clase,
   type ClaseDeAlumno,
   type Inscripto,
