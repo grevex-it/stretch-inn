@@ -12,7 +12,7 @@ Fases 0 a 3 con el panel (`apps/web`). El sistema central incluye alumnos y prof
 
 ## Arrancar ya, en paralelo al código
 
-- **Registro de GREVEX como Tech Provider de Meta** (0012): tarda y bloquea la Fase 5.
+- **Servidor de WAHA** (0021): alojarlo y vincular el número de Stretch Inn antes de la Fase 5.
 - **Relevamiento con Stretch Inn** (lista en `docs/pendientes.md`): bloquea la Fase 3.
 
 ## Fase 0 — Cimientos (estructura)
@@ -72,7 +72,7 @@ PWA con funcionamiento limitado sin conexión y cola de avisos con idempotencia 
 
 ## Fase 5 — Mensajería y licencias (segunda entrega)
 
-- `mensajeria`: WhatsApp Cloud API con registro integrado por centro (0012).
+- `mensajeria`: WhatsApp por WAHA, con un número por centro y ritmo de envío limitado (0021).
 - `licencias`: en USD con cotización guardada (0009).
 
 ## Transversal: logs y alertas
