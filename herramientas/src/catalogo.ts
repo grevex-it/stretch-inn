@@ -4,6 +4,7 @@ import { PERMISOS_ABONOS } from "@app/abonos";
 import { PERMISOS_AGENDA } from "@app/agenda";
 import { PERMISOS_ASISTENCIA } from "@app/asistencia";
 import { PERMISOS_CAJA } from "@app/caja";
+import { PERMISOS_GASTOS } from "@app/gastos";
 import { crearCatalogo, PERMISOS_IDENTIDAD } from "@app/identidad";
 import { PERMISOS_PERSONAS } from "@app/personas";
 
@@ -14,4 +15,5 @@ export const CATALOGO = crearCatalogo([
   PERMISOS_ASISTENCIA,
   PERMISOS_ABONOS,
   PERMISOS_CAJA,
+  PERMISOS_GASTOS,
 ]);

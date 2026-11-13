@@ -14,6 +14,7 @@ acuerdo.
 - `src/abonos.ts`: planes del centro, precios por sede y cuotas de los alumnos: paquetes de
   clases (0020).
 - `src/caja.ts`: cobros con clave de idempotencia, anulaciones y el día de caja.
+- `src/gastos.ts`: gastos de cada sede con clave de idempotencia, anulaciones y por período (0022).
 - `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
 ## Fuera de alcance
@@ -65,6 +66,10 @@ acuerdo.
 - `pedidoDeCobro` (cuota, medio y `claveIdempotencia`), `cobroHecho` (`{ id, monto, repetido }`),
   `pedidoDeAnulacion` (`{ motivo }`), `pedidoDelDia` (query `?sede&dia&pagina`), `pago` y
   `diaDeCaja` (una página de pagos más `cobrado`), con sus tipos.
+- `pedidoDeGasto` (sede, fecha, monto, categoría, medio, descripción y `claveIdempotencia`),
+  `gastoCargado` (`{ id, repetido }`), `pedidoDeGastos` (query `?sede&desde&hasta&pagina`),
+  `gasto` y `paginaDeGastos` (una página más `gastado`), con sus tipos. `CATEGORIAS_DE_GASTO`:
+  las mismas que `gastos` (un test lo controla). La anulación usa `pedidoDeAnulacion`.
 
 ## Reglas de uso
 

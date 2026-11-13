@@ -13,6 +13,7 @@
     "@app/agenda": "workspace:*",
     "@app/asistencia": "workspace:*",
     "@app/caja": "workspace:*",
+    "@app/gastos": "workspace:*",
     "@app/identidad": "workspace:*",
     "@app/nucleo": "workspace:*",
     "@app/personas": "workspace:*",

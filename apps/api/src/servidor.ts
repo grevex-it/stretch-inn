@@ -13,6 +13,7 @@ import { abonoVigente, crearAbonos, rutasDeAbonos } from "@app/abonos";
 import { crearAgenda, liberarLugares, rutasDeAgenda } from "@app/agenda";
 import { crearAsistencia, ocupadasDeMas, rutasDeAsistencia } from "@app/asistencia";
 import { crearCaja, EVENTO_PAGO_REGISTRADO, rutasDeCaja } from "@app/caja";
+import { crearGastos, rutasDeGastos } from "@app/gastos";
 import { construirApp } from "./app.ts";
 
 const logger = crearLogger({ nivel: "info" });
@@ -63,6 +64,7 @@ await app.register(rutasDeAgenda(crearAgenda(base, { ocupadasDeMas })));
 await app.register(rutasDeAsistencia(crearAsistencia(base, { abonoVigente })));
 await app.register(rutasDeAbonos(crearAbonos(base)));
 await app.register(rutasDeCaja(crearCaja(base, { cola })));
+await app.register(rutasDeGastos(crearGastos(base)));
 
 // Railway manda SIGTERM antes de cambiar al deploy nuevo: se terminan los pedidos en curso.
 process.on("SIGTERM", () => {
