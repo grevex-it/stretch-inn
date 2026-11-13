@@ -84,6 +84,20 @@ export function ocurrenciasDeLaSemana(horario: Horario, desde: string, zona: str
   return [ocurrenciaEn(fecha, horario, zona)];
 }
 
+/** Las fechas de la clase entre dos días AAAA-MM-DD, inclusive, en orden. */
+export function ocurrenciasDelPeriodo(
+  horario: Horario,
+  desde: string,
+  hasta: string,
+  zona: string,
+): Ocurrencia[] {
+  const fechas: Ocurrencia[] = [];
+  for (let semana = desde; semana <= hasta; semana = sumarDias(semana, 7)) {
+    fechas.push(...ocurrenciasDeLaSemana(horario, semana, zona).filter((o) => o.fecha <= hasta));
+  }
+  return fechas;
+}
+
 /**
  * Qué pasa con las ocurrencias futuras ya guardadas cuando cambia el horario: si siguen en el
  * mismo día, se mueven a la hora nueva; si cambió el día, se borran y se vuelven a armar a pedido.

@@ -1,6 +1,6 @@
 // Rutas /agenda sobre Postgres real: el permiso que declara cada ruta y la traducción HTTP ↔
 // agenda. La sesión la deja la API antes (apps/api/src/base/sesion.ts); acá se simula con una real.
-import { camasDeSede, profeDeSede } from "@app/contratos";
+import { camasDeSede, clasesDictadas, profeDeSede } from "@app/contratos";
 import type { ContextoCentro } from "@app/nucleo";
 import { crearAlumno } from "@app/personas";
 import { crearBase, enContexto, type Base } from "@app/plataforma";
@@ -75,6 +75,7 @@ describe("rutas de la agenda", () => {
       "GET /agenda/sedes/:id/profe": "agenda.ver",
       "PUT /agenda/sedes/:id/profe": "agenda.gestionar",
       "PUT /agenda/ocurrencias/:id/profe": "agenda.gestionar",
+      "GET /agenda/clases-dictadas": "agenda.gestionar",
     });
   });
 
@@ -94,6 +95,14 @@ describe("rutas de la agenda", () => {
       payload: { profeId: randomUUID() },
     });
     expect(invalido.statusCode).toBe(400);
+    const dictadas = await servidor.inject({
+      url: `/agenda/clases-dictadas?sede=${centro.norte}&desde=2026-11-01&hasta=2026-11-30`,
+    });
+    expect(clasesDictadas.parse(dictadas.json())).toEqual({ profes: [], sinProfe: 0 });
+    const sinPeriodo = await servidor.inject({
+      url: `/agenda/clases-dictadas?sede=${centro.norte}`,
+    });
+    expect(sinPeriodo.statusCode).toBe(400);
     const sinFecha = await servidor.inject({
       method: "PUT",
       url: `/agenda/ocurrencias/${randomUUID()}/profe`,

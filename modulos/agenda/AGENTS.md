@@ -48,6 +48,10 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
     sedes donde se puede ver la agenda.
   - `profeDeSede(quien, { sedeId })` y `fijarProfeDeSede(quien, { sedeId, profeId })`: el profe
     fijo de la sede (0022), el de sus clases nuevas.
+  - `clasesDictadas(quien, { sedeId, desde, hasta })`: para pagarles por clase (0022), cuántas
+    fechas de la sede dio cada profe entre dos días (hasta 62): las que ya terminaron y no se
+    cancelaron, con su reemplazo si lo tuvieron. Arma antes las fechas que falten (en una sola
+    escritura). Trae `{ profes: [{ profeId, nombre, clases }], sinProfe }`.
   - `fijarProfeDeFecha(quien, { id, profeId })`: el reemplazo en una fecha (también pasada, para
     corregir quién la dio); con null, vuelve a ser del profe de la clase.
   - `camas(quien, { sedeId })` y `fijarCamas(quien, { sedeId, camas })`: las camas de la sede
@@ -62,8 +66,8 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
   (`agenda.gestionar`); `POST /agenda/clases/:id/inscriptos` y
   `DELETE /agenda/inscripciones/:id` (`agenda.inscribir`); `GET /agenda/sedes/:id/camas`
   (`agenda.ver`) y `PUT /agenda/sedes/:id/camas` (`agenda.gestionar`); `GET /agenda/sedes/:id/profe`
-  (`agenda.ver`), `PUT /agenda/sedes/:id/profe` y `PUT /agenda/ocurrencias/:id/profe`
-  (`agenda.gestionar`).
+  (`agenda.ver`), `PUT /agenda/sedes/:id/profe`, `PUT /agenda/ocurrencias/:id/profe` y
+  `GET /agenda/clases-dictadas?sede&desde&hasta` (`agenda.gestionar`).
 - `PERMISOS_AGENDA`: la sección «Agenda» del catálogo (`agenda.ver`, `agenda.gestionar`,
   `agenda.inscribir`).
 
@@ -144,6 +148,10 @@ centro (`centros`).
   leer la tabla de `personas` (regla 4). Una clase rara vez pasa de una página: el panel los
   puede ordenar.
 - Reservas sueltas por fecha, si un centro trabaja sin horario fijo.
+- Las clases dictadas cuentan las fechas de las clases activas que falten armar; las de una clase
+  dada de baja cuentan solo si ya estaban armadas (alguien miró esa semana o tomó asistencia).
+- **[SUPUESTO]** Ver las clases dictadas pide `agenda.gestionar`: muestra cuánto trabajó cada
+  profe. Si hace falta, va a un permiso propio con el módulo de reportes.
 - Crear o editar una clase lee las camas sin tomarlas: si a la vez alguien baja las camas de esa
   sede, la clase nueva puede quedar con más cupo que camas. Es una ventana chica; tomarlas
   ahí cruza el orden de bloqueos con `fijarCamas` (clase y sede al revés).
