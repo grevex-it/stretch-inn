@@ -49,6 +49,7 @@ describe("crearAlumno", () => {
       fechaNacimiento: "1990-04-12",
       numeroDeSocio: 1,
       fechaDeInicio: null,
+      profeId: null,
       activo: true,
       bajaEn: null,
       pendienteDeCompletar: false,

@@ -1,6 +1,7 @@
 // Alumnos del centro (ver docs/decisiones/0011). Toda función corre dentro de enContexto: RLS
 // limita al centro del contexto.
 import { falla, ok, type Resultado } from "@app/nucleo";
+import { obtenerUsuarios } from "@app/identidad";
 import { conPuntoDeGuardado, type Transaccion } from "@app/plataforma";
 import { and, asc, count, eq, inArray, sql, type SQL } from "drizzle-orm";
 import { alumnos } from "./esquema.ts";
@@ -24,6 +25,7 @@ const columnas = {
   notas: alumnos.notas,
   numeroDeSocio: alumnos.numeroDeSocio,
   fechaDeInicio: alumnos.fechaDeInicio,
+  profeId: alumnos.profeId,
   activo: alumnos.activo,
   bajaEn: alumnos.bajaEn,
   pendienteDeCompletar: sql<boolean>`${alumnos.telefono} is null`,
@@ -120,12 +122,25 @@ async function siguienteNumero(tx: Transaccion): Promise<number> {
   return (fila?.ultimo ?? 0) + 1;
 }
 
+/** El profe asignado, si vino: un usuario activo del equipo del centro (identidad, 0022). */
+async function profeValido(tx: Transaccion, profeId: string | null | undefined): Promise<boolean> {
+  if (profeId == null) return true;
+  const [usuario] = await obtenerUsuarios(tx, [profeId]);
+  return usuario?.activo === true;
+}
+
+const PROFE_INVALIDO = falla(
+  "profe-invalido",
+  "Ese profe no es un integrante activo del equipo del centro.",
+);
+
 export async function crearAlumno(
   tx: Transaccion,
   datos: DatosDeAlumno,
 ): Promise<Resultado<{ id: string }, ErrorDeAlumno>> {
   const ficha = limpiarFicha(datos);
   if (!ficha.ok) return ficha;
+  if (!(await profeValido(tx, ficha.valor.profeId))) return PROFE_INVALIDO;
   const numeroDeSocio = ficha.valor.numeroDeSocio ?? (await siguienteNumero(tx));
   const guardado = await sinRepetir(tx, async () => {
     const [fila] = await tx
@@ -175,6 +190,7 @@ export async function editarAlumno(
 ): Promise<Resultado<{ version: number }, ErrorDeAlumno>> {
   const ficha = limpiarFicha(datos);
   if (!ficha.ok) return ficha;
+  if (!(await profeValido(tx, ficha.valor.profeId))) return PROFE_INVALIDO;
   const guardado = await guardarFicha(tx, { id, version, ficha: ficha.valor });
   if (!guardado.ok) return guardado;
   const fila = guardado.valor;

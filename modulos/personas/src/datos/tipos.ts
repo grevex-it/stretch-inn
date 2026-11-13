@@ -14,12 +14,15 @@ export interface DatosDeAlumno {
   numeroDeSocio?: number | null | undefined;
   /** AAAA-MM-DD: la «primera clase» (0019). Sin él, la edición conserva la que tenía. */
   fechaDeInicio?: string | null | undefined;
+  /** Su profe asignado: un usuario activo del equipo (0022). Sin él, la edición lo conserva. */
+  profeId?: string | null | undefined;
 }
 
-export interface Alumno extends Omit<DatosDeAlumno, "numeroDeSocio" | "fechaDeInicio"> {
+export interface Alumno extends Omit<DatosDeAlumno, "numeroDeSocio" | "fechaDeInicio" | "profeId"> {
   id: string;
   numeroDeSocio: number;
   fechaDeInicio: string | null;
+  profeId: string | null;
   activo: boolean;
   /** Cuándo se dio de baja; null si está activo. */
   bajaEn: Date | null;
@@ -53,4 +56,5 @@ export type ErrorDeAlumno =
   | "socio-repetido"
   | "alumno-inexistente"
   | "cambio-concurrente"
-  | "salud-muy-larga";
+  | "salud-muy-larga"
+  | "profe-invalido";
