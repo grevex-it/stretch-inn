@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   camasDeSede,
   clase,
+  clasesDictadas,
   edicionDeClase,
   fichaDeClase,
   paginaDeClasesDeAlumno,
@@ -10,6 +11,7 @@ import {
   paginaDeOcurrencias,
   pedidoDeClases,
   pedidoDeInscripcion,
+  pedidoDeDictadas,
   pedidoDeOcurrencias,
   profeDeSede,
 } from "../src/index.ts";
@@ -140,5 +142,16 @@ describe("profes de la agenda (0022)", () => {
       version: 1,
     };
     expect(clase.parse(respuesta)).toEqual(respuesta);
+  });
+});
+
+describe("clases dictadas (0022)", () => {
+  it("se piden por sede y período; vienen por profe y las sin profe aparte", () => {
+    expect(
+      pedidoDeDictadas.parse({ sede: SEDE, desde: "2026-11-01", hasta: "2026-11-30" }),
+    ).toEqual({ sedeId: SEDE, desde: "2026-11-01", hasta: "2026-11-30" });
+    expect(pedidoDeDictadas.safeParse({ sede: SEDE, desde: "2026-11-01" }).success).toBe(false);
+    const respuesta = { profes: [{ profeId: SEDE, nombre: "Lore", clases: 12 }], sinProfe: 2 };
+    expect(clasesDictadas.parse(respuesta)).toEqual(respuesta);
   });
 });

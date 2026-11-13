@@ -5,6 +5,7 @@ import {
   edicionDeClase,
   fichaDeClase,
   pedidoDeClases,
+  pedidoDeDictadas,
   pedidoDeOcurrencias,
   profeDeSede,
 } from "@app/contratos";
@@ -124,6 +125,13 @@ function profes(app: FastifyInstance, agenda: Agenda): void {
       ...cambio,
     });
     return enviar(respuesta, resultado, 204);
+  });
+
+  // Para pagarles por clase (0022): cuántas dio cada uno en el período.
+  app.get("/agenda/clases-dictadas", { config: gestionar }, async (pedido, respuesta) => {
+    const filtro = leer(pedidoDeDictadas, pedido.query, respuesta);
+    if (filtro === undefined) return respuesta;
+    return enviar(respuesta, await agenda.clasesDictadas(contextoDe(pedido), filtro), 200);
   });
 
   app.put("/agenda/ocurrencias/:id/profe", { config: gestionar }, async (pedido, respuesta) => {

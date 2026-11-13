@@ -5,6 +5,7 @@ import {
   diaDe,
   localAUtc,
   ocurrenciasDeLaSemana,
+  ocurrenciasDelPeriodo,
 } from "../../src/dominio/ocurrencias.ts";
 
 const BUENOS_AIRES = "America/Argentina/Buenos_Aires";
@@ -89,5 +90,14 @@ describe("cambioDeHorario", () => {
       actualizar: [],
       borrar: ["a", "b"],
     });
+  });
+});
+
+describe("ocurrenciasDelPeriodo", () => {
+  it("las fechas de la clase entre dos días, inclusive", () => {
+    const lunes = { dia: 1, hora: "18:30", duracionMinutos: 60 };
+    const fechas = ocurrenciasDelPeriodo(lunes, "2026-11-16", "2026-11-30", BUENOS_AIRES);
+    expect(fechas.map((f) => f.fecha)).toEqual(["2026-11-16", "2026-11-23", "2026-11-30"]);
+    expect(ocurrenciasDelPeriodo(lunes, "2026-11-17", "2026-11-22", BUENOS_AIRES)).toEqual([]);
   });
 });

@@ -11,6 +11,7 @@ const ESTADOS: Record<ErrorDeAgenda, number> = {
   "duracion-invalida": 400,
   "cupo-invalido": 400,
   "profe-invalido": 400,
+  "periodo-invalido": 400,
   "camas-invalidas": 400,
   "sin-permiso": 403,
   "clase-inexistente": 404,

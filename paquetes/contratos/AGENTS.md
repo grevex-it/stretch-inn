@@ -49,6 +49,8 @@ acuerdo.
 - `camasDeSede` (`{ camas }`: de 1 a 500, o null sin tope), las camas de una sede, con su tipo.
 - `profeDeSede` (`{ profeId }`, un usuario o null): el profe fijo de una sede y el reemplazo de
   una fecha (0022). La clase y la fecha traen `profeId`; al crear o editar una clase es opcional.
+- `pedidoDeDictadas` (query `?sede&desde&hasta`) y `clasesDictadas` (`{ profes, sinProfe }`):
+  las clases dictadas por cada profe en un período (0022), con su tipo.
 - `pedidoDeAsistencia` (de 1 a 100 marcas `{ alumnoId, estado }`, presente o ausente) y
   `planillaDeAsistencia` (la fecha y una página de sus inscriptos con su `estado` y su
   `avisoId`, `null` si no se marcó o no avisó), con sus tipos.

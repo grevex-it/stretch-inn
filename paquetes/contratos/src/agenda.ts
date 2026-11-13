@@ -137,6 +137,21 @@ export const camasDeSede = z.object({
  */
 export const profeDeSede = z.object({ profeId: profe });
 
+/** Query de GET /agenda/clases-dictadas: `?sede&desde&hasta` (días, inclusive; hasta 62). */
+export const pedidoDeDictadas = z
+  .object({
+    sede,
+    desde: z.iso.date("Revisá el día de inicio."),
+    hasta: z.iso.date("Revisá el día de fin."),
+  })
+  .transform(({ sede: sedeId, desde, hasta }) => ({ sedeId, desde, hasta }));
+
+/** Respuesta: las clases dictadas por cada profe (para pagarles por clase, 0022). */
+export const clasesDictadas = z.object({
+  profes: z.array(z.object({ profeId: z.uuid(), nombre: z.string(), clases: z.number().int() })),
+  sinProfe: z.number().int(),
+});
+
 export type PedidoDeClases = z.infer<typeof pedidoDeClases>;
 export type PedidoDeOcurrencias = z.infer<typeof pedidoDeOcurrencias>;
 export type FichaDeClase = z.infer<typeof fichaDeClase>;
@@ -151,3 +166,4 @@ export type Inscripto = z.infer<typeof inscripto>;
 export type PaginaDeInscriptos = z.infer<typeof paginaDeInscriptos>;
 export type PaginaDeClasesDeAlumno = z.infer<typeof paginaDeClasesDeAlumno>;
 export type CamasDeSede = z.infer<typeof camasDeSede>;
+export type ClasesDictadas = z.infer<typeof clasesDictadas>;

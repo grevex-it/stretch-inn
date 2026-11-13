@@ -66,6 +66,18 @@ export interface RepositorioAgenda {
   /** Con null, la fecha vuelve a ser del profe de la clase. */
   fijarProfeDeFecha(id: string, profeId: string | null): Promise<void>;
   /**
+   * Cuántas fechas de la sede en el período (días, inclusive) ya terminaron y no se cancelaron,
+   * por quién las dio (el reemplazo o el profe de la clase; null si ninguno).
+   */
+  dictadas(filtro: {
+    sedeId: string;
+    desde: string;
+    hasta: string;
+    ahora: Date;
+  }): Promise<{ profeId: string | null; clases: number }[]>;
+  /** El nombre de cada profe (identidad, hasta 100). */
+  nombresDeProfes(ids: readonly string[]): Promise<Map<string, string>>;
+  /**
    * Las fechas que ya empezaron y no tenían profe propio quedan con ese (el que tenía la clase):
    * cambiar el profe de la clase no cambia quién dio las pasadas.
    */
@@ -132,7 +144,8 @@ export type ErrorDeAgenda =
   | "fecha-inexistente"
   | "fecha-pasada"
   | "cambio-concurrente"
-  | "profe-invalido";
+  | "profe-invalido"
+  | "periodo-invalido";
 
 /** Sin `profeId`, la clase toma el profe fijo de la sede; con null, queda sin profe. */
 export type NuevaClase = DatosDeClase & { sedeId: string; profeId?: string | null | undefined };
@@ -142,6 +155,13 @@ export type EdicionDeClase = DatosDeClase & {
   version: number;
   profeId?: string | null | undefined;
 };
+
+/** Las clases dictadas por cada profe en un período (0022), y las de clases sin profe. */
+export interface ClasesDictadas {
+  /** Por profe: el que más clases dio primero y, si empatan, por nombre. */
+  profes: { profeId: string; nombre: string; clases: number }[];
+  sinProfe: number;
+}
 
 /** Lo que exporta el módulo: cada operación corre en su transacción con el contexto. */
 export interface Agenda {
@@ -210,6 +230,14 @@ export interface Agenda {
     quien: ContextoCentro,
     cambio: { id: string; profeId: string | null },
   ): Promise<Resultado<null, ErrorDeAgenda>>;
+  /**
+   * Las clases dictadas por cada profe en la sede entre dos días (hasta 62): las fechas que ya
+   * terminaron y no se cancelaron. Para pagarles por clase (0022).
+   */
+  clasesDictadas(
+    quien: ContextoCentro,
+    filtro: { sedeId: string; desde: string; hasta: string },
+  ): Promise<Resultado<ClasesDictadas, ErrorDeAgenda>>;
   /** Las inscripciones vigentes del alumno, en las sedes donde se puede ver la agenda. */
   clasesDeAlumno(
     quien: ContextoCentro,
