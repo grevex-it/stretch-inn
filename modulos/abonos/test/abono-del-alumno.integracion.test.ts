@@ -26,7 +26,12 @@ async function conCuota() {
   });
   if (!plan.ok) throw new Error(plan.error.mensaje);
   const alumnoId = await centro.alumno();
-  await conHorario(base, centro.ctx, { sedeId: centro.norte, alumnoId, dias: [1] });
+  await conHorario(base, centro.ctx, {
+    sedeId: centro.norte,
+    alumnoId,
+    dias: [1],
+    ahora: () => new Date("2026-11-15T12:00:00Z"),
+  });
   const cuota = await abonos.generarCuota(centro.ctx, {
     alumnoId,
     planId: plan.valor.id,
