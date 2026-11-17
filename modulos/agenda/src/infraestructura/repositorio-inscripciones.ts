@@ -12,11 +12,11 @@ export function repositorioInscripciones(tx: Transaccion): RepositorioInscripcio
       const alumno = await obtenerAlumno(tx, id);
       return alumno === undefined ? undefined : { activo: alumno.activo };
     },
-    async inscribir({ claseId, sedeId, alumnoId }) {
+    async inscribir({ claseId, sedeId, alumnoId, creadaEn }) {
       // El índice único parcial (clase, alumno vigente) es la barrera: si choca, no hay fila.
       const [fila] = await tx
         .insert(inscripciones)
-        .values({ claseId, sedeId, alumnoId, centroId: sql`app_centro_actual()` })
+        .values({ claseId, sedeId, alumnoId, creadaEn, centroId: sql`app_centro_actual()` })
         .onConflictDoNothing()
         .returning({ id: inscripciones.id });
       return fila?.id;

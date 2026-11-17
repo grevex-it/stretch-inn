@@ -60,6 +60,7 @@ async function profeValido(
 export async function crear(
   repo: RepositorioAgenda,
   quien: ContextoCentro,
+  ahora: Date,
   { sedeId, profeId, ...datos }: NuevaClase,
 ): Promise<Resultado<{ id: string }, ErrorDeAgenda>> {
   if (!puedeEn(quien, GESTIONAR, sedeId)) return SIN_PERMISO;
@@ -73,7 +74,7 @@ export async function crear(
     profeId ?? (profeId === null ? null : ((await repo.profeDeSede(sedeId)) ?? null)),
   );
   if (!profe.ok) return profe;
-  return ok(await repo.crearClase(sedeId, clase.valor, profe.valor));
+  return ok(await repo.crearClase(sedeId, clase.valor, profe.valor, ahora));
 }
 
 /**

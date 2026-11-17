@@ -125,14 +125,20 @@ export async function centroConDosSedes(base: Base) {
 
 /**
  * Inscribe al alumno en una clase de la sede por cada día (1 = lunes … 7 = domingo), a las 18:30:
- * su horario fijo. Cada fecha de ese horario gasta una clase del abono (0020).
+ * su horario fijo. Cada fecha de ese horario gasta una clase del abono (0020). Con `ahora`, la
+ * agenda las da de alta en ese momento: el mismo «ahora» del test, y no el día en que se corre.
  */
 export async function conHorario(
   base: Base,
   ctx: ContextoCentro,
-  { sedeId, alumnoId, dias }: { sedeId: string; alumnoId: string; dias: readonly number[] },
+  {
+    sedeId,
+    alumnoId,
+    dias,
+    ahora,
+  }: { sedeId: string; alumnoId: string; dias: readonly number[]; ahora?: () => Date },
 ): Promise<void> {
-  const agenda = crearAgenda(base);
+  const agenda = crearAgenda(base, ahora === undefined ? {} : { ahora });
   for (const dia of dias) {
     const clase = await agenda.crearClase(ctx, {
       sedeId,

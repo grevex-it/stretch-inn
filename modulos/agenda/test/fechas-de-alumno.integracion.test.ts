@@ -132,4 +132,22 @@ describe("fechasDeAlumno", () => {
       ),
     ).rejects.toThrow("entre 1 y 100");
   });
+
+  it("la clase y la inscripción cuentan desde el «ahora» de la agenda, no desde el reloj real", async () => {
+    const enero = crearAgenda(base, { ahora: () => new Date("2026-01-05T12:00:00Z") });
+    const { ctx, norte } = await centroConDosSedes(base, {
+      norte: [...TODO, ...ALUMNOS],
+      sur: [],
+    });
+    const creada = await enero.crearClase(ctx, { ...STRETCHING, sedeId: norte, dia: 1 });
+    if (!creada.ok) throw new Error(creada.error.mensaje);
+    const ana = await alumno(ctx, "Ana");
+    const alta = await enero.inscribir(ctx, { claseId: creada.valor.id, alumnoId: ana });
+    if (!alta.ok) throw new Error(alta.error.mensaje);
+
+    const fechas = await enContexto(base, ctx, (tx) =>
+      fechasDeAlumno(tx, { alumnoId: ana, sedeId: norte, desde: "2026-01-05", cantidad: 2 }),
+    );
+    expect(dias(fechas)).toEqual(["2026-01-05", "2026-01-12"]);
+  });
 });

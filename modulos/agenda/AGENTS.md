@@ -29,8 +29,9 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 
 - `crearAgenda(base, { ahora?, ocupadasDeMas? })`: devuelve `Agenda`. `ocupadasDeMas` dice
   cuántos lugares ocupan de más las recuperaciones en cada fecha; lo conecta la API con
-  `asistencia` (sin él, no se cuentan). Cada operación recibe el `ContextoCentro` de quien la
-  pide y corre en su propia transacción:
+  `asistencia` (sin él, no se cuentan). El alta de una clase y de una inscripción se fecha con
+  `ahora`, no con el reloj de la base: un test que simula el tiempo ve sus fechas desde ahí.
+  Cada operación recibe el `ContextoCentro` de quien la pide y corre en su propia transacción:
   - `clases(quien, { pagina, porPagina, sedeId? })`: las de las sedes donde puede ver la agenda.
   - `crearClase(quien, { sedeId, nombre, dia, hora, duracionMinutos, cupo, profeId? })`: sin
     `profeId`, el profe fijo de la sede; con null, sin profe.

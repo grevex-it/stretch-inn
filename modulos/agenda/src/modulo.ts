@@ -49,7 +49,7 @@ export function crearAgenda(base: Base, opciones: OpcionesAgenda = {}): Agenda {
   return {
     ...deLasSedes(con, ahora),
     clases: (quien, filtro) => con(quien, (repo) => clases.listar(repo, quien, filtro)),
-    crearClase: (quien, clase) => con(quien, (repo) => clases.crear(repo, quien, clase)),
+    crearClase: (quien, clase) => con(quien, (repo) => clases.crear(repo, quien, ahora(), clase)),
     editarClase: (quien, clase) => con(quien, (repo) => clases.editar(repo, quien, ahora(), clase)),
     fijarActiva: (quien, cambio) =>
       con(quien, (repo) => clases.fijarActiva(repo, quien, ahora(), cambio)),
