@@ -33,8 +33,8 @@ async function contarFechas(claseId: string): Promise<number> {
   }
 }
 
-async function conClase(ahora?: () => Date) {
-  const agenda = crearAgenda(base, ahora === undefined ? {} : { ahora });
+async function conClase() {
+  const agenda = crearAgenda(base);
   const centro = await centroConDosSedes(base, { norte: TODO, sur: [] });
   const creada = await agenda.crearClase(centro.ctx, { ...STRETCHING, sedeId: centro.norte });
   if (!creada.ok) throw new Error(creada.error.mensaje);
@@ -132,11 +132,12 @@ describe("cancelar una fecha", () => {
   });
 
   it("una fecha que ya empezó no se cambia", async () => {
-    const enUnMes = () => new Date(Date.now() + 4 * SEMANA);
-    const { agenda, ctx, semana } = await conClase(enUnMes);
+    // La clase se crea hoy; la fecha de la semana que viene ya empezó para quien la mira en un mes.
+    const { ctx, semana } = await conClase();
     const [fecha] = (await semana()).elementos;
     if (fecha === undefined) throw new Error("sin fecha");
-    expect(await agenda.fijarCancelada(ctx, { id: fecha.id, cancelada: true })).toMatchObject({
+    const enUnMes = crearAgenda(base, { ahora: () => new Date(Date.now() + 4 * SEMANA) });
+    expect(await enUnMes.fijarCancelada(ctx, { id: fecha.id, cancelada: true })).toMatchObject({
       ok: false,
       error: { codigo: "fecha-pasada" },
     });

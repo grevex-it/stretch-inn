@@ -39,7 +39,12 @@ export async function inscribir(
   const masOcupada = await repos.agenda.masOcupadaFutura([claseId], ahora);
   const enLasFechas = entraEnLasFechas(clase.cupo, clase.inscriptos + 1, masOcupada);
   if (!enLasFechas.ok) return enLasFechas;
-  const id = await repos.inscripciones.inscribir({ claseId, sedeId: clase.sedeId, alumnoId });
+  const id = await repos.inscripciones.inscribir({
+    claseId,
+    sedeId: clase.sedeId,
+    alumnoId,
+    creadaEn: ahora,
+  });
   if (id === undefined) return falla("ya-inscripto", "Ese alumno ya está inscripto en esta clase.");
   await repos.inscripciones.sumarInscriptos(claseId, 1);
   return ok({ id });

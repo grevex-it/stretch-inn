@@ -50,7 +50,13 @@ export interface RepositorioAgenda {
   /** Con `bloquear`, la fila queda tomada hasta el fin de la transacción (`for update`). */
   clase(id: string, bloquear?: boolean): Promise<(Clase & { creadaEn: Date }) | undefined>;
   clasesActivasDeSede(sedeId: string): Promise<(Clase & { creadaEn: Date })[]>;
-  crearClase(sedeId: string, datos: DatosDeClase, profeId: string | null): Promise<{ id: string }>;
+  /** `creadaEn` es el «ahora» de la agenda, no el reloj de la base: sus fechas cuentan desde ahí. */
+  crearClase(
+    sedeId: string,
+    datos: DatosDeClase,
+    profeId: string | null,
+    creadaEn: Date,
+  ): Promise<{ id: string }>;
   /** La versión nueva, o undefined si la clase cambió en el medio. Sin profe, lo conserva. */
   actualizarClase(
     id: string,
@@ -276,11 +282,15 @@ export interface RepositorioInscripciones {
   deClase(
     filtro: Pagina & { claseId: string },
   ): Promise<PaginaDe<{ id: string; alumnoId: string; creadaEn: Date }>>;
-  /** El id de la inscripción nueva, o undefined si ya tenía una vigente en esa clase. */
+  /**
+   * El id de la inscripción nueva, o undefined si ya tenía una vigente en esa clase. `creadaEn`
+   * es el «ahora» de la agenda: desde ahí está vigente.
+   */
   inscribir(inscripcion: {
     claseId: string;
     sedeId: string;
     alumnoId: string;
+    creadaEn: Date;
   }): Promise<string | undefined>;
   sumarInscriptos(claseId: string, cuantos: 1 | -1): Promise<void>;
   vigente(id: string): Promise<{ claseId: string } | undefined>;

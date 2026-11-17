@@ -70,10 +70,16 @@ function escriturasDeClases(
   tx: Transaccion,
 ): Pick<RepositorioAgenda, "crearClase" | "actualizarClase" | "fijarActiva"> {
   return {
-    async crearClase(sedeId, datos: DatosDeClase, profeId) {
+    async crearClase(sedeId, datos: DatosDeClase, profeId, creadaEn) {
       const [fila] = await tx
         .insert(clases)
-        .values({ ...datos, profeId, sedeId, centroId: sql`app_centro_actual()` })
+        .values({
+          ...datos,
+          profeId,
+          sedeId,
+          creadoEn: creadaEn,
+          centroId: sql`app_centro_actual()`,
+        })
         .returning({ id: clases.id });
       if (fila === undefined) throw new Error("La clase no se guardó.");
       return fila;
