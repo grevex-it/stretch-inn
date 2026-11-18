@@ -34,12 +34,9 @@ El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-impleme
   activo.
 - **Material para profesores:** alojar y reproducir hasta 150 clases en video necesita un servicio
   de almacenamiento y streaming. Su costo tiene que entrar en la mensualidad.
-- **Camas por sede** (pedido del 12/11): la API ya está (`agenda`, `GET`/`PUT
-/agenda/sedes/:id/camas`). La cantidad de camas es el cupo de todos los horarios de la sede: al
-  subirlas, todas las clases que ya existen pasan a la nueva cantidad; al bajarlas, las clases
-  con más cupo bajan con ellas, salvo que dejen afuera a un fijo o a una recuperación.
-  Falta en el panel: el formulario de camas de la sede, y usarlas como cupo por defecto al crear
-  una clase.
+- **Permiso para las camas:** evaluar si cambiar las camas de una sede necesita un permiso
+  propio. Hoy lo puede hacer cualquiera con `agenda.gestionar`, y al cambiarlas cambia el cupo
+  de todos los horarios de la sede.
 - **Licencias por sede** (0009): la mensualidad cambia por sede (base, sede nueva) y hay un alta
   por sede nueva.
 
