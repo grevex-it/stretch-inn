@@ -19,21 +19,24 @@ Elegir el servicio que consulta `/salud` cada minuto y avisa al grupo de Telegra
 
 ### Dominio propio
 
-El panel y la API tienen que estar en el mismo sitio para que la cookie de sesión funcione (0017): por ejemplo `app.dominio` y `api.dominio`. Los dominios `*.up.railway.app` no sirven entre sí. Comprarlo antes de salir a producción.
+El panel y la API tienen que estar en el mismo sitio para que la cookie de sesión funcione (0017): por ejemplo `app.dominio` y `api.dominio`. Los dominios `*.up.railway.app` no sirven entre sí. Se compra cuando haga falta publicar el sistema.
 
 ### Alcance de la primera entrega (cotización del 12/11)
 
 El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-implementacion.md` y
-`docs/alcance-y-reglas-compartidas.md`). Falta decidir cómo se modelan:
+`docs/alcance-y-reglas-compartidas.md`). Gastos ya está (módulo `gastos`, 0022). Falta:
 
-- **Profesores:** se les paga por clase dictada y cada sede tiene su profe fijo (0022). Falta
-  decidir dónde vive la ficha del profe: ¿en `personas`, vinculada a su cuenta del equipo
-  (`identidad`)? Las clases de `agenda` todavía no tienen profe.
+- **Profesores:** se les paga por clase dictada y cada sede tiene su profe fijo (0022). El profe
+  es un usuario del equipo (`identidad`). La API de `agenda` ya tiene el profe de cada clase, el
+  fijo de la sede, el reemplazo de una fecha y las clases dictadas por período; `personas`, el
+  profe asignado a cada alumno. Las tarifas, el tipo de profe y la liquidación están propuestos
+  en 0024 (con dos supuestos a confirmar con Stretch Inn). Falta en el panel: las pantallas de
+  profes de `agenda`.
 - **Reportes:** módulo nuevo, con filtro por período y sede y vista consolidada según permisos.
-  «Bajas por período» necesita la fecha de baja del alumno: hoy `personas` guarda solo si está
-  activo.
+  Para «Bajas por período», `personas` ya guarda la fecha de baja del alumno.
 - **Material para profesores:** alojar y reproducir hasta 150 clases en video necesita un servicio
-  de almacenamiento y streaming. Su costo tiene que entrar en la mensualidad.
+  de almacenamiento y streaming: Mux, confirmado el 18/11. Su costo tiene que entrar en la
+  mensualidad.
 - **Permiso para las camas:** evaluar si cambiar las camas de una sede necesita un permiso
   propio. Hoy lo puede hacer cualquiera con `agenda.gestionar`, y al cambiarlas cambia el cupo
   de todos los horarios de la sede.

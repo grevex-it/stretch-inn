@@ -26,5 +26,6 @@ Una decisión por archivo, con su contexto y su porqué. Una decisión aceptada 
 | [0020](0020-abono-por-clases.md)                   | El abono es un paquete de clases, no un período             |
 | [0021](0021-whatsapp-con-waha.md)                  | WhatsApp con WAHA                                           |
 | [0022](0022-viaje-gastos-y-pago-a-profes.md)       | Viaje, gastos y pago a los profes                           |
+| [0024](0024-tarifas-y-liquidacion-de-profes.md)    | Tarifas y liquidación de los profes                         |
 
 Temas abiertos: [`../pendientes.md`](../pendientes.md).
