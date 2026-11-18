@@ -30,14 +30,24 @@ Dominio (puro):
   lo que `quien` no puede dar.
 - `tieneMenosPermisos(objetivo, quien)`: para resetear contraseñas (0017).
 - `tieneAccesoTotal(efectivos, catalogo, sedes)`.
-- `crearCatalogo(secciones)`, `PERMISOS_IDENTIDAD`, `plantillasDelSistema(catalogo)`. Cada
-  plantilla trae su marca (`plantilla: "dueno"`), que se guarda en `roles.plantilla` al copiarla.
+- `crearCatalogo(secciones)` y `PERMISOS_IDENTIDAD`.
+- `plantillasDelSistema(catalogo)`: Dueño (todo el catálogo), Encargado, Profesor, Recepción y
+  Contaduría (`dominio/plantillas.ts`, lo acordado en 0019). Cada una trae su marca (`dueno`,
+  `encargado`, `profesor`, `recepcion`, `contadora`), que se guarda en `roles.plantilla` al
+  copiarla, y solo los permisos que están en el catálogo que recibe.
 
 Para migraciones (SQL, con el dueño del esquema):
 
 - `identidad_dar_al_dueno(array['modulo.accion', …])`: le da esos permisos al rol Dueño de
   **todos** los centros. Todo módulo que declara permisos la llama en una migración `--custom`;
   `herramientas/test/permisos-del-dueno.test.ts` falla si falta algún permiso del catálogo.
+- `identidad_dar_a_plantilla('profesor', array[…])`: lo mismo con el rol de otra plantilla. Si
+  un módulo le suma permisos a una plantilla en `plantillasDelSistema`, se los da también por
+  migración; `herramientas/test/plantillas.test.ts` falla si el código y las migraciones no dan
+  lo mismo.
+- `identidad_sumar_plantilla('profesor', 'Profesor')`: crea el rol de la plantilla en los centros
+  que no lo tienen (un centro con un rol propio de ese nombre no la recibe). Para una plantilla
+  nueva.
 
 Casos de uso (reciben la `Transaccion` de `enContexto`):
 
@@ -88,6 +98,9 @@ Equipo del centro (0017):
 - El rol Dueño de cada centro (`roles.plantilla = 'dueno'`, uno por centro) tiene todos los
   permisos del catálogo, también los de módulos sumados después del alta. Se lo identifica por
   la marca, no por el nombre: el centro lo puede renombrar.
+- Cada centro tiene un rol por plantilla (índice único por marca). Los roles con marca no se
+  editan: se duplican para armar uno propio (0007). Los permisos de un módulo nuevo llegan solos
+  al Dueño; a las demás plantillas, solo si la migración del módulo se los da.
 - Solo se resetea la contraseña de quien tiene menos permisos (subconjunto en cada sede y al
   menos uno menos), y nunca la de una cuenta con usuarios en otros centros (0017). Bloquear y
   reactivar siguen la misma regla de «menos permisos»; nadie se resetea ni se bloquea a sí mismo.
@@ -113,6 +126,8 @@ Equipo del centro (0017):
 - **Usuario:** la membresía de una cuenta en un centro.
 - **Rol:** conjunto de permisos. Las plantillas del sistema se copian al centro en el alta, con
   su marca en `roles.plantilla`.
+- **Plantilla:** rol que viene con el sistema (Dueño, Encargado, Profesor, Recepción y
+  Contaduría). No se edita; se duplica.
 - **Ajuste:** permiso extra o quitado a un usuario en una sede.
 - **Acceso total:** todos los permisos del catálogo en todas las sedes del centro.
 - **Sede activa:** la sede con la que trabaja la sesión, o «Todas mis sedes».
@@ -125,8 +140,9 @@ _Ninguna por ahora._
 
 ## Pendientes
 
-- Plantillas de encargado, recepción y profesor: cuando existan los permisos de caja, agenda y
-  asistencia.
+- Que la API no deje editar un rol con marca: cuando exista editar un rol (roles a medida).
+- Sumar los permisos de `reportes` al Encargado (los de su sede) y a Contaduría cuando exista
+  el módulo.
 - Editar el nombre y los roles de un usuario desde el equipo, y la pantalla de roles a medida.
 - El actor de soporte (0008) sigue las mismas reglas que un usuario; revisarlas cuando exista
   su login.

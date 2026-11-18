@@ -48,14 +48,24 @@ describe("sembrar", () => {
     }
   });
 
-  it("el rol del admin sale de la plantilla Dueño, para recibir los permisos de módulos nuevos", async () => {
+  it("el centro trae las cinco plantillas, y el admin solo tiene el Dueño (recibe los módulos nuevos)", async () => {
     const cliente = new pg.Client({ connectionString: inject("urlDueno") });
     await cliente.connect();
     try {
-      const { rows } = await cliente.query<{ nombre: string; plantilla: string | null }>(
-        "select nombre, plantilla from roles",
+      const roles = await cliente.query<{ nombre: string; plantilla: string | null }>(
+        "select nombre, plantilla from roles order by nombre",
       );
-      expect(rows).toEqual([{ nombre: "Dueño", plantilla: "dueno" }]);
+      expect(roles.rows).toEqual([
+        { nombre: "Contaduría", plantilla: "contadora" },
+        { nombre: "Dueño", plantilla: "dueno" },
+        { nombre: "Encargado", plantilla: "encargado" },
+        { nombre: "Profesor", plantilla: "profesor" },
+        { nombre: "Recepción", plantilla: "recepcion" },
+      ]);
+      const delAdmin = await cliente.query<{ plantilla: string | null }>(
+        "select distinct r.plantilla from asignaciones a join roles r on r.id = a.rol_id",
+      );
+      expect(delAdmin.rows).toEqual([{ plantilla: "dueno" }]);
     } finally {
       await cliente.end();
     }

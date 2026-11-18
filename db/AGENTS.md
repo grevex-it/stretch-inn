@@ -53,6 +53,16 @@ select identidad_dar_al_dueno(array['modulo.ver', 'modulo.editar']);
 Sumá además la sección del módulo a `herramientas/src/catalogo.ts`: su test falla si algún
 permiso del catálogo no llega al Dueño por migración.
 
+Si alguna otra plantilla tiene que traer permisos del módulo (por ejemplo, el Profesor), sumalos
+en `modulos/identidad/src/dominio/plantillas.ts` (para los centros nuevos) y dáselos en la misma
+migración a los centros que ya existen:
+
+```sql
+select identidad_dar_a_plantilla('profesor', array['modulo.ver']);
+```
+
+`herramientas/test/plantillas.test.ts` falla si el código y las migraciones no dan lo mismo.
+
 ## Rendimiento y concurrencia (ver 0013)
 
 - Índices que empiezan por `centro_id` (y `sede_id` si la tabla la tiene).

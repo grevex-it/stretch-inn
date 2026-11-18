@@ -83,8 +83,9 @@ export const roles = pgTable(
     centroId: uuid("centro_id").notNull(),
     nombre: text("nombre").notNull(),
     /**
-     * La plantilla del sistema de la que salió el rol (`dueno`), o null si es propio del centro.
-     * Las migraciones de cada módulo le dan sus permisos al Dueño con identidad_dar_al_dueno.
+     * La plantilla del sistema de la que salió el rol (ver `dominio/plantillas.ts`), o null si
+     * es propio del centro. Las migraciones de cada módulo le dan sus permisos al Dueño con
+     * identidad_dar_al_dueno y a las demás plantillas con identidad_dar_a_plantilla.
      */
     plantilla: text("plantilla"),
     creadoEn: timestamp("creado_en", { withTimezone: true }).notNull().defaultNow(),
@@ -92,7 +93,10 @@ export const roles = pgTable(
   },
   (tabla) => [
     uniqueIndex("roles_centro_nombre").on(tabla.centroId, tabla.nombre),
-    check("roles_plantilla", sql`${tabla.plantilla} in ('dueno')`),
+    check(
+      "roles_plantilla",
+      sql`${tabla.plantilla} in ('dueno', 'encargado', 'profesor', 'recepcion', 'contadora')`,
+    ),
   ],
 );
 
