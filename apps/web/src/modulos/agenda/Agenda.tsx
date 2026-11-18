@@ -1,6 +1,7 @@
 import { AccionDeAlumno } from "../../base/controles/AccionDeAlumno.tsx";
 import type { Clase } from "@app/contratos";
 import { FormularioDesplegable, FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
+import { CamasDeLaSede } from "./CamasDeLaSede.tsx";
 import { EditarClase } from "./EditarClase.tsx";
 import { paginaDeClases, paginaDeInscriptos } from "@app/contratos";
 import { useState } from "react";
@@ -108,9 +109,12 @@ function Encabezado({ sede, gestionar }: { sede: string; gestionar: boolean }) {
     <>
       <h1>Agenda</h1>{" "}
       {gestionar && sede !== "todas" && (
-        <FormularioDesplegable titulo="Nueva clase">
-          <EditarClase sede={sede} />
-        </FormularioDesplegable>
+        <>
+          <CamasDeLaSede sede={sede} />
+          <FormularioDesplegable titulo="Nueva clase">
+            <EditarClase sede={sede} />
+          </FormularioDesplegable>
+        </>
       )}
     </>
   );
