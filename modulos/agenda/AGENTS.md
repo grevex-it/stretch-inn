@@ -59,7 +59,9 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
     (1 a 500, o null: sin tope), el tope del cupo de todas sus clases (pedido del 12/11). Al
     bajarlas, las clases con más cupo bajan con ellas, todas o ninguna; no bajan si dejan afuera a
     los fijos de una clase (`camas-menos-que-inscriptos`) o a las recuperaciones de una fecha
-    futura (`fecha-completa`). Subirlas no toca los cupos.
+    futura (`fecha-completa`). Las camas son el cupo de todos los horarios de la sede: al
+    subirlas, todas sus clases (también las dadas de baja) pasan a las nuevas. Configurarlas por
+    primera vez es bajar el tope, y sacarlas (null) no toca los cupos.
 - `rutasDeAgenda(agenda)`: `GET /agenda/clases?pagina&sede`,
   `GET /agenda/ocurrencias?sede&desde&pagina`, `GET /agenda/clases/:id/inscriptos?pagina` y
   `GET /alumnos/:id/clases?pagina` (`agenda.ver`); `POST /agenda/clases`, `PUT /agenda/clases/:id`,
@@ -119,8 +121,11 @@ Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContex
   bloqueo de `asistencia` hasta el fin de la transacción: una recuperación no gana el lugar en
   el medio.
 - **El cupo de una clase no pasa las camas de su sede** (`cupo-mayor-que-camas`), al crearla ni
-  al editarla. Cambiar las camas de una sede va de a uno (bloqueo por sede) y toma con
-  `for update` las clases que tiene que bajar.
+  al editarla. Cambiar las camas de una sede va de a uno (bloqueo exclusivo por sede) y toma con
+  `for update` las clases que tiene que bajar. Crear y editar una clase toman el mismo bloqueo
+  compartido antes de leer las camas: esperan a un cambio en curso, pero no se esperan entre sí.
+  El orden es siempre sede y después clase, para que no se traben (deadlock). Subir los cupos suma uno a la `version` de cada
+  clase: una edición abierta antes del cambio se rechaza.
 - **El profe es un usuario activo del equipo del centro** (0022), leído con RLS por la API de
   `identidad`. La fecha muestra su reemplazo, si tiene, o el profe de la clase. Cambiar el profe
   de la clase deja las fechas que ya empezaron con el que tenían: cambia solo de ahí en adelante.
@@ -153,6 +158,3 @@ centro (`centros`).
   dada de baja cuentan solo si ya estaban armadas (alguien miró esa semana o tomó asistencia).
 - **[SUPUESTO]** Ver las clases dictadas pide `agenda.gestionar`: muestra cuánto trabajó cada
   profe. Si hace falta, va a un permiso propio con el módulo de reportes.
-- Crear o editar una clase lee las camas sin tomarlas: si a la vez alguien baja las camas de esa
-  sede, la clase nueva puede quedar con más cupo que camas. Es una ventana chica; tomarlas
-  ahí cruza el orden de bloqueos con `fijarCamas` (clase y sede al revés).

@@ -58,6 +58,12 @@ async function cupos(ctx: ContextoCentro, sedeId: string) {
   return new Map(lista.valor.elementos.map((c) => [c.id, c.cupo]));
 }
 
+async function versiones(ctx: ContextoCentro, sedeId: string) {
+  const lista = await agenda.clases(ctx, { ...PRIMERA, sedeId });
+  if (!lista.ok) throw new Error(lista.error.mensaje);
+  return new Map(lista.valor.elementos.map((c) => [c.id, c.version]));
+}
+
 describe("camas de la sede", () => {
   it("sin configurar no hay tope; configuradas, se leen y ninguna clase las pasa", async () => {
     const { ctx, norte } = await centro();
@@ -94,20 +100,59 @@ describe("camas de la sede", () => {
     expect(!editada.ok && editada.error.codigo).toBe("cupo-mayor-que-camas");
   });
 
-  it("al bajarlas, baja el cupo de las clases que las pasan; subirlas no toca nada", async () => {
+  it("al bajarlas, baja el cupo de las clases que las pasan; las de menos cupo quedan", async () => {
     const { ctx, norte } = await centro();
     const [chica, grande] = [await clase(ctx, norte, 4, 1), await clase(ctx, norte, 10, 2)];
+    await agenda.fijarCamas(ctx, { sedeId: norte, camas: 12 });
 
     expect((await agenda.fijarCamas(ctx, { sedeId: norte, camas: 6 })).ok).toBe(true);
+
     expect(await cupos(ctx, norte)).toEqual(
       new Map([
         [chica, 4],
         [grande, 6],
       ]),
     );
+  });
 
-    await agenda.fijarCamas(ctx, { sedeId: norte, camas: 20 });
-    expect((await cupos(ctx, norte)).get(grande)).toBe(6);
+  it("configurarlas por primera vez es bajar el tope: no sube ningún cupo", async () => {
+    const { ctx, norte } = await centro();
+    const chica = await clase(ctx, norte, 4);
+
+    expect((await agenda.fijarCamas(ctx, { sedeId: norte, camas: 6 })).ok).toBe(true);
+
+    expect((await cupos(ctx, norte)).get(chica)).toBe(4);
+  });
+
+  it("al subirlas, el cupo de todas las clases de la sede pasa a las camas nuevas", async () => {
+    const { ctx, norte, sur } = await centro();
+    const [chica, grande] = [await clase(ctx, norte, 4, 1), await clase(ctx, norte, 6, 2)];
+    const dadaDeBaja = await clase(ctx, norte, 2);
+    await agenda.fijarActiva(ctx, { id: dadaDeBaja, activa: false });
+    await agenda.fijarCamas(ctx, { sedeId: norte, camas: 6 });
+    const version = (await versiones(ctx, norte)).get(chica);
+
+    expect((await agenda.fijarCamas(ctx, { sedeId: norte, camas: 20 })).ok).toBe(true);
+
+    expect(await cupos(ctx, norte)).toEqual(
+      new Map([
+        [chica, 20],
+        [grande, 20],
+        [dadaDeBaja, 20],
+      ]),
+    );
+    expect((await versiones(ctx, norte)).get(chica)).toBe((version ?? 0) + 1);
+    expect(await cupos(ctx, sur)).toEqual(new Map());
+  });
+
+  it("sacarles el tope no toca los cupos", async () => {
+    const { ctx, norte } = await centro();
+    const chica = await clase(ctx, norte, 4);
+    await agenda.fijarCamas(ctx, { sedeId: norte, camas: 6 });
+
+    expect((await agenda.fijarCamas(ctx, { sedeId: norte, camas: null })).ok).toBe(true);
+
+    expect((await cupos(ctx, norte)).get(chica)).toBe(4);
   });
 
   it("no baja si deja afuera a un fijo, y dice en qué clase; no cambia nada", async () => {

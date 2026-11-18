@@ -120,6 +120,11 @@ export interface RepositorioAgenda {
   camas(sedeId: string): Promise<number | undefined>;
   /** Los cambios de camas de una sede van de a uno hasta el fin de la transacción. */
   bloquearCamas(sedeId: string): Promise<void>;
+  /**
+   * Para leer las camas sin que cambien hasta el fin de la transacción: espera a un cambio en
+   * curso, pero no a otras lecturas. Va antes de tomar cualquier clase de la sede.
+   */
+  compartirCamas(sedeId: string): Promise<void>;
   /** Con null, la sede queda sin tope. */
   guardarCamas(sedeId: string, camas: number | null): Promise<void>;
   /** Las clases de la sede con más cupo que esas camas, tomadas con `for update`. */
@@ -128,6 +133,8 @@ export interface RepositorioAgenda {
     camas: number,
   ): Promise<{ id: string; nombre: string; inscriptos: number }[]>;
   bajarCupos(ids: readonly string[], camas: number): Promise<void>;
+  /** Las clases de la sede con menos cupo pasan a esas camas, en una sola escritura. */
+  subirCupos(sedeId: string, camas: number): Promise<void>;
 }
 
 /**

@@ -66,6 +66,7 @@ export async function crear(
   if (!puedeEn(quien, GESTIONAR, sedeId)) return SIN_PERMISO;
   const clase = limpiarClase(datos);
   if (!clase.ok) return clase;
+  await repo.compartirCamas(sedeId);
   const enCamas = cupoEnCamas(clase.valor.cupo, await repo.camas(sedeId));
   if (!enCamas.ok) return enCamas;
   // Sin profe, el fijo de la sede (0022).
@@ -85,6 +86,16 @@ async function claseGestionable(repo: RepositorioAgenda, quien: ContextoCentro, 
   const clase = await repo.clase(claseId, true);
   if (clase === undefined) return CLASE_INEXISTENTE;
   return puedeEn(quien, GESTIONAR, clase.sedeId) ? ok(clase) : SIN_PERMISO;
+}
+
+/**
+ * Las camas de la sede de la clase quedan sin cambiar hasta el fin de la transacción. Primero la
+ * sede y después la clase, el mismo orden que fijarCamas: así no se traban entre sí. La sede se
+ * lee sin tomar la clase porque nunca cambia.
+ */
+async function compartirCamasDeClase(repo: RepositorioAgenda, claseId: string) {
+  const clase = await repo.clase(claseId);
+  if (clase !== undefined) await repo.compartirCamas(clase.sedeId);
 }
 
 /**
@@ -115,6 +126,7 @@ export async function editar(
   ahora: Date,
   { id: claseId, version, profeId, ...datos }: EdicionDeClase,
 ): Promise<Resultado<{ version: number }, ErrorDeAgenda>> {
+  await compartirCamasDeClase(repo, claseId);
   const actual = await claseGestionable(repo, quien, claseId);
   if (!actual.ok) return actual;
   const clase = limpiarClase(datos);
