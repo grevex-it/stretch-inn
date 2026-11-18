@@ -27,7 +27,8 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
   - `personas/`: pantalla Alumnos (lista con buscador, alta, edición, baja y reactivación). Con
     `personas.editar` la ficha se abre con «Editar»; con solo `personas.ver`, con «Ver» y en solo
     lectura. En las dos se ven las cuotas del alumno (`abonos.ver`) y, en cada cuota pagada,
-    anular su pago (`caja.anular`), sin `caja.ver`: ni totales ni caja del día (0019).
+    anular su pago (`caja.anular`), sin `caja.ver`: ni totales ni caja del día (0019). «Dar de
+    baja» y «Reactivar» aparecen con `personas.dar-de-baja`, con o sin `personas.editar`.
   - `agenda/`: clases de cada sede, alta y edición, e inscriptos. Las camas de la sede
     (`CamasDeLaSede.tsx`, con `agenda.gestionar`): obligatorias desde el panel, son el cupo por
     defecto de una clase nueva. Si bajarlas deja afuera a fijos, lista todas las clases que lo

@@ -8,7 +8,11 @@ export const PERMISOS_PERSONAS: {
   seccion: "Alumnos",
   permisos: [
     { permiso: "personas.ver", descripcion: "Ver los alumnos y sus fichas" },
-    { permiso: "personas.editar", descripcion: "Dar de alta, editar y dar de baja alumnos" },
+    { permiso: "personas.editar", descripcion: "Dar de alta y editar alumnos" },
+    {
+      permiso: "personas.dar-de-baja",
+      descripcion: "Dar de baja y reactivar alumnos (la baja libera su horario fijo)",
+    },
     {
       permiso: "personas.ver-salud",
       descripcion: "Ver los datos de salud de los alumnos (patologías)",

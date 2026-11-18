@@ -18,6 +18,7 @@ import { enviar, leer } from "./traducir.ts";
 
 const ver = { permiso: "personas.ver" } as const;
 const editar = { permiso: "personas.editar" } as const;
+const darDeBaja = { permiso: "personas.dar-de-baja" } as const;
 const conId = z.object({ id: z.uuid("Ese alumno no existe.") });
 
 /** Corre el trabajo en una transacción con el contexto del pedido. */
@@ -70,7 +71,7 @@ function escrituras(app: FastifyInstance, enElCentro: EnElCentro, alDarDeBaja?: 
     app.route({
       method: metodo,
       url: "/alumnos/:id/baja",
-      config: editar,
+      config: darDeBaja,
       handler: async (pedido, respuesta) => {
         const alumno = leer(conId, pedido.params, respuesta);
         if (alumno === undefined) return respuesta;

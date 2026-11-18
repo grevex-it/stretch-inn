@@ -48,15 +48,15 @@ async function crear(servidor: Awaited<ReturnType<typeof app>>["servidor"], dato
 }
 
 describe("rutas de alumnos", () => {
-  it("cada ruta declara su permiso: ver para leer, editar para cambiar", async () => {
+  it("cada ruta declara su permiso: ver para leer, editar para cambiar y uno propio para la baja", async () => {
     const { declaradas } = await app();
     expect(Object.fromEntries(Object.entries(declaradas).map(([r, c]) => [r, c.permiso]))).toEqual({
       "GET /alumnos": "personas.ver",
       "GET /alumnos/:id": "personas.ver",
       "POST /alumnos": "personas.editar",
       "PUT /alumnos/:id": "personas.editar",
-      "PUT /alumnos/:id/baja": "personas.editar",
-      "DELETE /alumnos/:id/baja": "personas.editar",
+      "PUT /alumnos/:id/baja": "personas.dar-de-baja",
+      "DELETE /alumnos/:id/baja": "personas.dar-de-baja",
       "GET /alumnos/:id/salud": "personas.ver-salud",
       "PUT /alumnos/:id/salud": "personas.editar-salud",
     });

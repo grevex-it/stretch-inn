@@ -1,5 +1,6 @@
-// Un alumno de la lista, con sus acciones. Dar de baja pide confirmación; reactivar, no. Sin
-// personas.editar, solo «Ver»: la ficha se abre en solo lectura.
+// Un alumno de la lista, con sus acciones. Con personas.editar, «Editar»; sin él, «Ver» y la ficha
+// en solo lectura. Dar de baja y reactivar van con personas.dar-de-baja: la baja pide
+// confirmación; reactivar, no.
 import type { Alumno } from "@app/contratos";
 import { useState } from "react";
 import { Aviso, mensajeDe } from "../../base/controles/Aviso.tsx";
@@ -10,6 +11,8 @@ import estilos from "./FilaDeAlumno.module.css";
 interface Props {
   alumno: Alumno;
   edita: boolean;
+  /** Con personas.dar-de-baja: «Dar de baja» o «Reactivar». */
+  daDeBaja: boolean;
   /** Abre la ficha: para editarla o, sin personas.editar, para verla. */
   alAbrir: (alumno: Alumno) => void;
 }
@@ -40,7 +43,24 @@ function ConfirmarBaja(props: { alumno: Alumno; alResponder: (si: boolean) => vo
   );
 }
 
-function Acciones({ alumno, alAbrir }: Omit<Props, "edita">) {
+function BotonDeBaja(props: {
+  alumno: Alumno;
+  ocupado: boolean;
+  alPedir: () => void;
+  alReactivar: () => void;
+}) {
+  return props.alumno.activo ? (
+    <Boton variante="secundario" deshabilitado={props.ocupado} alHacerClic={props.alPedir}>
+      Dar de baja
+    </Boton>
+  ) : (
+    <Boton variante="secundario" deshabilitado={props.ocupado} alHacerClic={props.alReactivar}>
+      Reactivar
+    </Boton>
+  );
+}
+
+function Acciones({ alumno, edita, daDeBaja, alAbrir }: Props) {
   const [confirmando, setConfirmando] = useState(false);
   const baja = useDarDeBaja();
   const reactivar = useReactivar();
@@ -52,7 +72,6 @@ function Acciones({ alumno, alAbrir }: Omit<Props, "edita">) {
     };
     return <ConfirmarBaja alumno={alumno} alResponder={alResponder} />;
   }
-  const ocupado = baja.isPending || reactivar.isPending;
   return (
     <div className={estilos.acciones}>
       <Boton
@@ -61,35 +80,27 @@ function Acciones({ alumno, alAbrir }: Omit<Props, "edita">) {
           alAbrir(alumno);
         }}
       >
-        Editar
+        {edita ? "Editar" : "Ver"}
       </Boton>
-      {alumno.activo ? (
-        <Boton
-          variante="secundario"
-          deshabilitado={ocupado}
-          alHacerClic={() => {
+      {daDeBaja && (
+        <BotonDeBaja
+          alumno={alumno}
+          ocupado={baja.isPending || reactivar.isPending}
+          alPedir={() => {
             setConfirmando(true);
           }}
-        >
-          Dar de baja
-        </Boton>
-      ) : (
-        <Boton
-          variante="secundario"
-          deshabilitado={ocupado}
-          alHacerClic={() => {
+          alReactivar={() => {
             reactivar.mutate(alumno.id);
           }}
-        >
-          Reactivar
-        </Boton>
+        />
       )}
       {error !== undefined && <Aviso tono="error">{error}</Aviso>}
     </div>
   );
 }
 
-export function FilaDeAlumno({ alumno, edita, alAbrir }: Props) {
+export function FilaDeAlumno(props: Props) {
+  const { alumno } = props;
   return (
     <tr className={estilos.fila}>
       <th scope="row" className={estilos.nombre}>
@@ -103,18 +114,7 @@ export function FilaDeAlumno({ alumno, edita, alAbrir }: Props) {
         </span>
       </td>
       <td>
-        {edita ? (
-          <Acciones alumno={alumno} alAbrir={alAbrir} />
-        ) : (
-          <Boton
-            variante="secundario"
-            alHacerClic={() => {
-              alAbrir(alumno);
-            }}
-          >
-            Ver
-          </Boton>
-        )}
+        <Acciones {...props} />
       </td>
     </tr>
   );

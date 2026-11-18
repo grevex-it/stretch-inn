@@ -316,6 +316,13 @@
       "when": 1794609043097,
       "tag": "20261113223043_fk-profe-asignado",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1795015315051,
+      "tag": "20261118152155_personas-dar-de-baja",
+      "breakpoints": true
     }
   ]
 }
