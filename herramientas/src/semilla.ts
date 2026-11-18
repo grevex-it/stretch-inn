@@ -1,4 +1,5 @@
-// Datos de prueba para desarrollo local: un centro con dos sedes y un admin con acceso total.
+// Datos de prueba para desarrollo local: un centro con dos sedes, las plantillas de roles y un
+// admin con acceso total (el Dueño).
 // Usa la conexión del dueño de la base, como las migraciones: es una herramienta, no la app.
 // Mientras no exista el alta de centros desde soporte (0008), es la forma de poder entrar.
 import { hashearClave, plantillasDelSistema } from "@app/identidad";
@@ -12,7 +13,8 @@ export interface CuentaDePrueba {
 }
 
 async function crearCentro(cliente: pg.Client, cuenta: CuentaDePrueba): Promise<void> {
-  const [centro, norte, sur, usuario, cuentaId] = Array.from({ length: 5 }, () => randomUUID());
+  const centro = randomUUID();
+  const [norte, sur, usuario, cuentaId] = Array.from({ length: 4 }, () => randomUUID());
   await cliente.query("insert into centros (id, nombre) values ($1, 'Centro de prueba')", [centro]);
   await cliente.query(
     `insert into sedes (id, centro_id, nombre, es_central)
@@ -28,8 +30,22 @@ async function crearCentro(cliente: pg.Client, cuenta: CuentaDePrueba): Promise<
     "insert into usuarios (id, centro_id, cuenta_id, nombre) values ($1, $2, $3, 'Admin de prueba')",
     [usuario, centro, cuentaId],
   );
+  const dueno = await copiarPlantillas(cliente, centro);
+  await cliente.query("insert into asignaciones values ($1, $2, $3, $5), ($1, $2, $4, $5)", [
+    centro,
+    usuario,
+    norte,
+    sur,
+    dueno,
+  ]);
+}
+
+/** Copia las plantillas del sistema al centro, como el alta (0007). Devuelve el rol Dueño. */
+async function copiarPlantillas(cliente: pg.Client, centro: string): Promise<string> {
+  let dueno = "";
   for (const plantilla of plantillasDelSistema(CATALOGO)) {
     const rol = randomUUID();
+    if (plantilla.plantilla === "dueno") dueno = rol;
     await cliente.query(
       "insert into roles (id, centro_id, nombre, plantilla) values ($1, $2, $3, $4)",
       [rol, centro, plantilla.nombre, plantilla.plantilla],
@@ -39,14 +55,8 @@ async function crearCentro(cliente: pg.Client, cuenta: CuentaDePrueba): Promise<
       rol,
       plantilla.permisos,
     ]);
-    await cliente.query("insert into asignaciones values ($1, $2, $3, $5), ($1, $2, $4, $5)", [
-      centro,
-      usuario,
-      norte,
-      sur,
-      rol,
-    ]);
   }
+  return dueno;
 }
 
 /** Crea el centro de prueba. Si la cuenta ya existe, no toca nada. */

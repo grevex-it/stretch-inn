@@ -323,6 +323,20 @@
       "when": 1795015315051,
       "tag": "20261118152155_personas-dar-de-baja",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1795019392202,
+      "tag": "20261118162952_plantillas-de-roles",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1795019394919,
+      "tag": "20261118162954_plantillas-en-los-centros",
+      "breakpoints": true
     }
   ]
 }

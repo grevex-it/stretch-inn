@@ -4,12 +4,11 @@ export type { NuevaAsignacion, NuevoAjuste } from "./aplicacion/puertos.ts";
 export {
   crearCatalogo,
   PERMISOS_IDENTIDAD,
-  plantillasDelSistema,
   type Catalogo,
   type PermisoDeclarado,
-  type Plantilla,
   type SeccionDePermisos,
 } from "./dominio/catalogo.ts";
+export { plantillasDelSistema, type Plantilla } from "./dominio/plantillas.ts";
 export {
   faltantesEnAlgunaSede,
   faltantesParaOtorgar,

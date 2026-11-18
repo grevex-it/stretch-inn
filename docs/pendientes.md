@@ -43,13 +43,11 @@ El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-impleme
 - **Licencias por sede** (0009): la mensualidad cambia por sede (base, sede nueva) y hay un alta
   por sede nueva.
 
-### Plantillas de roles
+### Roles a medida
 
-Hoy solo existe la plantilla del Dueño (0007 prevé también encargado, recepción y profesor).
-
-- **Profesor:** viene por defecto con `personas.editar` y `personas.dar-de-baja` (GREVEX, 18/11:
-  el profe maneja los alumnos en todo sentido), y el centro se los puede sacar (el panel ya abre
-  la ficha en solo lectura con «Ver»).
+Las plantillas Encargado, Profesor, Recepción y Contaduría ya están (0007, 0019). Falta la
+pantalla de roles: duplicar una plantilla, sacarle o sumarle permisos, y los ajustes
+individuales por usuario y sede.
 
 ### Nombre del producto
 

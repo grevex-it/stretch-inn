@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  crearCatalogo,
-  PERMISOS_IDENTIDAD,
-  plantillasDelSistema,
-} from "../../src/dominio/catalogo.ts";
+import { crearCatalogo, PERMISOS_IDENTIDAD } from "../../src/dominio/catalogo.ts";
 
 const caja = {
   seccion: "Caja",
@@ -36,13 +32,5 @@ describe("crearCatalogo", () => {
   it("rechaza un permiso que no tiene la forma modulo.accion", () => {
     const mal = { seccion: "Mal", permisos: [{ permiso: "Caja.Ver" as const, descripcion: "x" }] };
     expect(() => crearCatalogo([mal])).toThrow(/Caja\.Ver.*forma/);
-  });
-});
-
-describe("plantillasDelSistema", () => {
-  it("el dueño tiene todos los permisos del catálogo", () => {
-    const catalogo = crearCatalogo([PERMISOS_IDENTIDAD, caja]);
-    const [duenio] = plantillasDelSistema(catalogo);
-    expect(duenio).toEqual({ nombre: "Dueño", plantilla: "dueno", permisos: catalogo.todos });
   });
 });
