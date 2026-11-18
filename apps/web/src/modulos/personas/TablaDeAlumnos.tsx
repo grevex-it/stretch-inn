@@ -9,10 +9,10 @@ interface Props {
   buscar: string;
   edita: boolean;
   alIrA: (pagina: number) => void;
-  alEditar: (alumno: Alumno) => void;
+  alAbrir: (alumno: Alumno) => void;
 }
 
-export function TablaDeAlumnos({ pagina, buscar, edita, alIrA, alEditar }: Props) {
+export function TablaDeAlumnos({ pagina, buscar, edita, alIrA, alAbrir }: Props) {
   if (pagina.total === 0) {
     return (
       <p className={estilos.vacia}>
@@ -31,12 +31,12 @@ export function TablaDeAlumnos({ pagina, buscar, edita, alIrA, alEditar }: Props
             <th scope="col">Teléfono</th>
             <th scope="col">Documento</th>
             <th scope="col">Estado</th>
-            {edita && <th scope="col">Acciones</th>}
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {pagina.elementos.map((alumno) => (
-            <FilaDeAlumno key={alumno.id} alumno={alumno} edita={edita} alEditar={alEditar} />
+            <FilaDeAlumno key={alumno.id} alumno={alumno} edita={edita} alAbrir={alAbrir} />
           ))}
         </tbody>
       </table>

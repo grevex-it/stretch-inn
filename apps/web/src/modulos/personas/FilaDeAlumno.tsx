@@ -1,4 +1,5 @@
-// Un alumno de la lista, con sus acciones. Dar de baja pide confirmación; reactivar, no.
+// Un alumno de la lista, con sus acciones. Dar de baja pide confirmación; reactivar, no. Sin
+// personas.editar, solo «Ver»: la ficha se abre en solo lectura.
 import type { Alumno } from "@app/contratos";
 import { useState } from "react";
 import { Aviso, mensajeDe } from "../../base/controles/Aviso.tsx";
@@ -9,7 +10,8 @@ import estilos from "./FilaDeAlumno.module.css";
 interface Props {
   alumno: Alumno;
   edita: boolean;
-  alEditar: (alumno: Alumno) => void;
+  /** Abre la ficha: para editarla o, sin personas.editar, para verla. */
+  alAbrir: (alumno: Alumno) => void;
 }
 
 function ConfirmarBaja(props: { alumno: Alumno; alResponder: (si: boolean) => void }) {
@@ -38,7 +40,7 @@ function ConfirmarBaja(props: { alumno: Alumno; alResponder: (si: boolean) => vo
   );
 }
 
-function Acciones({ alumno, alEditar }: Omit<Props, "edita">) {
+function Acciones({ alumno, alAbrir }: Omit<Props, "edita">) {
   const [confirmando, setConfirmando] = useState(false);
   const baja = useDarDeBaja();
   const reactivar = useReactivar();
@@ -56,7 +58,7 @@ function Acciones({ alumno, alEditar }: Omit<Props, "edita">) {
       <Boton
         variante="secundario"
         alHacerClic={() => {
-          alEditar(alumno);
+          alAbrir(alumno);
         }}
       >
         Editar
@@ -87,7 +89,7 @@ function Acciones({ alumno, alEditar }: Omit<Props, "edita">) {
   );
 }
 
-export function FilaDeAlumno({ alumno, edita, alEditar }: Props) {
+export function FilaDeAlumno({ alumno, edita, alAbrir }: Props) {
   return (
     <tr className={estilos.fila}>
       <th scope="row" className={estilos.nombre}>
@@ -100,11 +102,20 @@ export function FilaDeAlumno({ alumno, edita, alEditar }: Props) {
           {alumno.activo ? "Activo" : "De baja"}
         </span>
       </td>
-      {edita && (
-        <td>
-          <Acciones alumno={alumno} alEditar={alEditar} />
-        </td>
-      )}
+      <td>
+        {edita ? (
+          <Acciones alumno={alumno} alAbrir={alAbrir} />
+        ) : (
+          <Boton
+            variante="secundario"
+            alHacerClic={() => {
+              alAbrir(alumno);
+            }}
+          >
+            Ver
+          </Boton>
+        )}
+      </td>
     </tr>
   );
 }

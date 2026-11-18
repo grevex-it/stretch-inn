@@ -43,6 +43,14 @@ El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-impleme
 - **Licencias por sede** (0009): la mensualidad cambia por sede (base, sede nueva) y hay un alta
   por sede nueva.
 
+### Plantillas de roles
+
+Hoy solo existe la plantilla del Dueño (0007 prevé también encargado, recepción y profesor).
+
+- **Profesor:** viene por defecto con `personas.editar`, y el centro lo puede bajar a
+  `personas.ver` (el panel ya abre la ficha en solo lectura con «Ver»). Evaluar un permiso propio
+  para dar de baja: hoy alcanza con `personas.editar`.
+
 ### Nombre del producto
 
 Por ahora repo `stretch-inn` (nombre del primer cliente) y paquetes neutros `@app/...`. Se define más adelante. A tener en cuenta: la regla de GREVEX de no usar nombres de clientes en redes, y que otros centros (posibles competidores) usarían un sistema con el nombre de Stretch Inn.
@@ -78,10 +86,11 @@ Inn está en 0019; los supuestos menores de cada módulo, en su `AGENTS.md`.
   el contexto solo admite usuario y soporte. Se hace junto con ese aviso, por WAHA (0021).
 - **Railway:** crear el servicio del worker (`pnpm --filter @app/worker start`) con la misma
   `DATABASE_URL` que la API.
-- **Panel:** el profe anula un cobro desde la ficha del alumno, sin `caja.ver` (0019). La API
-  ya lo permite: cada cuota de `GET /alumnos/:id/cuotas` trae su `pagoId`, y se anula con
-  `POST /caja/pagos/:id/anulacion` (`caja.anular`). Falta la pantalla.
 
 ## Del repo
 
 - Verificar que la versión de Postgres de Railway sea la 18, la misma que se usa en local y en los tests.
+- **Regla de depcruise para el panel** (estructura): que las pantallas de un módulo usen las de
+  otro solo por su `index.ts` (`apps/web/AGENTS.md`). Hoy no lo controla `pnpm check`. Al
+  sumarla, `caja/CobrarCuota.tsx` tiene que dejar de importar `../abonos/ciclo.ts` y pasar a
+  importar desde `abonos/index.ts`.

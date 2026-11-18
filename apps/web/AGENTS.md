@@ -24,7 +24,10 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
 - `src/modulos/<modulo>/`: pantallas de cada módulo. Una carpeta por módulo, como en el backend.
   - `identidad/`: pantalla Equipo (lista, alta, clave temporal, bloqueo). La clave temporal se
     muestra una sola vez y no se guarda en ninguna consulta.
-  - `personas/`: pantalla Alumnos (lista con buscador, alta, edición, baja y reactivación).
+  - `personas/`: pantalla Alumnos (lista con buscador, alta, edición, baja y reactivación). Con
+    `personas.editar` la ficha se abre con «Editar»; con solo `personas.ver`, con «Ver» y en solo
+    lectura. En las dos se ven las cuotas del alumno (`abonos.ver`) y, en cada cuota pagada,
+    anular su pago (`caja.anular`), sin `caja.ver`: ni totales ni caja del día (0019).
   - `agenda/`: clases de cada sede, alta y edición, e inscriptos. Las camas de la sede
     (`CamasDeLaSede.tsx`, con `agenda.gestionar`): obligatorias desde el panel, son el cupo por
     defecto de una clase nueva. Si bajarlas deja afuera a fijos, lista todas las clases que lo
@@ -33,13 +36,21 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
     recuperación de la sede (`ReglasDeLaSede.tsx`, con `asistencia.configurar`, 0020).
   - `abonos/`: planes (con las clases del paquete), precio por sede y generar la cuota (0020).
     `ciclo.ts` muestra la cuota con su inicio y sus clases («Desde el 30/11/2026 · 4 clases»).
+    Ofrece `CuotasDelAlumno`: la lista paginada de cuotas de un alumno, con una acción por cuota
+    pagada que decide quien la usa.
   - `caja/`: el día de caja de una sede, cobrar una cuota (efectivo o transferencia) y anular.
+    Ofrece `AnularPago`.
 
 ## Reglas
 
 - Los datos se piden siempre con `consultar`/`enviar` de `src/base/api.ts` y TanStack Query.
   Nunca `fetch` directo.
 - Los tipos de la API salen de `@app/contratos`. No se redefinen.
+- **Las pantallas de un módulo usan las de otro solo por su `index.ts`** (`src/modulos/<modulo>/
+index.ts`), como en el backend (regla 4). Ahí se exporta solo lo pensado para otros módulos;
+  el resto es interno. Un módulo no sabe quién lo usa: si hace falta algo de otro módulo (como
+  anular un pago desde las cuotas), lo recibe por props. Todavía no lo controla `pnpm check`
+  (`docs/pendientes.md`).
 - Ocultar un botón según el permiso es solo para la experiencia de usuario: **la seguridad la
   aplica la API**. Nunca confíes en el front para eso.
 - Cambiar de centro o de sede cambia qué datos se ven: esas acciones invalidan todas las
