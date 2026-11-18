@@ -8,6 +8,7 @@ import { Aviso, mensajeDe } from "../../base/controles/Aviso.tsx";
 import { Boton } from "../../base/controles/Boton.tsx";
 import { FormularioDesplegable } from "../../base/controles/FormularioRemoto.tsx";
 import { usePermiso } from "../../base/sesion.ts";
+import estilos from "./CamasDeLaSede.module.css";
 import { clasesQueImpiden } from "./clases-de-la-sede.ts";
 
 const camasObligatorias = camasDeSede.extend({ camas: camasDeSede.shape.camas.unwrap() });
@@ -76,6 +77,7 @@ function Formulario({ sede, camas }: { sede: string; camas: number | null }) {
   });
   return (
     <form
+      className={estilos.formulario}
       noValidate
       onSubmit={(evento) => {
         evento.preventDefault();
