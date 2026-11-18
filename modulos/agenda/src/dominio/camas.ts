@@ -26,6 +26,14 @@ export function cupoEnCamas(
   );
 }
 
+/**
+ * Las camas son el cupo de todos los horarios de la sede: al subirlas, todas las clases pasan a
+ * las nuevas. Configurarlas por primera vez pone un tope (baja) y sacarlas no toca los cupos.
+ */
+export function subenLosCupos(anteriores: number | undefined, nuevas: number | null): boolean {
+  return anteriores !== undefined && nuevas !== null && nuevas > anteriores;
+}
+
 /** Bajar las camas no puede dejar afuera a los fijos de ninguna clase. */
 export function camasPosibles(
   camas: number,

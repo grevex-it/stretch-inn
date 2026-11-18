@@ -2,7 +2,7 @@
 
 Temas abiertos para trabajar. Cuando uno se cierra, se escribe su decisión en `docs/decisiones/` y se borra de acá. Cuando el repo esté en GitHub, esto pasa a issues.
 
-_Última actualización: 13/11/2026._
+_Última actualización: 17/11/2026._
 
 ## Para definir
 
@@ -35,10 +35,11 @@ El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-impleme
 - **Material para profesores:** alojar y reproducir hasta 150 clases en video necesita un servicio
   de almacenamiento y streaming. Su costo tiene que entrar en la mensualidad.
 - **Camas por sede** (pedido del 12/11): la API ya está (`agenda`, `GET`/`PUT
-/agenda/sedes/:id/camas`). Son el tope del cupo de todas las clases de la sede; al bajarlas,
-  las clases con más cupo bajan con ellas, salvo que dejen afuera a un fijo o a una recuperación.
+/agenda/sedes/:id/camas`). La cantidad de camas es el cupo de todos los horarios de la sede: al
+  subirlas, todas las clases que ya existen pasan a la nueva cantidad; al bajarlas, las clases
+  con más cupo bajan con ellas, salvo que dejen afuera a un fijo o a una recuperación.
   Falta en el panel: el formulario de camas de la sede, y usarlas como cupo por defecto al crear
-  una clase. **[SUPUESTO]** Subir las camas no sube el cupo de las clases que ya existen.
+  una clase.
 - **Licencias por sede** (0009): la mensualidad cambia por sede (base, sede nueva) y hay un alta
   por sede nueva.
 

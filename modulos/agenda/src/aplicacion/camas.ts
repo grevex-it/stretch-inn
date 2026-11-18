@@ -1,7 +1,7 @@
 // Casos de uso de las camas de cada sede: el tope del cupo de sus clases (12/11). Verlas pide
 // ver la agenda en la sede; cambiarlas, gestionarla.
 import { ok, type ContextoCentro, type Resultado } from "@app/nucleo";
-import { camasPosibles, limpiarCamas } from "../dominio/camas.ts";
+import { camasPosibles, limpiarCamas, subenLosCupos } from "../dominio/camas.ts";
 import { entraEnLasFechas } from "../dominio/inscripcion.ts";
 import { GESTIONAR, VER } from "../dominio/permisos.ts";
 import { puedeEn, SIN_PERMISO } from "./clases.ts";
@@ -18,7 +18,8 @@ export async function camas(
 
 /**
  * Al bajarlas, las clases con más cupo bajan con ellas: todas o ninguna. No bajan si dejan afuera
- * a los fijos de una clase o a las recuperaciones de una fecha futura.
+ * a los fijos de una clase o a las recuperaciones de una fecha futura. Al subirlas, el cupo de
+ * todas las clases de la sede pasa a las camas nuevas.
  */
 export async function fijar(
   repo: RepositorioAgenda,
@@ -31,7 +32,10 @@ export async function fijar(
   if (!limpias.ok) return limpias;
   const nuevas = limpias.valor;
   await repo.bloquearCamas(sedeId);
-  if (nuevas !== null) {
+  const anteriores = await repo.camas(sedeId);
+  if (nuevas !== null && subenLosCupos(anteriores, nuevas)) {
+    await repo.subirCupos(sedeId, nuevas);
+  } else if (nuevas !== null) {
     const porEncima = await repo.clasesPorEncimaDe(sedeId, nuevas);
     const fijos = camasPosibles(nuevas, porEncima);
     if (!fijos.ok) return fijos;
