@@ -49,7 +49,7 @@ describe("lista", () => {
     expect(within(ana).getByText("Activo")).toBeDefined();
   });
 
-  it("quien solo ve no tiene botones para cambiar nada", async () => {
+  it("quien solo ve no tiene botones para cambiar nada: solo «Ver»", async () => {
     servidorFalso({
       "GET /api/sesion": enCentro(UNA_SEDE, { permisos: VE }),
       "GET /api/alumnos?pagina=1": LISTA,
@@ -57,7 +57,10 @@ describe("lista", () => {
     const usuario = montarPanel();
     await abrirAlumnos(usuario);
     const ana = await screen.findByRole("row", { name: /Pérez, Ana/ });
-    expect(within(ana).queryAllByRole("button")).toEqual([]);
+    const botones = within(ana)
+      .queryAllByRole("button")
+      .map((boton) => boton.textContent);
+    expect(botones).toEqual(["Ver"]);
     expect(screen.queryByRole("button", { name: "Sumar alumno" })).toBeNull();
   });
 

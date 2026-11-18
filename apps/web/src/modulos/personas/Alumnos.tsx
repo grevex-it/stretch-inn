@@ -1,5 +1,5 @@
-// Pantalla Alumnos: lista con buscador, alta, edición y baja (0011). Ocultar botones es solo UX:
-// la API aplica cada regla.
+// Pantalla Alumnos: lista con buscador, alta, edición y baja (0011). Sin personas.editar, la ficha
+// se abre en solo lectura. Ocultar botones es solo UX: la API aplica cada regla.
 import type { Alumno } from "@app/contratos";
 import { useState } from "react";
 import { Aviso, mensajeDe } from "../../base/controles/Aviso.tsx";
@@ -15,7 +15,7 @@ import { TablaDeAlumnos } from "./TablaDeAlumnos.tsx";
 type Editando = { alumno: Alumno | undefined } | null;
 
 /** El buscador y la tabla. Cambiar la búsqueda o las bajas vuelve a la página 1. */
-function Lista({ edita, alEditar }: { edita: boolean; alEditar: (alumno: Alumno) => void }) {
+function Lista({ edita, alAbrir }: { edita: boolean; alAbrir: (alumno: Alumno) => void }) {
   const [filtro, setFiltro] = useState<Filtro>({ pagina: 1, buscar: "", conBajas: false });
   const filtrar = (cambio: Partial<Filtro>) => {
     setFiltro((actual) => ({ ...actual, pagina: 1, ...cambio }));
@@ -38,7 +38,7 @@ function Lista({ edita, alEditar }: { edita: boolean; alEditar: (alumno: Alumno)
           pagina={alumnos.data}
           buscar={filtro.buscar}
           edita={edita}
-          alEditar={alEditar}
+          alAbrir={alAbrir}
           alIrA={(pagina) => {
             filtrar({ pagina });
           }}
@@ -80,6 +80,7 @@ export function Alumnos() {
         <FichaDeAlumno
           key={editando.alumno?.id ?? "nuevo"}
           alumno={editando.alumno}
+          soloLectura={!edita}
           alGuardar={(nombre) => {
             setEditando(null);
             setGuardado(nombre);
@@ -89,7 +90,7 @@ export function Alumnos() {
           }}
         />
       )}
-      <Lista edita={edita} alEditar={abrir} />
+      <Lista edita={edita} alAbrir={abrir} />
     </section>
   );
 }
