@@ -40,15 +40,15 @@ algo puede fallar por una regla.
 - `fijarActivo(tx, { id, activo }, alDarDeBaja?)`: baja y reactivación. Al dar de baja corre
   `alDarDeBaja(tx, { alumnoId, ahora })` en la misma transacción: si falla, la baja no queda.
 - `rutasDeAlumnos(base, { alDarDeBaja? })`: la API le pasa `liberarLugares` de `agenda`, así la
-  baja libera el horario fijo del alumno (0019). Rutas: `GET /alumnos?pagina&buscar&bajas=si` y `GET /alumnos/:id`
-  (`personas.ver`); `POST /alumnos`, `PUT /alumnos/:id` y `PUT`/`DELETE /alumnos/:id/baja`
-  (`personas.editar`).
+  baja libera el horario fijo del alumno (0019). Rutas: `GET /alumnos?pagina&buscar&bajas=si` y
+  `GET /alumnos/:id` (`personas.ver`); `POST /alumnos` y `PUT /alumnos/:id` (`personas.editar`);
+  `PUT`/`DELETE /alumnos/:id/baja` (`personas.dar-de-baja`).
 - `obtenerSalud(tx, alumnoId)` y `fijarSalud(tx, { alumnoId, patologias, version })`: los datos
   de salud (hasta 4000 caracteres), con su versión (0 si nunca se cargaron).
 - `GET /alumnos/:id/salud` (`personas.ver-salud`) y `PUT /alumnos/:id/salud`
   (`personas.editar-salud`), en `rutasDeAlumnos`.
 - `PERMISOS_PERSONAS`: la sección «Alumnos» del catálogo (0007): `personas.ver`,
-  `personas.editar`, `personas.ver-salud` y `personas.editar-salud`.
+  `personas.editar`, `personas.dar-de-baja`, `personas.ver-salud` y `personas.editar-salud`.
 
 ## Eventos
 
@@ -61,6 +61,8 @@ algo puede fallar por una regla.
   usuario con `personas.ver` en alguna sede ve a todos los alumnos del centro.
 - La baja no borra: oculta al alumno de la lista habitual y conserva su historia. Libera su
   horario fijo en `agenda` (la reactivación no lo devuelve: hay que volver a inscribirlo).
+- Dar de baja y reactivar tienen su permiso propio (`personas.dar-de-baja`), aparte de editar la
+  ficha: cada centro decide quién puede.
 - Si se carga el documento, no se repite dentro del centro (índice único parcial). Se guarda sin
   puntos ni espacios.
 - **El número de socio no se repite dentro del centro** (índice único). Las altas sin número van

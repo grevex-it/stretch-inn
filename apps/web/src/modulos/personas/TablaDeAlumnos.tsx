@@ -8,11 +8,12 @@ interface Props {
   pagina: PaginaDeAlumnos;
   buscar: string;
   edita: boolean;
+  daDeBaja: boolean;
   alIrA: (pagina: number) => void;
   alAbrir: (alumno: Alumno) => void;
 }
 
-export function TablaDeAlumnos({ pagina, buscar, edita, alIrA, alAbrir }: Props) {
+export function TablaDeAlumnos({ pagina, buscar, edita, daDeBaja, alIrA, alAbrir }: Props) {
   if (pagina.total === 0) {
     return (
       <p className={estilos.vacia}>
@@ -36,7 +37,13 @@ export function TablaDeAlumnos({ pagina, buscar, edita, alIrA, alAbrir }: Props)
         </thead>
         <tbody>
           {pagina.elementos.map((alumno) => (
-            <FilaDeAlumno key={alumno.id} alumno={alumno} edita={edita} alAbrir={alAbrir} />
+            <FilaDeAlumno
+              key={alumno.id}
+              alumno={alumno}
+              edita={edita}
+              daDeBaja={daDeBaja}
+              alAbrir={alAbrir}
+            />
           ))}
         </tbody>
       </table>

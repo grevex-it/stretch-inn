@@ -9,6 +9,8 @@ export const BEA = "8b0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f68";
 export const UNA_SEDE = [{ id: NORTE, nombre: "Norte" }];
 export const VE = ["personas.ver"];
 export const EDITA = ["personas.ver", "personas.editar"];
+export const DA_DE_BAJA = ["personas.ver", "personas.dar-de-baja"];
+export const GESTIONA = [...EDITA, "personas.dar-de-baja"];
 
 export function alumno(id: string, nombre: string, apellido: string, activo = true) {
   return {

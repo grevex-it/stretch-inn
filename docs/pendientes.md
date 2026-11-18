@@ -47,9 +47,9 @@ El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-impleme
 
 Hoy solo existe la plantilla del Dueño (0007 prevé también encargado, recepción y profesor).
 
-- **Profesor:** viene por defecto con `personas.editar`, y el centro lo puede bajar a
-  `personas.ver` (el panel ya abre la ficha en solo lectura con «Ver»). Evaluar un permiso propio
-  para dar de baja: hoy alcanza con `personas.editar`.
+- **Profesor:** viene por defecto con `personas.editar` y `personas.dar-de-baja` (GREVEX, 18/11:
+  el profe maneja los alumnos en todo sentido), y el centro se los puede sacar (el panel ya abre
+  la ficha en solo lectura con «Ver»).
 
 ### Nombre del producto
 

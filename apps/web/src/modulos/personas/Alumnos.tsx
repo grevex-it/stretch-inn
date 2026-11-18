@@ -15,7 +15,13 @@ import { TablaDeAlumnos } from "./TablaDeAlumnos.tsx";
 type Editando = { alumno: Alumno | undefined } | null;
 
 /** El buscador y la tabla. Cambiar la búsqueda o las bajas vuelve a la página 1. */
-function Lista({ edita, alAbrir }: { edita: boolean; alAbrir: (alumno: Alumno) => void }) {
+interface PropsDeLista {
+  edita: boolean;
+  daDeBaja: boolean;
+  alAbrir: (alumno: Alumno) => void;
+}
+
+function Lista({ edita, daDeBaja, alAbrir }: PropsDeLista) {
   const [filtro, setFiltro] = useState<Filtro>({ pagina: 1, buscar: "", conBajas: false });
   const filtrar = (cambio: Partial<Filtro>) => {
     setFiltro((actual) => ({ ...actual, pagina: 1, ...cambio }));
@@ -38,6 +44,7 @@ function Lista({ edita, alAbrir }: { edita: boolean; alAbrir: (alumno: Alumno) =
           pagina={alumnos.data}
           buscar={filtro.buscar}
           edita={edita}
+          daDeBaja={daDeBaja}
           alAbrir={alAbrir}
           alIrA={(pagina) => {
             filtrar({ pagina });
@@ -61,6 +68,7 @@ function Encabezado({ conBoton, alSumar }: { conBoton: boolean; alSumar: () => v
 
 export function Alumnos() {
   const edita = usePermiso("personas.editar");
+  const daDeBaja = usePermiso("personas.dar-de-baja");
   const [editando, setEditando] = useState<Editando>(null);
   const [guardado, setGuardado] = useState<string | null>(null);
   const abrir = (alumno: Alumno | undefined) => {
@@ -90,7 +98,7 @@ export function Alumnos() {
           }}
         />
       )}
-      <Lista edita={edita} alAbrir={abrir} />
+      <Lista edita={edita} daDeBaja={daDeBaja} alAbrir={abrir} />
     </section>
   );
 }

@@ -2,7 +2,16 @@
 import { screen, within } from "@testing-library/react";
 import type { UserEvent } from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { abrirAlumnos, alumno, ANA, BEA, EDITA, LISTA, pagina, UNA_SEDE } from "./alumnos-datos.ts";
+import {
+  abrirAlumnos,
+  alumno,
+  ANA,
+  BEA,
+  GESTIONA,
+  LISTA,
+  pagina,
+  UNA_SEDE,
+} from "./alumnos-datos.ts";
 import { enCentro, montarPanel } from "./render.tsx";
 import { servidorFalso } from "./servidor-falso.ts";
 
@@ -12,7 +21,7 @@ afterEach(() => {
 
 function conAlumnos(extra: Parameters<typeof servidorFalso>[0] = {}) {
   return servidorFalso({
-    "GET /api/sesion": enCentro(UNA_SEDE, { permisos: EDITA }),
+    "GET /api/sesion": enCentro(UNA_SEDE, { permisos: GESTIONA }),
     "GET /api/alumnos?pagina=1": LISTA,
     ...extra,
   });
@@ -159,7 +168,7 @@ describe("dar de baja y reactivar", () => {
 
   it("reactivar no pide confirmación", async () => {
     const servidor = servidorFalso({
-      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: EDITA }),
+      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: GESTIONA }),
       "GET /api/alumnos?pagina=1": LISTA,
       "GET /api/alumnos?pagina=1&bajas=si": {
         estado: 200,

@@ -6,7 +6,9 @@ import {
   alumno,
   ANA,
   BEA,
+  DA_DE_BAJA,
   EDITA,
+  GESTIONA,
   LISTA,
   pagina,
   UNA_SEDE,
@@ -64,9 +66,9 @@ describe("lista", () => {
     expect(screen.queryByRole("button", { name: "Sumar alumno" })).toBeNull();
   });
 
-  it("quien edita tiene «Sumar alumno», «Editar» y «Dar de baja»", async () => {
+  it("quien edita y da de baja tiene «Sumar alumno», «Editar» y «Dar de baja»", async () => {
     servidorFalso({
-      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: EDITA }),
+      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: GESTIONA }),
       "GET /api/alumnos?pagina=1": LISTA,
     });
     const usuario = montarPanel();
@@ -78,6 +80,37 @@ describe("lista", () => {
         .map((b) => b.textContent),
     ).toEqual(["Editar", "Dar de baja"]);
     expect(screen.getByRole("button", { name: "Sumar alumno" })).toBeDefined();
+  });
+
+  it("quien edita sin personas.dar-de-baja tiene «Editar», sin «Dar de baja»", async () => {
+    servidorFalso({
+      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: EDITA }),
+      "GET /api/alumnos?pagina=1": LISTA,
+    });
+    const usuario = montarPanel();
+    await abrirAlumnos(usuario);
+    const ana = await screen.findByRole("row", { name: /Pérez, Ana/ });
+    expect(
+      within(ana)
+        .getAllByRole("button")
+        .map((b) => b.textContent),
+    ).toEqual(["Editar"]);
+  });
+
+  it("quien da de baja sin editar tiene «Ver» y «Dar de baja»", async () => {
+    servidorFalso({
+      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: DA_DE_BAJA }),
+      "GET /api/alumnos?pagina=1": LISTA,
+    });
+    const usuario = montarPanel();
+    await abrirAlumnos(usuario);
+    const ana = await screen.findByRole("row", { name: /Pérez, Ana/ });
+    expect(
+      within(ana)
+        .getAllByRole("button")
+        .map((b) => b.textContent),
+    ).toEqual(["Ver", "Dar de baja"]);
+    expect(screen.queryByRole("button", { name: "Sumar alumno" })).toBeNull();
   });
 
   it("sin alumnos lo dice, en vez de mostrar una tabla vacía", async () => {
@@ -122,7 +155,7 @@ describe("buscador, bajas y páginas", () => {
 
   it("«Mostrar bajas» pide también las bajas, que se ven como «De baja»", async () => {
     servidorFalso({
-      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: EDITA }),
+      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: DA_DE_BAJA }),
       "GET /api/alumnos?pagina=1": LISTA,
       "GET /api/alumnos?pagina=1&bajas=si": pagina([alumno(ANA, "Ana", "Pérez", false)]),
     });
@@ -131,6 +164,19 @@ describe("buscador, bajas y páginas", () => {
     await usuario.click(screen.getByRole("checkbox", { name: "Mostrar bajas" }));
     const ana = await screen.findByRole("row", { name: /De baja/ });
     expect(within(ana).getByRole("button", { name: "Reactivar" })).toBeDefined();
+  });
+
+  it("sin personas.dar-de-baja, una baja no se reactiva desde la lista", async () => {
+    servidorFalso({
+      "GET /api/sesion": enCentro(UNA_SEDE, { permisos: EDITA }),
+      "GET /api/alumnos?pagina=1": LISTA,
+      "GET /api/alumnos?pagina=1&bajas=si": pagina([alumno(ANA, "Ana", "Pérez", false)]),
+    });
+    const usuario = montarPanel();
+    await abrirAlumnos(usuario);
+    await usuario.click(screen.getByRole("checkbox", { name: "Mostrar bajas" }));
+    const ana = await screen.findByRole("row", { name: /De baja/ });
+    expect(within(ana).queryByRole("button", { name: "Reactivar" })).toBeNull();
   });
 
   it("pagina de a 50: «Siguiente» pide la página 2", async () => {
