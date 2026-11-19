@@ -40,6 +40,10 @@ export interface PermisoConOrigen {
 export interface PermisosDeIntegrante {
   asignaciones: { sedeId: string; rolId: string; rol: string }[];
   permisos: PermisoConOrigen[];
+  /** Si tiene roles o ajustes en sedes que no están en el contexto de quien consulta. */
+  enOtrasSedes: boolean;
+  /** Si son los de quien consulta: se muestran en solo lectura. */
+  esQuienConsulta: boolean;
 }
 
 export interface AsignacionConPermisos {

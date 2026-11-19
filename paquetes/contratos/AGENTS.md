@@ -8,6 +8,7 @@ acuerdo.
 
 - `src/sesion.ts`: login, estado de la sesión, centro y sede activa, cambio de clave (0017).
 - `src/equipo.ts`: lista del equipo y de roles, alta, clave temporal (0017).
+- `src/roles.ts`: roles a medida, catálogo de permisos, asignaciones por sede y ajustes (0007).
 - `src/alumnos.ts`: lista con buscador, ficha, alta y edición de alumnos (0011).
 - `src/agenda.ts`: clases semanales de cada sede y la semana de fechas concretas.
 - `src/asistencia.ts`: la planilla de asistencia de una fecha y las marcas que se guardan.
@@ -34,6 +35,11 @@ acuerdo.
   trae su `zonaHoraria`: el panel muestra las fechas en esa zona (regla 3).
 - `pedidoDePagina` (query `?pagina=N`, de a 50), `pedidoDeAlta`, `paginaDeEquipo`,
   `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
+- `pedidoDeRol`, `edicionDeRol`, `rolCreado`, `rolEditado`, `fichaDeRol` (con su `plantilla`:
+  esos no se editan), `catalogoDePermisos`, `pedidoDeAsignacion`, `pedidoDeAjuste` y
+  `permisosDeIntegrante` (por sede y permiso, su origen; y `enOtrasSedes`, si tiene más en sedes
+  que quien consulta no ve ahora; y `esQuienConsulta`, para mostrar los propios en solo lectura),
+  con sus tipos.
 - `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,
   `alumno` y `paginaDeAlumnos`, con sus tipos. El celular es opcional; `numeroDeSocio` y
   `fechaDeInicio` y `profeId` también, y si no vienen en la edición se conservan. El alumno trae

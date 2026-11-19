@@ -1,6 +1,7 @@
 // Pantalla Equipo: quién trabaja en el centro, con qué rol en cada sede, y las acciones de quien
 // gestiona usuarios (0017). Ocultar botones es solo UX: la API aplica cada regla.
 import type { AltaHecha } from "@app/contratos";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Aviso, mensajeDe } from "../../base/controles/Aviso.tsx";
 import { Boton } from "../../base/controles/Boton.tsx";
@@ -9,6 +10,7 @@ import { ClaveTemporal } from "./ClaveTemporal.tsx";
 import { useEquipo } from "./consultas.ts";
 import estilos from "./Equipo.module.css";
 import { FormularioDeAlta } from "./FormularioDeAlta.tsx";
+import { PermisosDeIntegrante } from "./PermisosDeIntegrante.tsx";
 import { TablaDeEquipo } from "./TablaDeEquipo.tsx";
 
 /** Lo último que se hizo: la clave temporal a pasar, o null si la cuenta ya existía. */
@@ -26,10 +28,13 @@ function AvisoDeResultado({ resultado, alCerrar }: { resultado: Resultado; alCer
   return <ClaveTemporal nombre={resultado.nombre} clave={resultado.clave} alCerrar={alCerrar} />;
 }
 
+type Integrante = { id: string; nombre: string };
+
 function Lista(props: {
   gestiona: boolean;
   nombresDeSedes: ReadonlyMap<string, string>;
   alGenerarClave: (nombre: string, clave: string) => void;
+  alVerPermisos: (integrante: Integrante) => void;
 }) {
   const [pagina, setPagina] = useState(1);
   const equipo = useEquipo(pagina);
@@ -38,13 +43,36 @@ function Lista(props: {
   return <TablaDeEquipo pagina={equipo.data} alIrA={setPagina} {...props} />;
 }
 
+/** La lista y, arriba, los permisos de quien se esté mirando. */
+function Integrantes(props: Omit<Parameters<typeof Lista>[0], "alVerPermisos">) {
+  const [viendo, setViendo] = useState<Integrante | null>(null);
+  return (
+    <>
+      {viendo !== null && (
+        <PermisosDeIntegrante
+          key={viendo.id}
+          integrante={viendo}
+          alCerrar={() => {
+            setViendo(null);
+          }}
+        />
+      )}
+      <Lista alVerPermisos={setViendo} {...props} />
+    </>
+  );
+}
+
 function Encabezado({ conBoton, alSumar }: { conBoton: boolean; alSumar: () => void }) {
+  const gestionaRoles = usePermiso("roles.gestionar");
   return (
     <div className={estilos.encabezado}>
       <h1 id="titulo-equipo" className={estilos.titulo}>
         Equipo
       </h1>
-      {conBoton && <Boton alHacerClic={alSumar}>Sumar persona</Boton>}
+      <div className={estilos.enlaces}>
+        {gestionaRoles && <Link to="/equipo/roles">Roles</Link>}
+        {conBoton && <Boton alHacerClic={alSumar}>Sumar persona</Boton>}
+      </div>
     </div>
   );
 }
@@ -82,7 +110,7 @@ export function Equipo() {
           }}
         />
       )}
-      <Lista
+      <Integrantes
         gestiona={gestiona}
         nombresDeSedes={new Map(sedes.map((sede) => [sede.id, sede.nombre]))}
         alGenerarClave={(nombre, clave) => {

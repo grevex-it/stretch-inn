@@ -61,7 +61,8 @@ Roles a medida y permisos de cada integrante (0007):
 
 - `crearRoles(base, { catalogo })`: devuelve `Roles`, con `catalogo`, `rol`, `crearRol`,
   `editarRol`, `borrarRol`, `permisosDe` (por sede y permiso: de qué roles viene, su ajuste y si
-  al final lo tiene), `asignar`, `quitarAsignacion`, `ajustar` y `quitarAjuste`. Cada uno recibe
+  al final lo tiene; `enOtrasSedes`, si tiene roles o ajustes en sedes fuera del contexto;
+  y `esQuienConsulta`), `asignar`, `quitarAsignacion`, `ajustar` y `quitarAjuste`. Cada uno recibe
   el `ContextoCentro` de quien lo pide y corre en su transacción. Lo que puede sacar permisos se
   deshace entero si deja al centro sin nadie con acceso total. El catálogo lo arma la API
   (`apps/api/src/catalogo.ts`).
@@ -163,7 +164,8 @@ _Ninguna por ahora._
 
 ## Pendientes
 
-- La pantalla de roles a medida y los ajustes por persona en el panel.
+- `GET /equipo/roles` pide `usuarios.gestionar`: quien tiene `roles.gestionar` sin él no ve la
+  lista de la pantalla Roles. Hoy solo el Dueño tiene `roles.gestionar`.
 - Sumar los permisos de `reportes` al Encargado (los de su sede) y a Contaduría cuando exista
   el módulo.
 - Editar el nombre de un usuario desde el equipo.

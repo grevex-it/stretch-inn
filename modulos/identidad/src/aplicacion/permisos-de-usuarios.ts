@@ -111,9 +111,19 @@ export async function quitarAjuste(
   return falla("ajuste-inexistente", "Esa persona no tiene ese ajuste en esa sede.");
 }
 
-/** Por sede y permiso: de qué roles viene, si tiene un ajuste y si al final lo tiene. */
+/** Si tiene roles o ajustes en sedes fuera del contexto (con una sede activa, las demás). */
+async function enOtrasSedes(repo: RepositorioRoles, quien: ContextoCentro, usuarioId: string) {
+  const filas = await repo.permisosDeUsuario(usuarioId);
+  return filas.some((f) => !quien.permisosPorSede.has(id<"Sede">(f.sedeId)));
+}
+
+/**
+ * Por sede y permiso: de qué roles viene, si tiene un ajuste y si al final lo tiene, en las sedes
+ * que ve quien consulta; si tiene más en otras, y si es quien consulta (nadie se cambia a sí mismo).
+ */
 export async function permisosDe(
   repo: RepositorioRoles,
+  quien: ContextoCentro,
   usuarioId: string,
 ): Respuesta<PermisosDeIntegrante> {
   if (!(await repo.existeUsuario(usuarioId))) return INEXISTENTE;
@@ -135,5 +145,7 @@ export async function permisosDe(
   return ok({
     asignaciones: asignaciones.map(({ sedeId, rolId, rol }) => ({ sedeId, rolId, rol })),
     permisos: [...filas.values()],
+    enOtrasSedes: await enOtrasSedes(repo, quien, usuarioId),
+    esQuienConsulta: actorDe(quien) === usuarioId,
   });
 }

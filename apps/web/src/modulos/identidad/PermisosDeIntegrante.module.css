@@ -1,0 +1,103 @@
+.ficha {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  color: var(--si-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde);
+  border-radius: var(--si-radio-lg);
+}
+
+.encabezado,
+.fila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.encabezado {
+  justify-content: space-between;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: var(--si-peso-medio);
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: var(--si-peso-medio);
+  text-align: left;
+}
+
+.bloque {
+  display: grid;
+  gap: 8px;
+}
+
+.texto {
+  margin: 0;
+}
+
+.roles {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.selector {
+  min-height: var(--si-alto-control-min);
+  padding: 0 8px;
+  font: inherit;
+  color: var(--si-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-sm);
+}
+
+/* En pantallas chicas las tablas se deslizan de costado, todas juntas. */
+.deslizable {
+  overflow-x: auto;
+}
+
+/* Mismos anchos en todas las secciones: las columnas quedan alineadas. */
+.tabla {
+  width: 100%;
+  min-width: 560px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.columnaPermiso {
+  width: 32%;
+}
+
+.columnaOrigen {
+  width: 34%;
+}
+
+.columnaEstado {
+  width: 10%;
+}
+
+.columnaAccion {
+  width: 24%;
+}
+
+.permiso > *,
+.ajustado > * {
+  padding: 8px 12px;
+  text-align: left;
+  border-top: 1px solid var(--si-borde);
+}
+
+/* Par de color controlado por el test de @app/ui: los ajustes se destacan. */
+.ajustado {
+  color: var(--si-alerta-texto);
+  background: var(--si-alerta-fondo);
+}

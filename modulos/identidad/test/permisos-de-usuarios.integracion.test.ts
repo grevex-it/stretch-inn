@@ -172,6 +172,31 @@ describe("un dueño", () => {
     ).toMatchObject(error("mas-permisos"));
   });
 
+  it("con una sede activa, avisa si la persona tiene permisos en otras sedes", async () => {
+    const c = await centroConPlantillas();
+    const otras = async (quien: ContextoCentro, usuarioId: string) => {
+      const permisos = await roles.permisosDe(quien, usuarioId);
+      if (!permisos.ok) throw new Error(permisos.error.mensaje);
+      return permisos.valor.enOtrasSedes;
+    };
+    expect(await otras(await como(c.dueno), c.profeDeLasDos.usuarioId)).toBe(false);
+    const { sesion } = await entrarComo(acceso, c.dueno.email, { sede: c.mendoza });
+    const enMendoza = contextoDe(sesion);
+    expect(await otras(enMendoza, c.profeDeLasDos.usuarioId)).toBe(true);
+    expect(await otras(enMendoza, c.profeDeMendoza.usuarioId)).toBe(false);
+  });
+
+  it("dice si son los permisos de quien consulta, para mostrarlos en solo lectura", async () => {
+    const c = await centroConPlantillas();
+    const lore = await como(c.dueno);
+    const propios = await roles.permisosDe(lore, c.dueno.usuarioId);
+    const ajenos = await roles.permisosDe(lore, c.profeDeMendoza.usuarioId);
+    expect([propios, ajenos]).toMatchObject([
+      { ok: true, valor: { esQuienConsulta: true } },
+      { ok: true, valor: { esQuienConsulta: false } },
+    ]);
+  });
+
   it("lo que no existe responde que no existe", async () => {
     const c = await centroConPlantillas();
     const otro = await centroConPlantillas();

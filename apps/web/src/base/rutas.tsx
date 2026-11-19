@@ -10,6 +10,7 @@ import { Asistencia } from "../modulos/asistencia/Asistencia.tsx";
 import { Abonos } from "../modulos/abonos/Abonos.tsx";
 import { Caja } from "../modulos/caja/Caja.tsx";
 import { Equipo } from "../modulos/identidad/Equipo.tsx";
+import { Roles } from "../modulos/identidad/Roles.tsx";
 import { Alumnos } from "../modulos/personas/Alumnos.tsx";
 import { Estructura } from "./estructura/Estructura.tsx";
 import { Inicio } from "./estructura/Inicio.tsx";
@@ -17,6 +18,7 @@ import { Inicio } from "./estructura/Inicio.tsx";
 const raiz = createRootRoute({ component: Estructura });
 const inicio = createRoute({ getParentRoute: () => raiz, path: "/", component: Inicio });
 const equipo = createRoute({ getParentRoute: () => raiz, path: "/equipo", component: Equipo });
+const roles = createRoute({ getParentRoute: () => raiz, path: "/equipo/roles", component: Roles });
 const alumnos = createRoute({ getParentRoute: () => raiz, path: "/alumnos", component: Alumnos });
 
 const agenda = createRoute({ getParentRoute: () => raiz, path: "/agenda", component: Agenda });
@@ -31,7 +33,7 @@ const caja = createRoute({ getParentRoute: () => raiz, path: "/caja", component:
 /** El historial se pasa en los tests (en memoria); en el navegador, el del navegador. */
 export function crearRouter(historial?: RouterHistory) {
   return createRouter({
-    routeTree: raiz.addChildren([inicio, alumnos, equipo, agenda, asistencia, abonos, caja]),
+    routeTree: raiz.addChildren([inicio, alumnos, equipo, roles, agenda, asistencia, abonos, caja]),
     ...(historial === undefined ? {} : { history: historial }),
   });
 }

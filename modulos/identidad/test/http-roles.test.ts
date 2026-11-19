@@ -38,7 +38,9 @@ function rolesDoble() {
     editarRol: vi.fn<Roles["editarRol"]>(() => Promise.resolve(ok({ version: 2 }))),
     borrarRol: vi.fn<Roles["borrarRol"]>(HECHO),
     permisosDe: vi.fn<Roles["permisosDe"]>(() =>
-      Promise.resolve(ok({ asignaciones: [], permisos: [] })),
+      Promise.resolve(
+        ok({ asignaciones: [], permisos: [], enOtrasSedes: false, esQuienConsulta: false }),
+      ),
     ),
     asignar: vi.fn<Roles["asignar"]>(HECHO),
     quitarAsignacion: vi.fn<Roles["quitarAsignacion"]>(HECHO),
@@ -105,6 +107,8 @@ describe("rutas de roles", () => {
     expect((await servidor.inject({ url: `${base}/permisos` })).json()).toEqual({
       asignaciones: [],
       permisos: [],
+      enOtrasSedes: false,
+      esQuienConsulta: false,
     });
     const asignacion = { sedeId: OTRO, rolId: UUID };
     const asignado = await servidor.inject({
