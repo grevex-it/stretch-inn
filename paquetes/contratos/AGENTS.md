@@ -38,7 +38,8 @@ acuerdo.
 - `pedidoDeRol`, `edicionDeRol`, `rolCreado`, `rolEditado`, `fichaDeRol` (con su `plantilla`:
   esos no se editan), `catalogoDePermisos`, `pedidoDeAsignacion`, `pedidoDeAjuste` y
   `permisosDeIntegrante` (por sede y permiso, su origen; y `enOtrasSedes`, si tiene más en sedes
-  que quien consulta no ve ahora), con sus tipos.
+  que quien consulta no ve ahora; y `esQuienConsulta`, para mostrar los propios en solo lectura),
+  con sus tipos.
 - `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,
   `alumno` y `paginaDeAlumnos`, con sus tipos. El celular es opcional; `numeroDeSocio` y
   `fechaDeInicio` y `profeId` también, y si no vienen en la edición se conservan. El alumno trae

@@ -13,6 +13,7 @@ type Rol = PaginaDeRoles["elementos"][number];
 interface Props {
   rol: Rol;
   alAbrir: (apertura: Apertura) => void;
+  alBorrar: (nombre: string) => void;
 }
 
 function Confirmar(props: { nombre: string; alResponder: (si: boolean) => void }) {
@@ -38,7 +39,7 @@ function Confirmar(props: { nombre: string; alResponder: (si: boolean) => void }
   );
 }
 
-function Acciones({ rol, alAbrir }: Props) {
+function Acciones({ rol, alAbrir, alBorrar }: Props) {
   const [confirmando, setConfirmando] = useState(false);
   const borrar = useBorrarRol();
   if (confirmando) {
@@ -47,7 +48,13 @@ function Acciones({ rol, alAbrir }: Props) {
         nombre={rol.nombre}
         alResponder={(si) => {
           setConfirmando(false);
-          if (si) borrar.mutate(rol.id);
+          if (si) {
+            borrar.mutate(rol.id, {
+              onSuccess: () => {
+                alBorrar(rol.nombre);
+              },
+            });
+          }
         }}
       />
     );
@@ -74,7 +81,8 @@ function Acciones({ rol, alAbrir }: Props) {
   );
 }
 
-export function FilaDeRol({ rol, alAbrir }: Props) {
+export function FilaDeRol(props: Props) {
+  const { rol } = props;
   return (
     <tr className={estilos.fila}>
       <th scope="row" className={estilos.nombre}>
@@ -86,7 +94,7 @@ export function FilaDeRol({ rol, alAbrir }: Props) {
         </span>
       </td>
       <td>
-        <Acciones rol={rol} alAbrir={alAbrir} />
+        <Acciones {...props} />
       </td>
     </tr>
   );

@@ -1,5 +1,6 @@
 // Cada permiso del catálogo en una sede: de qué rol viene, si tiene un ajuste (extra o quitado,
-// destacados) y si al final lo tiene. Con usuarios.gestionar, se ajusta uno por uno.
+// destacados) y si al final lo tiene. Con usuarios.gestionar, se ajusta uno por uno. Todas las
+// tablas usan los mismos anchos de columna, para que se lean alineadas.
 import type { CatalogoDePermisos, PedidoDeAjuste, PermisosDeIntegrante } from "@app/contratos";
 import { Boton } from "../../base/controles/Boton.tsx";
 import type { CambiosDePermisos } from "./cambios-de-permisos.ts";
@@ -48,10 +49,16 @@ export function OrigenDePermisos({ sedeId, secciones, permisos, gestiona, cambio
     permisos.filter((p) => p.sedeId === sedeId).map((p) => [p.permiso, p]),
   );
   return (
-    <div className={estilos.bloque}>
+    <div className={`${estilos.bloque} ${estilos.deslizable}`}>
       {secciones.map((seccion) => (
         <table key={seccion.seccion} className={estilos.tabla} aria-label={seccion.seccion}>
           <caption className={estilos.subtitulo}>{seccion.seccion}</caption>
+          <colgroup>
+            <col className={estilos.columnaPermiso} />
+            <col className={estilos.columnaOrigen} />
+            <col className={estilos.columnaEstado} />
+            {gestiona && <col className={estilos.columnaAccion} />}
+          </colgroup>
           <tbody>
             {seccion.permisos.map(({ permiso, descripcion }) => {
               const fila = porPermiso.get(permiso);

@@ -1,6 +1,7 @@
 // Los permisos de una persona del equipo (0007): sus roles en cada sede y, por permiso, de dónde
 // viene. Con una sede activa solo se ve esa sede: si tiene más en otras, se avisa para pasar a
-// «Todas mis sedes». Ocultar botones es solo UX: la API aplica cada regla.
+// «Todas mis sedes». Los propios se ven en solo lectura: nadie se cambia a sí mismo. Ocultar
+// botones es solo UX: la API aplica cada regla.
 import { useId, useState } from "react";
 import { Aviso, mensajeDe } from "../../base/controles/Aviso.tsx";
 import { Boton } from "../../base/controles/Boton.tsx";
@@ -79,6 +80,20 @@ function AvisoDeOtrasSedes({ nombre }: { nombre: string }) {
   );
 }
 
+function Avisos(props: { nombre: string; propios: boolean; otrasSedes: boolean }) {
+  return (
+    <>
+      {props.propios && (
+        <Aviso tono="alerta">
+          Son tus permisos: no podés cambiártelos. Si hace falta, pedíselo a otra persona que
+          gestione el equipo.
+        </Aviso>
+      )}
+      {props.otrasSedes && <AvisoDeOtrasSedes nombre={props.nombre} />}
+    </>
+  );
+}
+
 function Contenido({ integrante }: Pick<Props, "integrante">) {
   const { visibles, puedePasarATodas } = useSedesVisibles();
   const [sedeId, setSedeId] = useState<string | undefined>(undefined);
@@ -92,12 +107,14 @@ function Contenido({ integrante }: Pick<Props, "integrante">) {
   if (permisos.data === undefined || catalogo.data === undefined || sede === undefined) {
     return <p>Cargando…</p>;
   }
-  const comun = { gestiona, cambios };
+  const comun = { gestiona: gestiona && !permisos.data.esQuienConsulta, cambios };
   return (
     <>
-      {puedePasarATodas && permisos.data.enOtrasSedes && (
-        <AvisoDeOtrasSedes nombre={integrante.nombre} />
-      )}
+      <Avisos
+        nombre={integrante.nombre}
+        propios={permisos.data.esQuienConsulta}
+        otrasSedes={puedePasarATodas && permisos.data.enOtrasSedes}
+      />
       <ElegirSede sedes={visibles} sede={sede} alElegir={setSedeId} />
       {cambios.error !== undefined && <Aviso tono="error">{cambios.error}</Aviso>}
       <RolesEnLaSede sede={sede} asignaciones={permisos.data.asignaciones} {...comun} />

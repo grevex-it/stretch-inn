@@ -29,6 +29,7 @@ function conPermisos(
     sedeActiva?: string;
     sedes?: { id: string; nombre: string }[];
     enOtrasSedes?: boolean;
+    esQuienConsulta?: boolean;
     extra?: Record<string, Respuesta>;
   } = {},
 ) {
@@ -40,7 +41,10 @@ function conPermisos(
     "GET /api/equipo?pagina=1": pagina([integrante(ANA, "Ana")]),
     "GET /api/equipo/roles?pagina=1": LISTA_DE_ROLES,
     "GET /api/equipo/catalogo": CATALOGO,
-    [`GET /api/equipo/${ANA}/permisos`]: permisosDeAna(opciones.enOtrasSedes),
+    [`GET /api/equipo/${ANA}/permisos`]: permisosDeAna(
+      opciones.enOtrasSedes,
+      opciones.esQuienConsulta,
+    ),
     [`PUT /api/equipo/${ANA}/ajustes`]: { estado: 204 },
     [`DELETE /api/equipo/${ANA}/ajustes/${NORTE}/caja.anular`]: { estado: 204 },
     [`POST /api/equipo/${ANA}/asignaciones`]: { estado: 204 },
@@ -86,6 +90,20 @@ describe("permisos de una persona", () => {
         .queryAllByRole("button")
         .map((b) => b.textContent),
     ).toEqual(["Cerrar"]);
+  });
+
+  it("los propios se ven en solo lectura, con un aviso: nadie se cambia a sí mismo", async () => {
+    conPermisos({ esQuienConsulta: true });
+    const usuario = montarPanel();
+    const region = await abrirPermisosDeAna(usuario);
+    await fila(region, "Cobrar");
+    expect(within(region).getByText(/Son tus permisos: no podés cambiártelos/)).toBeDefined();
+    expect(
+      within(region)
+        .queryAllByRole("button")
+        .map((b) => b.textContent),
+    ).toEqual(["Cerrar"]);
+    expect(within(region).queryByLabelText("Rol para sumar")).toBeNull();
   });
 
   it("quitar, dar como extra y volver al rol mandan el ajuste de esa sede", async () => {

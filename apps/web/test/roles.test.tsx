@@ -149,6 +149,26 @@ describe("el editor de un rol", () => {
 });
 
 describe("borrar un rol", () => {
+  it("después de guardar y borrar, el aviso es el del borrado", async () => {
+    conRoles({
+      [`PUT /api/equipo/roles/${PROPIO}`]: { estado: 200, cuerpo: { version: 4 } },
+      [`DELETE /api/equipo/roles/${PROPIO}`]: { estado: 204 },
+    });
+    const usuario = montarPanel();
+    await abrirRoles(usuario);
+    const propio = await screen.findByRole("row", { name: /Profe sin bajas/ });
+    await usuario.click(within(propio).getByRole("button", { name: "Editar" }));
+    await usuario.click(await screen.findByRole("button", { name: "Guardar" }));
+    expect((await screen.findByRole("status")).textContent).toBe(
+      "Guardamos el rol Profe sin bajas.",
+    );
+    await usuario.click(within(propio).getByRole("button", { name: "Borrar" }));
+    await usuario.click(within(propio).getByRole("button", { name: "Sí, borrar" }));
+    await vi.waitFor(() => {
+      expect(screen.getByRole("status").textContent).toBe("Borramos el rol Profe sin bajas.");
+    });
+  });
+
   it("pide confirmación y, si alguien lo tiene, muestra quiénes", async () => {
     const servidor = conRoles({
       [`DELETE /api/equipo/roles/${PROPIO}`]: {

@@ -60,10 +60,33 @@
   border-radius: var(--si-radio-sm);
 }
 
-.tabla {
-  display: block;
+/* En pantallas chicas las tablas se deslizan de costado, todas juntas. */
+.deslizable {
   overflow-x: auto;
+}
+
+/* Mismos anchos en todas las secciones: las columnas quedan alineadas. */
+.tabla {
+  width: 100%;
+  min-width: 560px;
+  table-layout: fixed;
   border-collapse: collapse;
+}
+
+.columnaPermiso {
+  width: 32%;
+}
+
+.columnaOrigen {
+  width: 34%;
+}
+
+.columnaEstado {
+  width: 10%;
+}
+
+.columnaAccion {
+  width: 24%;
 }
 
 .permiso > *,

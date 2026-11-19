@@ -29,7 +29,9 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
     (Sin acceso, Ver, Operar o Personalizado, `matriz.ts`) y una casilla por permiso. «Permisos»
     en cada fila abre los roles y el origen de cada permiso de esa persona en una sede
     (`PermisosDeIntegrante.tsx`), con los ajustes destacados; con `usuarios.gestionar`, se suman
-    y quitan roles y se ajusta permiso por permiso. Con una sede activa, si la persona tiene
+    y quitan roles y se ajusta permiso por permiso. Los propios se ven en solo lectura, con un
+    aviso: nadie se cambia a sí mismo. Las tablas de cada sección usan los mismos anchos de
+    columna. Con una sede activa, si la persona tiene
     permisos en otras sedes, ofrece pasar a «Todas mis sedes».
   - `personas/`: pantalla Alumnos (lista con buscador, alta, edición, baja y reactivación). Con
     `personas.editar` la ficha se abre con «Editar»; con solo `personas.ver`, con «Ver» y en solo

@@ -61,7 +61,8 @@ Roles a medida y permisos de cada integrante (0007):
 
 - `crearRoles(base, { catalogo })`: devuelve `Roles`, con `catalogo`, `rol`, `crearRol`,
   `editarRol`, `borrarRol`, `permisosDe` (por sede y permiso: de qué roles viene, su ajuste y si
-  al final lo tiene; y `enOtrasSedes`, si tiene roles o ajustes en sedes fuera del contexto), `asignar`, `quitarAsignacion`, `ajustar` y `quitarAjuste`. Cada uno recibe
+  al final lo tiene; `enOtrasSedes`, si tiene roles o ajustes en sedes fuera del contexto;
+  y `esQuienConsulta`), `asignar`, `quitarAsignacion`, `ajustar` y `quitarAjuste`. Cada uno recibe
   el `ContextoCentro` de quien lo pide y corre en su transacción. Lo que puede sacar permisos se
   deshace entero si deja al centro sin nadie con acceso total. El catálogo lo arma la API
   (`apps/api/src/catalogo.ts`).

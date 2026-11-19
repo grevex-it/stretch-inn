@@ -12,7 +12,10 @@ import estilos from "./Equipo.module.css";
 import { FilaDeRol } from "./FilaDeRol.tsx";
 import tabla from "./TablaDeEquipo.module.css";
 
-function Lista({ alAbrir }: { alAbrir: (apertura: Apertura) => void }) {
+function Lista(props: {
+  alAbrir: (apertura: Apertura) => void;
+  alBorrar: (nombre: string) => void;
+}) {
   const [pagina, setPagina] = useState(1);
   const roles = useListaDeRoles(pagina);
   if (roles.error !== null) return <Aviso tono="error">{mensajeDe(roles.error)}</Aviso>;
@@ -29,7 +32,7 @@ function Lista({ alAbrir }: { alAbrir: (apertura: Apertura) => void }) {
         </thead>
         <tbody>
           {roles.data.elementos.map((rol) => (
-            <FilaDeRol key={rol.id} rol={rol} alAbrir={alAbrir} />
+            <FilaDeRol key={rol.id} rol={rol} {...props} />
           ))}
         </tbody>
       </table>
@@ -43,9 +46,10 @@ const claveDe = (apertura: Apertura) =>
 
 export function Roles() {
   const [abierto, setAbierto] = useState<Apertura | null>(null);
-  const [guardado, setGuardado] = useState<string | null>(null);
+  /** Lo último que se hizo: «Guardamos…» o «Borramos…». */
+  const [hecho, setHecho] = useState<string | null>(null);
   const abrir = (apertura: Apertura) => {
-    setGuardado(null);
+    setHecho(null);
     setAbierto(apertura);
   };
   return (
@@ -67,7 +71,7 @@ export function Roles() {
           )}
         </div>
       </div>
-      {guardado !== null && <Aviso tono="ok">Guardamos el rol {guardado}.</Aviso>}
+      {hecho !== null && <Aviso tono="ok">{hecho}</Aviso>}
       {abierto !== null && (
         <EditorDeRol
           key={claveDe(abierto)}
@@ -77,11 +81,16 @@ export function Roles() {
           }}
           alGuardar={(nombre) => {
             setAbierto(null);
-            setGuardado(nombre);
+            setHecho(`Guardamos el rol ${nombre}.`);
           }}
         />
       )}
-      <Lista alAbrir={abrir} />
+      <Lista
+        alAbrir={abrir}
+        alBorrar={(nombre) => {
+          setHecho(`Borramos el rol ${nombre}.`);
+        }}
+      />
     </section>
   );
 }

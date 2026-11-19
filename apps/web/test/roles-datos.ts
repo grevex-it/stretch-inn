@@ -46,7 +46,7 @@ export function ficha(id: string, nombre: string, plantilla: string | null, perm
 export const GESTIONA_ROLES = ["usuarios.ver", "usuarios.gestionar", "roles.gestionar"];
 
 /** Ana: Recepción en Norte (caja.ver y caja.anular), con caja.cobrar extra y caja.anular quitado. */
-export function permisosDeAna(enOtrasSedes = false) {
+export function permisosDeAna(enOtrasSedes = false, esQuienConsulta = false) {
   const fila = (permiso: string, roles: string[], ajuste: string | null, efectivo: boolean) => ({
     sedeId: NORTE,
     permiso,
@@ -64,6 +64,7 @@ export function permisosDeAna(enOtrasSedes = false) {
         fila("caja.anular", ["Recepción"], "quitado", false),
       ],
       enOtrasSedes,
+      esQuienConsulta,
     },
   };
 }

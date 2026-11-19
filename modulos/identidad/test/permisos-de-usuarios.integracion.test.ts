@@ -186,6 +186,17 @@ describe("un dueño", () => {
     expect(await otras(enMendoza, c.profeDeMendoza.usuarioId)).toBe(false);
   });
 
+  it("dice si son los permisos de quien consulta, para mostrarlos en solo lectura", async () => {
+    const c = await centroConPlantillas();
+    const lore = await como(c.dueno);
+    const propios = await roles.permisosDe(lore, c.dueno.usuarioId);
+    const ajenos = await roles.permisosDe(lore, c.profeDeMendoza.usuarioId);
+    expect([propios, ajenos]).toMatchObject([
+      { ok: true, valor: { esQuienConsulta: true } },
+      { ok: true, valor: { esQuienConsulta: false } },
+    ]);
+  });
+
   it("lo que no existe responde que no existe", async () => {
     const c = await centroConPlantillas();
     const otro = await centroConPlantillas();

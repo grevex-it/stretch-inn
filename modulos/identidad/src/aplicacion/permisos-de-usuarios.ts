@@ -119,7 +119,7 @@ async function enOtrasSedes(repo: RepositorioRoles, quien: ContextoCentro, usuar
 
 /**
  * Por sede y permiso: de qué roles viene, si tiene un ajuste y si al final lo tiene, en las sedes
- * que ve quien consulta; y si tiene más en otras.
+ * que ve quien consulta; si tiene más en otras, y si es quien consulta (nadie se cambia a sí mismo).
  */
 export async function permisosDe(
   repo: RepositorioRoles,
@@ -146,5 +146,6 @@ export async function permisosDe(
     asignaciones: asignaciones.map(({ sedeId, rolId, rol }) => ({ sedeId, rolId, rol })),
     permisos: [...filas.values()],
     enOtrasSedes: await enOtrasSedes(repo, quien, usuarioId),
+    esQuienConsulta: actorDe(quien) === usuarioId,
   });
 }

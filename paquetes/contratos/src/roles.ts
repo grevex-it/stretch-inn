@@ -70,6 +70,8 @@ export const permisosDeIntegrante = z.object({
     }),
   ),
   enOtrasSedes: z.boolean(),
+  /** Si son los permisos de quien consulta: nadie se cambia los suyos. */
+  esQuienConsulta: z.boolean(),
 });
 
 export type PedidoDeRol = z.infer<typeof pedidoDeRol>;
