@@ -77,6 +77,9 @@ Para otros módulos (reciben la `Transaccion` de `enContexto`):
 - `obtenerUsuarios(tx, ids)`: hasta 100 usuarios del centro en una sola consulta
   (`{ id, nombre, activo }`), para que `agenda` y `personas` muestren y validen un profe (0022).
   Los ids que no son del centro no vuelven.
+- `listarUsuariosActivos(tx, { pagina, porPagina })`: los integrantes activos del centro, por
+  nombre y paginados (`{ id, nombre }`), para elegir el profe de un alumno (0022). Cualquiera del
+  equipo puede dar clases.
 
 Login y sesiones (0017):
 
