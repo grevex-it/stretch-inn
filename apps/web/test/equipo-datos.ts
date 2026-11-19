@@ -29,7 +29,7 @@ export function pagina(elementos: unknown[], total = elementos.length, numero = 
   return { estado: 200, cuerpo: { pagina: numero, porPagina: 50, total, elementos } };
 }
 
-export const ROLES = pagina([{ id: RECEPCION, nombre: "Recepción" }]);
+export const ROLES = pagina([{ id: RECEPCION, nombre: "Recepción", plantilla: null }]);
 
 /** Entra a Equipo desde la navegación, como lo haría la persona. */
 export async function abrirEquipo(usuario: UserEvent) {

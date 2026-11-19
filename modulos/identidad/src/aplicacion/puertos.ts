@@ -32,7 +32,8 @@ export interface RepositorioIdentidad {
   permisosDelCentro(): Promise<FilaDePermisoDeUsuario[]>;
   /** Ids de todas las sedes del centro del contexto, las vea o no el actor. */
   sedesDelCentro(): Promise<string[]>;
-  existeRolConNombre(nombre: string): Promise<boolean>;
+  /** Sin importar mayúsculas; `salvo` deja afuera al rol que se está editando. */
+  existeRolConNombre(nombre: string, salvo?: string): Promise<boolean>;
   crearRol(rol: { id: string; nombre: string; permisos: readonly Permiso[] }): Promise<void>;
   /** Los permisos del rol, o undefined si no existe en el centro. */
   permisosDeRol(rolId: string): Promise<Permiso[] | undefined>;

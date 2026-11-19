@@ -71,7 +71,7 @@ function lecturasDePermisos(tx: Transaccion): LecturasDePermisos {
     async roles({ pagina, porPagina }) {
       const [elementos, [total]] = await Promise.all([
         tx
-          .select({ id: roles.id, nombre: roles.nombre })
+          .select({ id: roles.id, nombre: roles.nombre, plantilla: roles.plantilla })
           .from(roles)
           .orderBy(asc(roles.nombre), asc(roles.id))
           .limit(porPagina)

@@ -3,7 +3,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { CATALOGO } from "../src/catalogo.ts";
+import { CATALOGO } from "@app/api/catalogo";
 
 const MIGRACIONES = join(import.meta.dirname, "..", "..", "db", "migraciones");
 

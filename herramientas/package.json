@@ -7,14 +7,9 @@
     "test": "vitest run --fsModuleCachePath node_modules/.vitest-cache"
   },
   "dependencies": {
-    "@app/abonos": "workspace:*",
-    "@app/agenda": "workspace:*",
-    "@app/asistencia": "workspace:*",
-    "@app/caja": "workspace:*",
+    "@app/api": "workspace:*",
     "@app/contratos": "workspace:*",
-    "@app/gastos": "workspace:*",
     "@app/identidad": "workspace:*",
-    "@app/personas": "workspace:*",
     "exceljs": "4.4.0",
     "pg": "^8.23.1",
     "zod": "^4.6.7"

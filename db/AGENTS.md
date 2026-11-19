@@ -50,8 +50,9 @@ ya existen (ver `modulos/identidad/AGENTS.md`):
 select identidad_dar_al_dueno(array['modulo.ver', 'modulo.editar']);
 ```
 
-Sumá además la sección del módulo a `herramientas/src/catalogo.ts`: su test falla si algún
-permiso del catálogo no llega al Dueño por migración.
+Sumá además la sección del módulo a `apps/api/src/catalogo.ts` (lo usan la API y
+`herramientas`): `herramientas/test/permisos-del-dueno.test.ts` falla si algún permiso del
+catálogo no llega al Dueño por migración.
 
 Si alguna otra plantilla tiene que traer permisos del módulo (por ejemplo, el Profesor), sumalos
 en `modulos/identidad/src/dominio/plantillas.ts` (para los centros nuevos) y dáselos en la misma

@@ -171,30 +171,15 @@ importers:
 
   herramientas:
     dependencies:
-      '@app/abonos':
+      '@app/api':
         specifier: workspace:*
-        version: link:../modulos/abonos
-      '@app/agenda':
-        specifier: workspace:*
-        version: link:../modulos/agenda
-      '@app/asistencia':
-        specifier: workspace:*
-        version: link:../modulos/asistencia
-      '@app/caja':
-        specifier: workspace:*
-        version: link:../modulos/caja
+        version: link:../apps/api
       '@app/contratos':
         specifier: workspace:*
         version: link:../paquetes/contratos
-      '@app/gastos':
-        specifier: workspace:*
-        version: link:../modulos/gastos
       '@app/identidad':
         specifier: workspace:*
         version: link:../modulos/identidad
-      '@app/personas':
-        specifier: workspace:*
-        version: link:../modulos/personas
       exceljs:
         specifier: 4.4.0
         version: 4.4.0

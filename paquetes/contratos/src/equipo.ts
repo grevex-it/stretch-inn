@@ -1,4 +1,5 @@
-// Equipo del centro (ver docs/decisiones/0017): lista, alta, reset de clave y bloqueo.
+// Equipo del centro (ver docs/decisiones/0017): lista, alta, reset de clave y bloqueo. Roles,
+// asignaciones y ajustes: roles.ts.
 import { z } from "zod";
 import { numeroDePagina, paginaDe, POR_PAGINA } from "./paginas.ts";
 
@@ -25,7 +26,10 @@ export const paginaDeEquipo = paginaDe(
   }),
 );
 
-export const paginaDeRoles = paginaDe(z.object({ id: z.uuid(), nombre: z.string() }));
+/** `plantilla`: de qué plantilla del sistema salió el rol (no se edita), o null si es propio. */
+export const paginaDeRoles = paginaDe(
+  z.object({ id: z.uuid(), nombre: z.string(), plantilla: z.string().nullable() }),
+);
 
 /** La clave temporal se muestra una sola vez. Es null si la cuenta ya existía (se vinculó). */
 export const altaHecha = z.object({ usuarioId: z.uuid(), claveTemporal: z.string().nullable() });

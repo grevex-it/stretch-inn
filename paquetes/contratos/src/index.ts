@@ -25,6 +25,24 @@ export {
   type PedidoDeAlta,
 } from "./equipo.ts";
 export {
+  catalogoDePermisos,
+  edicionDeRol,
+  fichaDeRol,
+  pedidoDeAjuste,
+  pedidoDeAsignacion,
+  pedidoDeRol,
+  permisosDeIntegrante,
+  rolCreado,
+  rolEditado,
+  type CatalogoDePermisos,
+  type EdicionDeRol,
+  type FichaDeRol,
+  type PedidoDeAjuste,
+  type PedidoDeAsignacion,
+  type PedidoDeRol,
+  type PermisosDeIntegrante,
+} from "./roles.ts";
+export {
   alumno,
   alumnoCreado,
   alumnoEditado,
