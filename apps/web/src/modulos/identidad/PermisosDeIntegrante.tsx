@@ -57,13 +57,13 @@ function ElegirSede(props: { sedes: Sede[]; sede: Sede; alElegir: (sedeId: strin
   );
 }
 
-function AvisoDeOtrasSedes({ nombre }: { nombre: string }) {
+function AvisoDeOtrasSedes({ nombre, propios }: { nombre: string; propios: boolean }) {
+  const para = propios ? "verlos" : "verlos y cambiarlos";
   const elegir = useElegirSede();
   return (
     <div className={estilos.bloque}>
       <Aviso tono="alerta">
-        {nombre} también tiene permisos en otras sedes. Para verlos y cambiarlos, pasá a «Todas mis
-        sedes».
+        {`${nombre} también tiene permisos en otras sedes. Para ${para}, pasá a «Todas mis sedes».`}
       </Aviso>
       <div>
         <Boton
@@ -89,7 +89,7 @@ function Avisos(props: { nombre: string; propios: boolean; otrasSedes: boolean }
           gestione el equipo.
         </Aviso>
       )}
-      {props.otrasSedes && <AvisoDeOtrasSedes nombre={props.nombre} />}
+      {props.otrasSedes && <AvisoDeOtrasSedes nombre={props.nombre} propios={props.propios} />}
     </>
   );
 }

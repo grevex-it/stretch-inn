@@ -26,8 +26,10 @@ const INEXISTENTE = falla("usuario-inexistente", "Esa persona no es del equipo d
 /** Una página del equipo con email y roles, en tres consultas (sin N+1). */
 export async function listar(
   repo: RepositorioEquipo,
+  quien: ContextoCentro,
   pagina: Pagina,
 ): Promise<PaginaDe<Integrante>> {
+  const propio = quien.actor.tipo === "usuario" ? quien.actor.usuarioId : undefined;
   const usuarios = await repo.usuarios(pagina);
   const ids = usuarios.elementos.map((u) => u.id);
   const [asignaciones, emails] = await Promise.all([repo.asignacionesDe(ids), repo.emailsDe(ids)]);
@@ -39,6 +41,7 @@ export async function listar(
       asignaciones: asignaciones
         .filter((a) => a.usuarioId === u.id)
         .map(({ sedeId, rolId, rol }) => ({ sedeId, rolId, rol })),
+      esQuienConsulta: u.id === propio,
     })),
   };
 }

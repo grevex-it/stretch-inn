@@ -34,7 +34,8 @@ acuerdo.
   `estadoDeSesion`, con sus tipos (`PedidoDeIngreso`, `EstadoDeSesion`, …). El centro activo
   trae su `zonaHoraria`: el panel muestra las fechas en esa zona (regla 3).
 - `pedidoDePagina` (query `?pagina=N`, de a 50), `pedidoDeAlta`, `paginaDeEquipo`,
-  `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos.
+  `paginaDeRoles`, `altaHecha` y `claveGenerada`, con sus tipos. Cada integrante del equipo
+  trae `esQuienConsulta`: sus acciones no se le aplican a sí mismo.
 - `pedidoDeRol`, `edicionDeRol`, `rolCreado`, `rolEditado`, `fichaDeRol` (con su `plantilla`:
   esos no se editan), `catalogoDePermisos`, `pedidoDeAsignacion`, `pedidoDeAjuste` y
   `permisosDeIntegrante` (por sede y permiso, su origen; y `enOtrasSedes`, si tiene más en sedes

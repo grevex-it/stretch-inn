@@ -197,6 +197,15 @@ describe("con una sede activa", () => {
     });
   });
 
+  it("en los propios, el aviso de otras sedes es solo para verlos", async () => {
+    conPermisos({ sedes: DOS_SEDES, sedeActiva: NORTE, enOtrasSedes: true, esQuienConsulta: true });
+    const usuario = montarPanel();
+    const region = await abrirPermisosDeAna(usuario);
+    expect(
+      (await within(region).findByText(/también tiene permisos en otras sedes/)).textContent,
+    ).toBe("Ana también tiene permisos en otras sedes. Para verlos, pasá a «Todas mis sedes».");
+  });
+
   it("en «Todas mis sedes» no hay aviso, y se elige la sede", async () => {
     conPermisos({ sedes: DOS_SEDES, enOtrasSedes: true });
     const usuario = montarPanel();

@@ -44,7 +44,10 @@ describe("darDeAlta", () => {
       email,
       activo: true,
       asignaciones: [{ sedeId: c.norte, rolId: c.recepcion, rol: "Recepción" }],
+      esQuienConsulta: false,
     });
+    const propios = lista.elementos.filter((integrante) => integrante.esQuienConsulta);
+    expect(propios.map((integrante) => integrante.id)).toEqual([c.admin.usuarioId]);
   });
 
   it("con un email que ya tiene cuenta la vincula: entra con su clave de siempre", async () => {

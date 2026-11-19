@@ -19,7 +19,7 @@ export function crearEquipo(base: Base, opciones: OpcionesEquipo = {}): Equipo {
   };
   return {
     listar: (quien, pagina) =>
-      enContexto(base, quien, (tx) => casos.listar(repositorioEquipo(tx), pagina)),
+      enContexto(base, quien, (tx) => casos.listar(repositorioEquipo(tx), quien, pagina)),
     roles: (quien, pagina) => enContexto(base, quien, (tx) => repositorioEquipo(tx).roles(pagina)),
     // Con punto de guardado: si el alta falla a mitad de camino, no queda nada a medias.
     darDeAlta: (quien, datos) =>

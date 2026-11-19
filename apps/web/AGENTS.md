@@ -23,7 +23,8 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
     `BuscarAlumno` para elegir un alumno.
 - `src/modulos/<modulo>/`: pantallas de cada módulo. Una carpeta por módulo, como en el backend.
   - `identidad/`: pantalla Equipo (lista, alta, clave temporal, bloqueo). La clave temporal se
-    muestra una sola vez y no se guarda en ninguna consulta. Pantalla Roles (`/equipo/roles`,
+    muestra una sola vez y no se guarda en ninguna consulta. En la fila propia solo está
+    «Permisos»: clave temporal y bloqueo no se aplican a uno mismo. Pantalla Roles (`/equipo/roles`,
     enlace desde Equipo con `roles.gestionar`): las plantillas se ven y se duplican; los roles
     propios se editan y se borran. El editor (`MatrizDePermisos.tsx`) tiene un atajo por sección
     (Sin acceso, Ver, Operar o Personalizado, `matriz.ts`) y una casilla por permiso. «Permisos»

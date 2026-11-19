@@ -88,6 +88,21 @@ describe("lista del equipo", () => {
     expect(screen.getByRole("button", { name: "Sumar persona" })).toBeDefined();
   });
 
+  it("en la fila propia solo están los permisos: clave y bloqueo no se aplican a uno mismo", async () => {
+    servidorFalso({
+      "GET /api/sesion": enCentro(DOS_SEDES, { permisos: GESTIONA }),
+      "GET /api/equipo?pagina=1": pagina([integrante(ANA, "Ana", true, true)]),
+    });
+    const usuario = montarPanel();
+    await abrirEquipo(usuario);
+    const ana = await screen.findByRole("row", { name: /Ana/ });
+    expect(
+      within(ana)
+        .getAllByRole("button")
+        .map((b) => b.textContent),
+    ).toEqual(["Permisos"]);
+  });
+
   it("pagina de a 50: «Siguiente» pide la página 2", async () => {
     const servidor = servidorFalso({
       "GET /api/sesion": enCentro(DOS_SEDES, { permisos: VE }),

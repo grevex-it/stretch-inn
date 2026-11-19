@@ -15,6 +15,8 @@ export interface Integrante {
   activo: boolean;
   /** Solo las de las sedes que ve quien consulta. */
   asignaciones: { sedeId: string; rolId: string; rol: string }[];
+  /** Si es quien consulta: nadie se resetea, se bloquea ni se cambia a sí mismo. */
+  esQuienConsulta: boolean;
 }
 
 export interface PaginaDe<T> extends Pagina {
@@ -31,7 +33,9 @@ interface RolDelCentro {
 
 /** Corre dentro de enContexto: RLS limita al centro y a las sedes visibles. */
 export interface RepositorioEquipo {
-  usuarios(pagina: Pagina): Promise<PaginaDe<Omit<Integrante, "email" | "asignaciones">>>;
+  usuarios(
+    pagina: Pagina,
+  ): Promise<PaginaDe<Omit<Integrante, "email" | "asignaciones" | "esQuienConsulta">>>;
   asignacionesDe(
     usuarioIds: readonly string[],
   ): Promise<{ usuarioId: string; sedeId: string; rolId: string; rol: string }[]>;
