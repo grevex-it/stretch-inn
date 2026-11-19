@@ -1,12 +1,10 @@
 // El profe asignado a cada alumno (0022, lo trae la planilla): un usuario activo del equipo del
 // centro. Sobre Postgres real, con RLS.
-import { type ContextoCentro } from "@app/nucleo";
 import { crearBase, enContexto, type Base } from "@app/plataforma";
 import { randomUUID } from "node:crypto";
-import pg from "pg";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
 import { crearAlumno, editarAlumno, obtenerAlumno } from "../src/index.ts";
-import { ANA, contextoConPermisos } from "./ayudas.ts";
+import { ANA, contextoConPermisos, profe } from "./ayudas.ts";
 
 let base: Base;
 beforeAll(() => {
@@ -17,30 +15,6 @@ afterAll(async () => {
 });
 
 const nuevoCentro = () => contextoConPermisos(base, ["personas.ver", "personas.editar"]);
-
-async function comoDueno(consulta: string, valores: unknown[]): Promise<void> {
-  const cliente = new pg.Client({ connectionString: inject("urlDueno") });
-  await cliente.connect();
-  try {
-    await cliente.query(consulta, valores);
-  } finally {
-    await cliente.end();
-  }
-}
-
-/** Un usuario más del equipo del centro: un profe. */
-async function profe(ctx: ContextoCentro, nombre: string, activo = true): Promise<string> {
-  const [cuenta, usuario] = [randomUUID(), randomUUID()];
-  await comoDueno(
-    "insert into plataforma.cuentas (id, email, hash_clave, debe_cambiar_clave) values ($1, $2, 'x', false)",
-    [cuenta, `${cuenta}@prueba.com`],
-  );
-  await comoDueno(
-    "insert into usuarios (id, centro_id, cuenta_id, nombre, activo) values ($1, $2, $3, $4, $5)",
-    [usuario, ctx.centroId, cuenta, nombre, activo],
-  );
-  return usuario;
-}
 
 describe("profe asignado", () => {
   it("se carga con un usuario activo del centro; editar sin mandarlo lo conserva", async () => {

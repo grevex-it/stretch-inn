@@ -74,6 +74,18 @@ describe("fichaDeAlumno", () => {
     expect(fichaDeAlumno.safeParse({ ...ficha, profeId: "lore" }).success).toBe(false);
   });
 
+  it("el contacto de emergencia es opcional: puede no venir, venir vacío o en null", () => {
+    const contacto = { emergenciaNombre: "Marta (madre)", emergenciaTelefono: "11 4444-5555" };
+    expect(fichaDeAlumno.parse({ ...ficha, ...contacto })).toMatchObject(contacto);
+    expect(fichaDeAlumno.parse(ficha)).not.toHaveProperty("emergenciaNombre");
+    const vacio = { emergenciaNombre: "", emergenciaTelefono: null };
+    expect(fichaDeAlumno.parse({ ...ficha, ...vacio })).toMatchObject(vacio);
+    expect(
+      fichaDeAlumno.safeParse({ ...ficha, emergenciaNombre: "x".repeat(101) }).error?.issues[0]
+        ?.message,
+    ).toBe("El nombre del contacto de emergencia es muy largo.");
+  });
+
   it("la edición lleva la versión que se vio", () => {
     expect(edicionDeAlumno.safeParse(ficha).success).toBe(false);
     expect(edicionDeAlumno.parse({ ...ficha, version: 3 })).toEqual({ ...ficha, version: 3 });
@@ -88,6 +100,9 @@ describe("alumno", () => {
       numeroDeSocio: 283,
       fechaDeInicio: null,
       profeId: null,
+      profeNombre: null,
+      emergenciaNombre: null,
+      emergenciaTelefono: null,
       activo: true,
       bajaEn: null,
       pendienteDeCompletar: false,

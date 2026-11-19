@@ -26,6 +26,8 @@ const columnas = {
   numeroDeSocio: alumnos.numeroDeSocio,
   fechaDeInicio: alumnos.fechaDeInicio,
   profeId: alumnos.profeId,
+  emergenciaNombre: alumnos.emergenciaNombre,
+  emergenciaTelefono: alumnos.emergenciaTelefono,
   activo: alumnos.activo,
   bajaEn: alumnos.bajaEn,
   pendienteDeCompletar: sql<boolean>`${alumnos.telefono} is null`,

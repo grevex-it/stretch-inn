@@ -62,3 +62,17 @@ export const ANA = {
   fechaNacimiento: null,
   notas: "",
 };
+
+/** Un usuario más del equipo del centro del contexto: un profe (0022). */
+export async function profe(ctx: ContextoCentro, nombre: string, activo = true): Promise<string> {
+  const [cuenta, usuario] = [randomUUID(), randomUUID()];
+  await comoDueno(
+    "insert into plataforma.cuentas (id, email, hash_clave, debe_cambiar_clave) values ($1, $2, 'x', false)",
+    [cuenta, `${cuenta}@prueba.com`],
+  );
+  await comoDueno(
+    "insert into usuarios (id, centro_id, cuenta_id, nombre, activo) values ($1, $2, $3, $4, $5)",
+    [usuario, ctx.centroId, cuenta, nombre, activo],
+  );
+  return usuario;
+}

@@ -46,6 +46,7 @@ export {
   alumno,
   alumnoCreado,
   alumnoEditado,
+  paginaDeProfes,
   edicionDeAlumno,
   fichaDeAlumno,
   paginaDeAlumnos,
@@ -56,6 +57,7 @@ export {
   type EdicionDeAlumno,
   type FichaDeAlumno,
   type PaginaDeAlumnos,
+  type PaginaDeProfes,
   type PedidoDeAlumnos,
   type SaludDeAlumno,
 } from "./alumnos.ts";

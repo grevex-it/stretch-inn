@@ -50,6 +50,8 @@ describe("crearAlumno", () => {
       numeroDeSocio: 1,
       fechaDeInicio: null,
       profeId: null,
+      emergenciaNombre: null,
+      emergenciaTelefono: null,
       activo: true,
       bajaEn: null,
       pendienteDeCompletar: false,

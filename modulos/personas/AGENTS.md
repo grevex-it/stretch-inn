@@ -5,9 +5,10 @@ Nivel: liviano (`src/datos/`, `src/http/`). Ver `docs/decisiones/0003-hexagonal-
 ## Alcance
 
 Los alumnos del centro: ficha (nombre, apellido, número de socio y, opcionales, celular,
-documento, email, fecha de nacimiento, fecha de inicio y notas), lista con buscador, alta, edición,
-baja (con su fecha) y reactivación. La ficha sigue la planilla de Stretch Inn (0022). Sus datos de
-salud (patologías), aparte de la ficha y con permisos propios (0019).
+documento, email, fecha de nacimiento, fecha de inicio, contacto de emergencia y notas), lista
+con buscador, alta, edición, baja (con su fecha) y reactivación. La ficha sigue la planilla de
+Stretch Inn (0022). Sus datos de salud (patologías), aparte de la ficha y con permisos propios
+(0019).
 
 ## Fuera de alcance
 
@@ -19,7 +20,8 @@ salud (patologías), aparte de la ficha y con permisos propios (0019).
 
 - `@app/nucleo`
 - `@app/plataforma`
-- `@app/identidad` (el profe asignado es un usuario del equipo: `obtenerUsuarios`, 0022)
+- `@app/identidad` (el profe asignado es un usuario del equipo: `obtenerUsuarios` y
+  `listarUsuariosActivos`, 0022)
 - `@app/contratos` (rutas HTTP)
 
 ## API pública
@@ -35,8 +37,13 @@ algo puede fallar por una regla.
   `numeroDeSocio`, el alta toma el siguiente del centro y la edición conserva el que tenía; sin
   `fechaDeInicio`, la edición conserva la que tenía (así el formulario que todavía no los manda no
   los borra). Lo mismo con `profeId`, el profe asignado: un usuario activo del equipo del centro
-  (`profe-invalido` si no). Cada alumno trae además `bajaEn` y `pendienteDeCompletar` (sin
-  celular).
+  (`profe-invalido` si no). Lo mismo con el contacto de emergencia (`emergenciaNombre`, con el
+  vínculo dentro del nombre, y `emergenciaTelefono`, con al menos 6 números si se carga; 0019).
+  Cada alumno trae además `bajaEn` y `pendienteDeCompletar` (sin celular).
+- `GET /alumnos` y `GET /alumnos/:id` traen también `profeNombre`, el nombre del profe asignado
+  (un solo `obtenerUsuarios` por página). `GET /alumnos/profes?pagina` (`personas.editar`): los
+  integrantes activos del equipo para elegir el profe (`listarUsuariosActivos` de identidad), sin
+  pedir `usuarios.ver`.
 - `fijarActivo(tx, { id, activo }, alDarDeBaja?)`: baja y reactivación. Al dar de baja corre
   `alDarDeBaja(tx, { alumnoId, ahora })` en la misma transacción: si falla, la baja no queda.
 - `rutasDeAlumnos(base, { alDarDeBaja? })`: la API le pasa `liberarLugares` de `agenda`, así la

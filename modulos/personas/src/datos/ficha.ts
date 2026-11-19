@@ -29,7 +29,20 @@ const vacioANull = (texto: string | null) => (texto === null || texto === "" ? n
  * número de socio y la fecha de inicio que no vienen quedan sin venir (la edición los conserva).
  */
 function normalizarFicha(datos: DatosDeAlumno): DatosDeAlumno {
-  return { ...normalizarContacto(datos), ...normalizarPlanilla(datos) };
+  return {
+    ...normalizarContacto(datos),
+    ...normalizarPlanilla(datos),
+    ...normalizarEmergencia(datos),
+  };
+}
+
+/** El contacto de emergencia: lo que no vino queda sin venir; vacío, en null. */
+function normalizarEmergencia({ emergenciaNombre, emergenciaTelefono }: DatosDeAlumno) {
+  const limpio = (texto: string | null) => vacioANull(texto?.trim() ?? null);
+  return {
+    ...(emergenciaNombre === undefined ? {} : { emergenciaNombre: limpio(emergenciaNombre) }),
+    ...(emergenciaTelefono === undefined ? {} : { emergenciaTelefono: limpio(emergenciaTelefono) }),
+  };
 }
 
 /** Lo que no vino queda sin venir; la fecha de inicio vacía, en null. */
@@ -67,6 +80,23 @@ function reglasDeLaPlanilla(ficha: DatosDeAlumno, hoy: Date): Resultado<null, Er
   return ok(null);
 }
 
+const pocosDigitos = (telefono: string | null | undefined) =>
+  telefono != null && digitos(telefono).length < MINIMO_DE_DIGITOS;
+
+/** Los teléfonos, si se cargan, tienen al menos 6 números. */
+function reglasDeLosTelefonos(ficha: DatosDeAlumno): Resultado<null, ErrorDeAlumno> {
+  if (pocosDigitos(ficha.telefono)) {
+    return falla("telefono-invalido", "Revisá el teléfono: tiene que tener al menos 6 números.");
+  }
+  if (pocosDigitos(ficha.emergenciaTelefono)) {
+    return falla(
+      "telefono-invalido",
+      "Revisá el teléfono de emergencia: tiene que tener al menos 6 números.",
+    );
+  }
+  return ok(null);
+}
+
 /** La ficha recortada y normalizada, o la primera regla que no cumple. */
 export function limpiarFicha(
   datos: DatosDeAlumno,
@@ -76,9 +106,8 @@ export function limpiarFicha(
   if (ficha.nombre === "" || ficha.apellido === "") {
     return falla("nombre-vacio", "Escribí el nombre y el apellido.");
   }
-  if (ficha.telefono !== null && digitos(ficha.telefono).length < MINIMO_DE_DIGITOS) {
-    return falla("telefono-invalido", "Revisá el teléfono: tiene que tener al menos 6 números.");
-  }
+  const telefonos = reglasDeLosTelefonos(ficha);
+  if (!telefonos.ok) return telefonos;
   if (ficha.fechaNacimiento !== null && !fechaValida(ficha.fechaNacimiento, hoy)) {
     return falla("fecha-invalida", "Revisá la fecha de nacimiento.");
   }

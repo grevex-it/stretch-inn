@@ -1,6 +1,6 @@
 // Rutas de alumnos (ver docs/decisiones/0011). Solo traducen HTTP ↔ datos del módulo: la API ya
 // resolvió la sesión y exigió el permiso. Cada pedido corre en su transacción con el contexto.
-import { edicionDeAlumno, fichaDeAlumno, pedidoDeAlumnos } from "@app/contratos";
+import { edicionDeAlumno, fichaDeAlumno, pedidoDeAlumnos, pedidoDePagina } from "@app/contratos";
 import { falla, ok } from "@app/nucleo";
 import { contextoDe, enContexto, type Base, type Transaccion } from "@app/plataforma";
 import type { FastifyInstance, FastifyPluginCallback, FastifyRequest } from "fastify";
@@ -13,6 +13,7 @@ import {
   type AlDarDeBaja,
   obtenerAlumno,
 } from "../datos/alumnos.ts";
+import { conNombreDeProfe, listarProfes } from "../datos/profes.ts";
 import { rutasDeSalud } from "./rutas-salud.ts";
 import { enviar, leer } from "./traducir.ts";
 
@@ -31,13 +32,26 @@ function lecturas(app: FastifyInstance, enElCentro: EnElCentro): void {
   app.get("/alumnos", { config: ver }, async (pedido, respuesta) => {
     const busqueda = leer(pedidoDeAlumnos, pedido.query, respuesta);
     if (busqueda === undefined) return respuesta;
-    return enElCentro(pedido, (tx) => listarAlumnos(tx, busqueda));
+    return enElCentro(pedido, async (tx) => {
+      const pagina = await listarAlumnos(tx, busqueda);
+      return { ...pagina, elementos: await conNombreDeProfe(tx, pagina.elementos) };
+    });
+  });
+
+  // Elegir el profe es parte de editar la ficha: lo ve quien la edita, sin usuarios.ver.
+  app.get("/alumnos/profes", { config: editar }, async (pedido, respuesta) => {
+    const pagina = leer(pedidoDePagina, pedido.query, respuesta);
+    if (pagina === undefined) return respuesta;
+    return enElCentro(pedido, (tx) => listarProfes(tx, pagina));
   });
 
   app.get("/alumnos/:id", { config: ver }, async (pedido, respuesta) => {
     const alumno = leer(conId, pedido.params, respuesta);
     if (alumno === undefined) return respuesta;
-    const ficha = await enElCentro(pedido, (tx) => obtenerAlumno(tx, alumno.id));
+    const ficha = await enElCentro(pedido, async (tx) => {
+      const encontrado = await obtenerAlumno(tx, alumno.id);
+      return encontrado && (await conNombreDeProfe(tx, [encontrado]))[0];
+    });
     const resultado =
       ficha === undefined
         ? falla("alumno-inexistente", "Ese alumno no existe en el centro.")

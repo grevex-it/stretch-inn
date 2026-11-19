@@ -351,6 +351,13 @@
       "when": 1795096422351,
       "tag": "20261119135342_personas-protegidas",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1795128919559,
+      "tag": "20261119225519_personas-contacto-de-emergencia",
+      "breakpoints": true
     }
   ]
 }

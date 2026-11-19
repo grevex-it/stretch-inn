@@ -16,13 +16,21 @@ export interface DatosDeAlumno {
   fechaDeInicio?: string | null | undefined;
   /** Su profe asignado: un usuario activo del equipo (0022). Sin él, la edición lo conserva. */
   profeId?: string | null | undefined;
+  /** El contacto de emergencia (0019), con el vínculo en el nombre. Sin él, la edición lo conserva. */
+  emergenciaNombre?: string | null | undefined;
+  emergenciaTelefono?: string | null | undefined;
 }
 
-export interface Alumno extends Omit<DatosDeAlumno, "numeroDeSocio" | "fechaDeInicio" | "profeId"> {
+type Conservables =
+  "numeroDeSocio" | "fechaDeInicio" | "profeId" | "emergenciaNombre" | "emergenciaTelefono";
+
+export interface Alumno extends Omit<DatosDeAlumno, Conservables> {
   id: string;
   numeroDeSocio: number;
   fechaDeInicio: string | null;
   profeId: string | null;
+  emergenciaNombre: string | null;
+  emergenciaTelefono: string | null;
   activo: boolean;
   /** Cuándo se dio de baja; null si está activo. */
   bajaEn: Date | null;
