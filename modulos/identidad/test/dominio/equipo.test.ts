@@ -50,21 +50,25 @@ describe("puedeCambiarPermisosDe: roles y ajustes de otro, en una sede", () => {
     permisos: porSede([[NORTE, ["usuarios.gestionar", "caja.ver", "caja.cobrar"]]]),
   };
   const profe = { usuarioId: "profe", permisos: porSede([[NORTE, ["caja.cobrar"]]]) };
-  const enNorte = { sedeId: NORTE, esDueno: false };
+  const enNorte = { sedeId: NORTE, esDueno: false, protegido: false };
 
   it("con usuarios.gestionar en esa sede, a alguien con menos permisos", () => {
     expect(puedeCambiarPermisosDe(encargado, profe, enNorte)).toEqual({ ok: true, valor: null });
   });
 
   it("pide usuarios.gestionar en esa sede, no en otra", () => {
-    expect(puedeCambiarPermisosDe(encargado, profe, { sedeId: SUR, esDueno: false })).toMatchObject(
-      { ok: false, error: { codigo: "sin-gestion-en-la-sede" } },
-    );
+    expect(
+      puedeCambiarPermisosDe(encargado, profe, { sedeId: SUR, esDueno: false, protegido: false }),
+    ).toMatchObject({ ok: false, error: { codigo: "sin-gestion-en-la-sede" } });
   });
 
   it("nunca a uno mismo, tampoco un dueño", () => {
     expect(
-      puedeCambiarPermisosDe(encargado, { ...encargado }, { sedeId: NORTE, esDueno: true }),
+      puedeCambiarPermisosDe(
+        encargado,
+        { ...encargado },
+        { sedeId: NORTE, esDueno: true, protegido: false },
+      ),
     ).toMatchObject({ ok: false, error: { codigo: "a-vos-mismo" } });
   });
 
@@ -79,9 +83,28 @@ describe("puedeCambiarPermisosDe: roles y ajustes de otro, en una sede", () => {
     }
   });
 
+  it("a un Dueño o a la Contaduría solo con roles.gestionar en esa sede, aunque tenga menos permisos", () => {
+    const protegido = { ...enNorte, protegido: true };
+    expect(puedeCambiarPermisosDe(encargado, profe, protegido)).toMatchObject({
+      ok: false,
+      error: { codigo: "persona-protegida" },
+    });
+    const conRoles = {
+      ...encargado,
+      permisos: porSede([[NORTE, ["usuarios.gestionar", "roles.gestionar", "caja.cobrar"]]]),
+    };
+    expect(puedeCambiarPermisosDe(conRoles, profe, protegido)).toEqual({ ok: true, valor: null });
+  });
+
   it("un dueño puede con cualquier otro, también con otro dueño", () => {
     const otroDueno = { usuarioId: "otro", permisos: encargado.permisos };
-    expect(puedeCambiarPermisosDe(encargado, otroDueno, { sedeId: NORTE, esDueno: true })).toEqual({
+    expect(
+      puedeCambiarPermisosDe(encargado, otroDueno, {
+        sedeId: NORTE,
+        esDueno: true,
+        protegido: false,
+      }),
+    ).toEqual({
       ok: true,
       valor: null,
     });

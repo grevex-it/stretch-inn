@@ -73,11 +73,36 @@ describe("una encargada con usuarios.gestionar en Mendoza", () => {
     const ajuste = { sedeId: c.mendoza, permiso: "caja.ver", tipo: "quitado" } as const;
     const deshacer = { sedeId: c.mendoza, permiso: "caja.ver" } as const;
     for (const otro of [c.dueno, c.contaduria]) {
-      expect(await roles.ajustar(eli, otro.usuarioId, ajuste)).toMatchObject(error("mas-permisos"));
+      expect(await roles.ajustar(eli, otro.usuarioId, ajuste)).toMatchObject(
+        error("persona-protegida"),
+      );
       expect(await roles.quitarAjuste(eli, otro.usuarioId, deshacer)).toMatchObject(
-        error("mas-permisos"),
+        error("persona-protegida"),
       );
     }
+  });
+
+  it("no toca a una Contaduría que está solo en Mendoza: eso es de quien gestiona roles", async () => {
+    const c = await centroConPlantillas();
+    const eli = await como(c.encargada);
+    const carla = await persona(c.centroId, "Carla", [[c.mendoza, c.roles.contadora]]);
+    const enMendoza = { sedeId: c.mendoza, rolId: c.roles.contadora };
+    const ajuste = { sedeId: c.mendoza, permiso: "caja.ver", tipo: "quitado" } as const;
+    const deshacer = { sedeId: c.mendoza, permiso: "caja.ver" } as const;
+    expect(await roles.ajustar(eli, carla.usuarioId, ajuste)).toMatchObject(
+      error("persona-protegida"),
+    );
+    expect(await roles.quitarAjuste(eli, carla.usuarioId, deshacer)).toMatchObject(
+      error("persona-protegida"),
+    );
+    expect(await roles.quitarAsignacion(eli, carla.usuarioId, enMendoza)).toMatchObject(
+      error("persona-protegida"),
+    );
+    const profe = { sedeId: c.mendoza, rolId: c.roles.profesor };
+    expect(await roles.asignar(eli, carla.usuarioId, profe)).toMatchObject(
+      error("persona-protegida"),
+    );
+    expect(await roles.ajustar(await como(c.dueno), carla.usuarioId, ajuste)).toEqual(HECHO);
   });
 
   it("no da lo que no tiene: ni asistencia.configurar como extra, ni el rol Dueño", async () => {

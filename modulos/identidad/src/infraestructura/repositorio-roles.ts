@@ -1,6 +1,6 @@
 // Repositorio de los roles a medida y los permisos de cada integrante, sobre Drizzle. Corre dentro
 // de enContexto: RLS limita al centro y a las sedes visibles. Lo que tiene que ver todas las sedes
-// pasa por funciones de alcance mínimo (identidad_asignaciones_del_rol, …).
+// pasa por funciones de alcance mínimo (identidad_asignaciones_del_rol, identidad_es_protegido, …).
 import type { Permiso } from "@app/nucleo";
 import type { Transaccion } from "@app/plataforma";
 import { and, asc, eq, sql } from "drizzle-orm";
@@ -119,7 +119,10 @@ async function rolesYAjustesDe(
 
 function deIntegrantes(
   tx: Transaccion,
-): Pick<Propias, "existeUsuario" | "permisosDeUsuario" | "rolesYAjustesDe" | "quitarAjuste"> {
+): Pick<
+  Propias,
+  "existeUsuario" | "permisosDeUsuario" | "esProtegido" | "rolesYAjustesDe" | "quitarAjuste"
+> {
   return {
     async existeUsuario(usuarioId) {
       const filas = await tx
@@ -129,6 +132,12 @@ function deIntegrantes(
       return filas.length > 0;
     },
     permisosDeUsuario: (usuarioId) => repositorioEquipo(tx).permisosDeUsuario(usuarioId),
+    async esProtegido(usuarioId) {
+      const filas = await tx.execute<{ protegido: boolean }>(
+        sql`select identidad_es_protegido(${usuarioId}) as protegido`,
+      );
+      return filas.rows[0]?.protegido === true;
+    },
     rolesYAjustesDe: (usuarioId) => rolesYAjustesDe(tx, usuarioId),
     async quitarAjuste({ usuarioId, sedeId, permiso }) {
       const quitados = await tx

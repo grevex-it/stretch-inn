@@ -25,6 +25,7 @@ const ESTADOS: Record<ErrorDeRoles, number> = {
   "a-vos-mismo": 403,
   "mas-permisos": 403,
   "sin-gestion-en-la-sede": 403,
+  "persona-protegida": 403,
   "rol-inexistente": 404,
   "usuario-inexistente": 404,
   "asignacion-inexistente": 404,

@@ -54,6 +54,8 @@ Casos de uso (reciben la `Transaccion` de `enContexto`):
 - `cargarPermisos(tx, cuentaId, centroId)`: permisos efectivos, para armar el `ContextoCentro`.
 - `identidad_asignaciones_del_rol(rol)` (SQL, alcance mínimo): quiénes tienen un rol, en todas
   las sedes del centro.
+- `identidad_es_protegido(usuario)` (SQL, alcance mínimo): si tiene el Dueño o la Contaduría en
+  alguna sede del centro.
 
 Roles a medida y permisos de cada integrante (0007):
 
@@ -117,8 +119,11 @@ Equipo del centro (0017):
 - Asignar o quitar un rol, o ajustar un permiso, a otro en una sede: con `usuarios.gestionar` en
   **esa** sede, nunca a uno mismo (tampoco un dueño), y nadie da lo que no tiene ahí. Solo un
   dueño (acceso total en el contexto) toca a quien tiene más permisos o permisos en otra sede;
-  los dueños se cubren entre ellos. Con una sede activa, el dueño queda como cualquier otro. Los permisos de un módulo nuevo llegan solos
-  al Dueño; a las demás plantillas, solo si la migración del módulo se los da.
+  los dueños se cubren entre ellos. Con una sede activa, el dueño queda como cualquier otro.
+- A quien tiene el Dueño o la Contaduría (por la marca, en cualquier sede) solo le asigna, quita
+  o ajusta quien tiene `roles.gestionar` en la sede del cambio, aunque tenga menos permisos.
+- Los permisos de un módulo nuevo llegan solos al Dueño; a las demás plantillas, solo si la
+  migración del módulo se los da.
 - Solo se resetea la contraseña de quien tiene menos permisos (subconjunto en cada sede y al
   menos uno menos), y nunca la de una cuenta con usuarios en otros centros (0017). Bloquear y
   reactivar siguen la misma regla de «menos permisos»; nadie se resetea ni se bloquea a sí mismo.

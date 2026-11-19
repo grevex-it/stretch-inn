@@ -41,6 +41,7 @@ async function cambiable(
     {
       sedeId: id<"Sede">(objetivo.sedeId),
       esDueno: tieneAccesoTotal(quien.permisosPorSede, catalogo.todos, sedes),
+      protegido: await repo.esProtegido(objetivo.usuarioId),
     },
   );
 }

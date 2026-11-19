@@ -4,7 +4,8 @@ import { falla, ok, type Resultado, type SedeId } from "@app/nucleo";
 import { tieneMenosPermisos, type PermisosPorSede } from "./permisos.ts";
 
 export type ErrorDeGestion = "a-vos-mismo" | "mas-permisos";
-export type ErrorDeCambioDePermisos = ErrorDeGestion | "sin-gestion-en-la-sede";
+export type ErrorDeCambioDePermisos =
+  ErrorDeGestion | "sin-gestion-en-la-sede" | "persona-protegida";
 export type ErrorDeAlta = "nombre-vacio" | "sin-sedes";
 
 export interface Integrante {
@@ -41,13 +42,20 @@ export function puedeGestionarA(
 export function puedeCambiarPermisosDe(
   quien: Integrante,
   objetivo: Integrante,
-  { sedeId, esDueno }: { sedeId: SedeId; esDueno: boolean },
+  { sedeId, esDueno, protegido }: { sedeId: SedeId; esDueno: boolean; protegido: boolean },
 ): Resultado<null, ErrorDeCambioDePermisos> {
-  if (quien.permisos.get(sedeId)?.has("usuarios.gestionar") !== true) {
+  const enLaSede = quien.permisos.get(sedeId);
+  if (enLaSede?.has("usuarios.gestionar") !== true) {
     return falla("sin-gestion-en-la-sede", "No gestionás usuarios en esa sede.");
   }
   if (quien.usuarioId === objetivo.usuarioId) {
     return falla("a-vos-mismo", "No podés cambiar tus propios permisos: pedíselo a un dueño.");
+  }
+  if (protegido && !enLaSede.has("roles.gestionar")) {
+    return falla(
+      "persona-protegida",
+      "A un dueño o a la contaduría solo le cambia los permisos quien gestiona roles.",
+    );
   }
   if (!esDueno && !tieneMenosPermisos(objetivo.permisos, quien.permisos)) {
     return falla(

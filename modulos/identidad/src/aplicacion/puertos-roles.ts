@@ -61,6 +61,8 @@ export interface RepositorioRoles extends RepositorioIdentidad {
   existeUsuario(usuarioId: string): Promise<boolean>;
   /** Función de alcance mínimo: en todas sus sedes, para compararlo con quien gestiona. */
   permisosDeUsuario(usuarioId: string): Promise<FilaDePermiso[]>;
+  /** Función de alcance mínimo: si tiene el Dueño o la Contaduría (por su marca) en alguna sede. */
+  esProtegido(usuarioId: string): Promise<boolean>;
   /** Sus roles y ajustes en las sedes que ve quien consulta. */
   rolesYAjustesDe(usuarioId: string): Promise<{
     asignaciones: AsignacionConPermisos[];

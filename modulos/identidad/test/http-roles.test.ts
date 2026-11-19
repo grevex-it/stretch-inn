@@ -133,6 +133,7 @@ describe("rutas de roles", () => {
       ["rol-inexistente", 404],
       ["permisos-ajenos", 403],
       ["mas-permisos", 403],
+      ["persona-protegida", 403],
       ["rol-de-plantilla", 409],
       ["rol-en-uso", 409],
       ["cambio-concurrente", 409],
