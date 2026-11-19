@@ -15,13 +15,14 @@ export const DOS_SEDES = [
 export const VE = ["usuarios.ver"];
 export const GESTIONA = ["usuarios.ver", "usuarios.gestionar"];
 
-export function integrante(id: string, nombre: string, activo = true) {
+export function integrante(id: string, nombre: string, activo = true, esQuienConsulta = false) {
   return {
     id,
     nombre,
     email: `${nombre.toLowerCase()}@ejemplo.com`,
     activo,
     asignaciones: [{ sedeId: NORTE, rolId: RECEPCION, rol: "Recepción" }],
+    esQuienConsulta,
   };
 }
 

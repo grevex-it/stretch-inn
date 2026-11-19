@@ -51,6 +51,7 @@ describe("respuestas", () => {
           email: "ana@ejemplo.com",
           activo: true,
           asignaciones: [{ sedeId: UUID, rolId: UUID, rol: "Recepción" }],
+          esQuienConsulta: false,
         },
       ],
     };

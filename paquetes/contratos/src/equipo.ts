@@ -23,6 +23,8 @@ export const paginaDeEquipo = paginaDe(
     activo: z.boolean(),
     /** Solo las de las sedes que ve quien consulta. */
     asignaciones: z.array(z.object({ sedeId: z.uuid(), rolId: z.uuid(), rol: z.string() })),
+    /** Si es quien consulta: sus acciones no se le aplican a sí mismo. */
+    esQuienConsulta: z.boolean(),
   }),
 );
 

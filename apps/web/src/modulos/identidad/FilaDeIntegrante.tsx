@@ -145,7 +145,9 @@ export function FilaDeIntegrante(props: Props) {
           >
             Permisos
           </Boton>
-          {gestiona && <Acciones integrante={integrante} alGenerarClave={alGenerarClave} />}
+          {gestiona && !integrante.esQuienConsulta && (
+            <Acciones integrante={integrante} alGenerarClave={alGenerarClave} />
+          )}
         </div>
       </td>
     </tr>
