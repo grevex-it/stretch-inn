@@ -14,6 +14,6 @@ export const PERMISOS_ABONOS: {
   permisos: [
     { permiso: VER, descripcion: "Ver los planes, sus precios y las cuotas de los alumnos" },
     { permiso: GESTIONAR, descripcion: "Crear y editar planes y sus precios por sede" },
-    { permiso: ASIGNAR, descripcion: "Generar y anular la cuota mensual de un alumno" },
+    { permiso: ASIGNAR, descripcion: "Generar y anular la cuota de un alumno (paquete de clases)" },
   ],
 };
