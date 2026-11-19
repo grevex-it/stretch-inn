@@ -28,7 +28,7 @@ export const fichaDeRol = z.object({
   id: z.uuid(),
   nombre: z.string(),
   plantilla: z.string().nullable(),
-  permisos: z.array(z.string()),
+  permisos: z.array(permiso),
   version: z.number().int(),
 });
 
@@ -37,7 +37,7 @@ export const catalogoDePermisos = z.object({
   secciones: z.array(
     z.object({
       seccion: z.string(),
-      permisos: z.array(z.object({ permiso: z.string(), descripcion: z.string() })),
+      permisos: z.array(z.object({ permiso, descripcion: z.string() })),
     }),
   ),
 });
@@ -55,19 +55,21 @@ export const pedidoDeAjuste = z.object({
 
 /**
  * Los roles de un integrante en las sedes que ve quien consulta y, por permiso, de dónde viene:
- * de qué roles, si tiene un ajuste y si al final lo tiene (gana el quitado).
+ * de qué roles, si tiene un ajuste y si al final lo tiene (gana el quitado). `enOtrasSedes`: si
+ * tiene más en sedes que quien consulta no ve ahora (por ejemplo, con una sede activa).
  */
 export const permisosDeIntegrante = z.object({
   asignaciones: z.array(z.object({ sedeId: z.uuid(), rolId: z.uuid(), rol: z.string() })),
   permisos: z.array(
     z.object({
       sedeId: z.uuid(),
-      permiso: z.string(),
+      permiso,
       roles: z.array(z.string()),
       ajuste: z.enum(["extra", "quitado"]).nullable(),
       efectivo: z.boolean(),
     }),
   ),
+  enOtrasSedes: z.boolean(),
 });
 
 export type PedidoDeRol = z.infer<typeof pedidoDeRol>;

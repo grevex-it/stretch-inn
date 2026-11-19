@@ -1,0 +1,25 @@
+.editor {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde);
+  border-radius: var(--si-radio-lg);
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+.ayuda {
+  margin: 0;
+}
+
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

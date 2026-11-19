@@ -9,7 +9,8 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { consultar, enviar, enviarYLeer } from "../../base/api.ts";
 
-const EQUIPO = ["equipo"] as const;
+/** Toda consulta del equipo cuelga de esta clave: un cambio las vuelve a pedir todas. */
+export const EQUIPO = ["equipo"] as const;
 
 export function useEquipo(pagina: number) {
   return useQuery({

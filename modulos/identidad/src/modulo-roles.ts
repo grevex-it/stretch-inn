@@ -35,7 +35,8 @@ export function crearRoles(base: Base, { catalogo }: OpcionesRoles): Roles {
     editarRol: (quien, rol) =>
       sinPerderAccesoTotal(quien, (repo) => casos.editarRol(repo, catalogo, quien, rol)),
     borrarRol: (quien, rolId) => en(quien, (repo) => casos.borrarRol(repo, rolId)),
-    permisosDe: (quien, usuarioId) => en(quien, (repo) => integrantes.permisosDe(repo, usuarioId)),
+    permisosDe: (quien, usuarioId) =>
+      en(quien, (repo) => integrantes.permisosDe(repo, quien, usuarioId)),
     asignar: (quien, usuarioId, asignacion) =>
       en(quien, (repo) => integrantes.asignar(repo, catalogo, quien, { ...asignacion, usuarioId })),
     quitarAsignacion: (quien, usuarioId, asignacion) =>

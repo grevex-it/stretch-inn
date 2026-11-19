@@ -45,9 +45,10 @@ El sistema central suma profesores, gastos y reportes (ver `docs/plan-de-impleme
 
 ### Roles a medida
 
-Las plantillas Encargado, Profesor, Recepción y Contaduría y la API de roles, asignaciones y
-ajustes ya están (0007, 0019). Falta la pantalla del panel: duplicar una plantilla, sacarle o
-sumarle permisos, y los ajustes individuales por usuario y sede.
+Las plantillas Encargado, Profesor, Recepción y Contaduría, la API de roles, asignaciones y
+ajustes, y sus pantallas en el panel ya están (0007, 0019). Queda abierto: `GET /equipo/roles`
+pide `usuarios.gestionar`, así que quien tenga `roles.gestionar` sin él no ve la lista de roles
+(hoy no pasa: solo el Dueño tiene `roles.gestionar`).
 
 ### Nombre del producto
 

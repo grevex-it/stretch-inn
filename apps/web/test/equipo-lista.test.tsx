@@ -54,7 +54,7 @@ describe("lista del equipo", () => {
     expect(within(screen.getByRole("row", { name: /Bea/ })).getByText("Bloqueado")).toBeDefined();
   });
 
-  it("quien solo ve el equipo no tiene botones para cambiarlo", async () => {
+  it("quien solo ve el equipo no tiene botones para cambiarlo: solo ve los permisos", async () => {
     servidorFalso({
       "GET /api/sesion": enCentro(DOS_SEDES, { permisos: VE }),
       "GET /api/equipo?pagina=1": pagina([integrante(ANA, "Ana")]),
@@ -62,7 +62,11 @@ describe("lista del equipo", () => {
     const usuario = montarPanel();
     await abrirEquipo(usuario);
     const ana = await screen.findByRole("row", { name: /Ana/ });
-    expect(within(ana).queryAllByRole("button")).toEqual([]);
+    expect(
+      within(ana)
+        .getAllByRole("button")
+        .map((b) => b.textContent),
+    ).toEqual(["Permisos"]);
     expect(screen.queryByRole("button", { name: "Sumar persona" })).toBeNull();
   });
 
@@ -78,7 +82,7 @@ describe("lista del equipo", () => {
       within(ana)
         .getAllByRole("button")
         .map((b) => b.textContent),
-    ).toEqual(["Nueva clave temporal", "Bloquear"]);
+    ).toEqual(["Permisos", "Nueva clave temporal", "Bloquear"]);
     const bea = screen.getByRole("row", { name: /Bea/ });
     expect(within(bea).getByRole("button", { name: "Reactivar" })).toBeDefined();
     expect(screen.getByRole("button", { name: "Sumar persona" })).toBeDefined();

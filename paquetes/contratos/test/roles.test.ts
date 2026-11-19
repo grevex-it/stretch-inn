@@ -73,6 +73,7 @@ describe("respuestas de roles", () => {
           efectivo: false,
         },
       ],
+      enOtrasSedes: true,
     };
     expect(permisosDeIntegrante.parse(permisos)).toEqual(permisos);
   });

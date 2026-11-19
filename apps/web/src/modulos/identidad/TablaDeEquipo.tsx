@@ -10,9 +10,10 @@ interface Props {
   gestiona: boolean;
   alIrA: (pagina: number) => void;
   alGenerarClave: (nombre: string, clave: string) => void;
+  alVerPermisos: (integrante: { id: string; nombre: string }) => void;
 }
 
-export function TablaDeEquipo({ pagina, nombresDeSedes, gestiona, alIrA, alGenerarClave }: Props) {
+export function TablaDeEquipo({ pagina, alIrA, ...fila }: Props) {
   return (
     <>
       <table className={estilos.tabla}>
@@ -22,18 +23,12 @@ export function TablaDeEquipo({ pagina, nombresDeSedes, gestiona, alIrA, alGener
             <th scope="col">Email</th>
             <th scope="col">Roles</th>
             <th scope="col">Estado</th>
-            {gestiona && <th scope="col">Acciones</th>}
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {pagina.elementos.map((integrante) => (
-            <FilaDeIntegrante
-              key={integrante.id}
-              integrante={integrante}
-              nombresDeSedes={nombresDeSedes}
-              gestiona={gestiona}
-              alGenerarClave={alGenerarClave}
-            />
+            <FilaDeIntegrante key={integrante.id} integrante={integrante} {...fila} />
           ))}
         </tbody>
       </table>

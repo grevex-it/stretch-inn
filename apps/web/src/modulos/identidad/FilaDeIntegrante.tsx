@@ -15,6 +15,7 @@ interface Props {
   nombresDeSedes: ReadonlyMap<string, string>;
   gestiona: boolean;
   alGenerarClave: AlGenerarClave;
+  alVerPermisos: (integrante: Integrante) => void;
 }
 
 type Confirmable = "clave" | "bloqueo";
@@ -120,7 +121,8 @@ function Acciones({ integrante, alGenerarClave }: Pick<Props, "integrante" | "al
   );
 }
 
-export function FilaDeIntegrante({ integrante, nombresDeSedes, gestiona, alGenerarClave }: Props) {
+export function FilaDeIntegrante(props: Props) {
+  const { integrante, nombresDeSedes, gestiona, alGenerarClave } = props;
   return (
     <tr className={estilos.fila}>
       <th scope="row" className={estilos.nombre}>
@@ -133,11 +135,19 @@ export function FilaDeIntegrante({ integrante, nombresDeSedes, gestiona, alGener
           {integrante.activo ? "Activo" : "Bloqueado"}
         </span>
       </td>
-      {gestiona && (
-        <td>
-          <Acciones integrante={integrante} alGenerarClave={alGenerarClave} />
-        </td>
-      )}
+      <td>
+        <div className={estilos.acciones}>
+          <Boton
+            variante="secundario"
+            alHacerClic={() => {
+              props.alVerPermisos(integrante);
+            }}
+          >
+            Permisos
+          </Boton>
+          {gestiona && <Acciones integrante={integrante} alGenerarClave={alGenerarClave} />}
+        </div>
+      </td>
     </tr>
   );
 }
