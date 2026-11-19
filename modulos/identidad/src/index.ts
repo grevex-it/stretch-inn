@@ -1,5 +1,4 @@
 // API pública del módulo identidad. Lo único que pueden importar los demás.
-export type { ErrorDePermisos } from "./aplicacion/casos-de-uso.ts";
 export type { NuevaAsignacion, NuevoAjuste } from "./aplicacion/puertos.ts";
 export {
   crearCatalogo,
@@ -19,13 +18,10 @@ export {
   type Asignacion,
   type PermisosPorSede,
 } from "./dominio/permisos.ts";
-export {
-  ajustarPermiso,
-  asignarRol,
-  cargarPermisos,
-  crearRol,
-  quitarAsignacion,
-} from "./modulo.ts";
+export { cargarPermisos } from "./modulo.ts";
+export type { Roles } from "./aplicacion/puertos-roles.ts";
+export { crearRoles } from "./modulo-roles.ts";
+export { rutasDeRoles } from "./http/rutas-roles.ts";
 export { crearAcceso } from "./modulo-acceso.ts";
 export type { Acceso, SesionResuelta } from "./aplicacion/puertos-acceso.ts";
 export { rutasDeSesion } from "./http/rutas-sesion.ts";

@@ -1,9 +1,11 @@
-// Reglas para gestionar el equipo del centro: alta, reset de clave y bloqueo (0007 y 0017).
-// Puras: sin base ni HTTP.
-import { falla, ok, type Resultado } from "@app/nucleo";
+// Reglas para gestionar el equipo del centro: alta, reset de clave, bloqueo, y roles y ajustes de
+// cada persona (0007 y 0017). Puras: sin base ni HTTP.
+import { falla, ok, type Resultado, type SedeId } from "@app/nucleo";
 import { tieneMenosPermisos, type PermisosPorSede } from "./permisos.ts";
 
 export type ErrorDeGestion = "a-vos-mismo" | "mas-permisos";
+export type ErrorDeCambioDePermisos =
+  ErrorDeGestion | "sin-gestion-en-la-sede" | "persona-protegida";
 export type ErrorDeAlta = "nombre-vacio" | "sin-sedes";
 
 export interface Integrante {
@@ -26,6 +28,39 @@ export function puedeGestionarA(
     return falla(
       "mas-permisos",
       "Solo podés hacerlo con alguien que tenga menos permisos que vos. Si hace falta, pedíselo al soporte.",
+    );
+  }
+  return ok(null);
+}
+
+/**
+ * Asignar o quitar un rol, o ajustar un permiso, a otro en una sede: con usuarios.gestionar en esa
+ * sede, nunca a uno mismo, y solo a quien tiene menos permisos en todas sus sedes. Un dueño
+ * (acceso total) puede con cualquier otro, también con otro dueño: entre ellos se cubren.
+ * Que no dé lo que no tiene se controla aparte, con los permisos que da.
+ */
+export function puedeCambiarPermisosDe(
+  quien: Integrante,
+  objetivo: Integrante,
+  { sedeId, esDueno, protegido }: { sedeId: SedeId; esDueno: boolean; protegido: boolean },
+): Resultado<null, ErrorDeCambioDePermisos> {
+  const enLaSede = quien.permisos.get(sedeId);
+  if (enLaSede?.has("usuarios.gestionar") !== true) {
+    return falla("sin-gestion-en-la-sede", "No gestionás usuarios en esa sede.");
+  }
+  if (quien.usuarioId === objetivo.usuarioId) {
+    return falla("a-vos-mismo", "No podés cambiar tus propios permisos: pedíselo a un dueño.");
+  }
+  if (protegido && !enLaSede.has("roles.gestionar")) {
+    return falla(
+      "persona-protegida",
+      "A un dueño o a la contaduría solo le cambia los permisos quien gestiona roles.",
+    );
+  }
+  if (!esDueno && !tieneMenosPermisos(objetivo.permisos, quien.permisos)) {
+    return falla(
+      "mas-permisos",
+      "Solo podés cambiarle los permisos a alguien con menos permisos que vos y solo en tus sedes.",
     );
   }
   return ok(null);

@@ -1,29 +1,9 @@
-// Casos de uso de roles y permisos (ver docs/decisiones/0007 y 0017).
-import { falla, id, ok, type ContextoCentro, type Permiso, type Resultado } from "@app/nucleo";
-import { randomUUID } from "node:crypto";
+// Cálculo de los permisos efectivos y el control del acceso total (ver docs/decisiones/0007 y
+// 0017). Los roles, las asignaciones y los ajustes están en roles.ts y permisos-de-usuarios.ts.
+import { falla, id, type Resultado } from "@app/nucleo";
 import type { Catalogo } from "../dominio/catalogo.ts";
-import {
-  faltantesEnAlgunaSede,
-  faltantesParaOtorgar,
-  permisosEfectivos,
-  tieneAccesoTotal,
-  type PermisosPorSede,
-} from "../dominio/permisos.ts";
-import type {
-  FilaDePermiso,
-  FilaDePermisoDeUsuario,
-  NuevaAsignacion,
-  NuevoAjuste,
-  RepositorioIdentidad,
-} from "./puertos.ts";
-
-export type ErrorDePermisos =
-  | "nombre-vacio"
-  | "nombre-repetido"
-  | "permisos-ajenos"
-  | "rol-inexistente"
-  | "asignacion-inexistente"
-  | "ultimo-acceso-total";
+import { permisosEfectivos, tieneAccesoTotal, type PermisosPorSede } from "../dominio/permisos.ts";
+import type { FilaDePermiso, FilaDePermisoDeUsuario, RepositorioIdentidad } from "./puertos.ts";
 
 /** Permisos efectivos a partir de las filas de roles y ajustes. */
 export function efectivosDe(filas: readonly FilaDePermiso[]): PermisosPorSede {
@@ -47,43 +27,6 @@ export async function cargarPermisos(
   return efectivosDe(await repo.permisosDe(cuentaId, centroId));
 }
 
-function ajenos(faltantes: Permiso[]): Resultado<never, ErrorDePermisos> {
-  return falla("permisos-ajenos", `No podés dar permisos que no tenés: ${faltantes.join(", ")}.`);
-}
-
-export async function crearRol(
-  repo: RepositorioIdentidad,
-  quien: ContextoCentro,
-  { nombre, permisos }: { nombre: string; permisos: readonly Permiso[] },
-): Promise<Resultado<{ id: string }, ErrorDePermisos>> {
-  if (nombre.trim() === "") return falla("nombre-vacio", "El nombre no puede quedar vacío.");
-  const faltantes = faltantesEnAlgunaSede(quien.permisosPorSede, permisos);
-  if (faltantes.length > 0) return ajenos(faltantes);
-  if (await repo.existeRolConNombre(nombre.trim())) {
-    return falla("nombre-repetido", `Ya hay un rol llamado "${nombre.trim()}".`);
-  }
-  const rolId = randomUUID();
-  await repo.crearRol({ id: rolId, nombre: nombre.trim(), permisos });
-  return ok({ id: rolId });
-}
-
-export async function asignarRol(
-  repo: RepositorioIdentidad,
-  quien: ContextoCentro,
-  asignacion: NuevaAsignacion,
-): Promise<Resultado<null, ErrorDePermisos>> {
-  const permisos = await repo.permisosDeRol(asignacion.rolId);
-  if (permisos === undefined) return falla("rol-inexistente", "Ese rol no existe en el centro.");
-  const faltantes = faltantesParaOtorgar(
-    quien.permisosPorSede,
-    id<"Sede">(asignacion.sedeId),
-    permisos,
-  );
-  if (faltantes.length > 0) return ajenos(faltantes);
-  await repo.asignar(asignacion);
-  return ok(null);
-}
-
 function conAccesoTotal(
   filas: readonly FilaDePermisoDeUsuario[],
   sedesDelCentro: readonly string[],
@@ -102,11 +45,11 @@ function conAccesoTotal(
  * Hace el cambio y verifica después que siga habiendo alguien con acceso total (0007, regla 2).
  * Se llama dentro de conPuntoDeGuardado: si devuelve falla, el cambio se deshace.
  */
-export async function cambiarSinPerderAccesoTotal(
-  repo: RepositorioIdentidad,
+export async function cambiarSinPerderAccesoTotal<T, Codigo extends string>(
+  repo: Pick<RepositorioIdentidad, "sedesDelCentro" | "permisosDelCentro">,
   catalogo: Catalogo,
-  cambio: () => Promise<Resultado<null, ErrorDePermisos>>,
-): Promise<Resultado<null, ErrorDePermisos>> {
+  cambio: () => Promise<Resultado<T, Codigo>>,
+): Promise<Resultado<T, Codigo | "ultimo-acceso-total">> {
   const sedes = await repo.sedesDelCentro();
   const antes = conAccesoTotal(await repo.permisosDelCentro(), sedes, catalogo);
   const resultado = await cambio();
@@ -118,25 +61,4 @@ export async function cambiarSinPerderAccesoTotal(
     );
   }
   return resultado;
-}
-
-export async function quitarAsignacion(
-  repo: RepositorioIdentidad,
-  asignacion: NuevaAsignacion,
-): Promise<Resultado<null, ErrorDePermisos>> {
-  const quitada = await repo.quitarAsignacion(asignacion);
-  return quitada ? ok(null) : falla("asignacion-inexistente", "Esa asignación no existe.");
-}
-
-export async function ajustarPermiso(
-  repo: RepositorioIdentidad,
-  quien: ContextoCentro,
-  ajuste: NuevoAjuste,
-): Promise<Resultado<null, ErrorDePermisos>> {
-  const faltantes = faltantesParaOtorgar(quien.permisosPorSede, id<"Sede">(ajuste.sedeId), [
-    ajuste.permiso,
-  ]);
-  if (faltantes.length > 0) return ajenos(faltantes);
-  await repo.ajustar(ajuste);
-  return ok(null);
 }

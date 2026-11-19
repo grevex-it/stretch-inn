@@ -52,10 +52,24 @@ Para migraciones (SQL, con el dueño del esquema):
 Casos de uso (reciben la `Transaccion` de `enContexto`):
 
 - `cargarPermisos(tx, cuentaId, centroId)`: permisos efectivos, para armar el `ContextoCentro`.
-- `crearRol(tx, quien, { nombre, permisos })`.
-- `asignarRol(tx, quien, { usuarioId, sedeId, rolId })`.
-- `quitarAsignacion(tx, asignacion, catalogo)` y `ajustarPermiso(tx, quien, ajuste, catalogo)`:
-  si el centro se quedaría sin nadie con acceso total, devuelven falla y no cambian nada.
+- `identidad_asignaciones_del_rol(rol)` (SQL, alcance mínimo): quiénes tienen un rol, en todas
+  las sedes del centro.
+- `identidad_es_protegido(usuario)` (SQL, alcance mínimo): si tiene el Dueño o la Contaduría en
+  alguna sede del centro.
+
+Roles a medida y permisos de cada integrante (0007):
+
+- `crearRoles(base, { catalogo })`: devuelve `Roles`, con `catalogo`, `rol`, `crearRol`,
+  `editarRol`, `borrarRol`, `permisosDe` (por sede y permiso: de qué roles viene, su ajuste y si
+  al final lo tiene), `asignar`, `quitarAsignacion`, `ajustar` y `quitarAjuste`. Cada uno recibe
+  el `ContextoCentro` de quien lo pide y corre en su transacción. Lo que puede sacar permisos se
+  deshace entero si deja al centro sin nadie con acceso total. El catálogo lo arma la API
+  (`apps/api/src/catalogo.ts`).
+- `rutasDeRoles(roles)`: `GET /equipo/catalogo` y `GET /equipo/:id/permisos` (`usuarios.ver`);
+  `GET`, `PUT` y `DELETE /equipo/roles/:id` y `POST /equipo/roles` (`roles.gestionar`);
+  `POST /equipo/:id/asignaciones`, `DELETE /equipo/:id/asignaciones/:sedeId/:rolId`,
+  `PUT /equipo/:id/ajustes` y `DELETE /equipo/:id/ajustes/:sedeId/:permiso`
+  (`usuarios.gestionar`). `GET /equipo/roles` (en `rutasDeEquipo`) dice la plantilla de cada rol.
 
 Para otros módulos (reciben la `Transaccion` de `enContexto`):
 
@@ -99,8 +113,17 @@ Equipo del centro (0017):
   permisos del catálogo, también los de módulos sumados después del alta. Se lo identifica por
   la marca, no por el nombre: el centro lo puede renombrar.
 - Cada centro tiene un rol por plantilla (índice único por marca). Los roles con marca no se
-  editan: se duplican para armar uno propio (0007). Los permisos de un módulo nuevo llegan solos
-  al Dueño; a las demás plantillas, solo si la migración del módulo se los da.
+  editan ni se borran: se duplican para armar uno propio (0007).
+- Un rol que alguien tiene no se borra: el mensaje dice quiénes, de todas las sedes. Sumarle un
+  permiso a un rol en uso pide tenerlo en cada sede donde se usa.
+- Asignar o quitar un rol, o ajustar un permiso, a otro en una sede: con `usuarios.gestionar` en
+  **esa** sede, nunca a uno mismo (tampoco un dueño), y nadie da lo que no tiene ahí. Solo un
+  dueño (acceso total en el contexto) toca a quien tiene más permisos o permisos en otra sede;
+  los dueños se cubren entre ellos. Con una sede activa, el dueño queda como cualquier otro.
+- A quien tiene el Dueño o la Contaduría (por la marca, en cualquier sede) solo le asigna, quita
+  o ajusta quien tiene `roles.gestionar` en la sede del cambio, aunque tenga menos permisos.
+- Los permisos de un módulo nuevo llegan solos al Dueño; a las demás plantillas, solo si la
+  migración del módulo se los da.
 - Solo se resetea la contraseña de quien tiene menos permisos (subconjunto en cada sede y al
   menos uno menos), y nunca la de una cuenta con usuarios en otros centros (0017). Bloquear y
   reactivar siguen la misma regla de «menos permisos»; nadie se resetea ni se bloquea a sí mismo.
@@ -140,10 +163,10 @@ _Ninguna por ahora._
 
 ## Pendientes
 
-- Que la API no deje editar un rol con marca: cuando exista editar un rol (roles a medida).
+- La pantalla de roles a medida y los ajustes por persona en el panel.
 - Sumar los permisos de `reportes` al Encargado (los de su sede) y a Contaduría cuando exista
   el módulo.
-- Editar el nombre y los roles de un usuario desde el equipo, y la pantalla de roles a medida.
+- Editar el nombre de un usuario desde el equipo.
 - El actor de soporte (0008) sigue las mismas reglas que un usuario; revisarlas cuando exista
   su login.
 - Login de operadores de soporte y sesión fijada a un centro por 2 horas (0008).

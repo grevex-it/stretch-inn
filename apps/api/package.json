@@ -2,6 +2,9 @@
   "name": "@app/api",
   "private": true,
   "type": "module",
+  "exports": {
+    "./catalogo": "./src/catalogo.ts"
+  },
   "scripts": {
     "dev": "node --env-file-if-exists=../../.env --watch src/servidor.ts",
     "start": "node src/servidor.ts",

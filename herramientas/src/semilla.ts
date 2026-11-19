@@ -5,7 +5,7 @@
 import { hashearClave, plantillasDelSistema } from "@app/identidad";
 import { randomUUID } from "node:crypto";
 import pg from "pg";
-import { CATALOGO } from "./catalogo.ts";
+import { CATALOGO } from "@app/api/catalogo";
 
 export interface CuentaDePrueba {
   email: string;

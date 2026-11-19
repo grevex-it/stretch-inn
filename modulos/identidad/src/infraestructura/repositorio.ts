@@ -2,7 +2,7 @@
 // las sedes visibles; las funciones de alcance mínimo son la única excepción (0017).
 import type { Permiso } from "@app/nucleo";
 import type { Transaccion } from "@app/plataforma";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, ne, sql } from "drizzle-orm";
 import type {
   FilaDePermiso,
   FilaDePermisoDeUsuario,
@@ -51,11 +51,12 @@ function lecturas(tx: Transaccion): Lecturas {
       );
       return filas.rows.map((fila) => fila.id);
     },
-    async existeRolConNombre(nombre) {
+    async existeRolConNombre(nombre, salvo) {
+      const mismo = sql`lower(${roles.nombre}) = lower(${nombre})`;
       const filas = await tx
         .select({ id: roles.id })
         .from(roles)
-        .where(sql`lower(${roles.nombre}) = lower(${nombre})`);
+        .where(salvo === undefined ? mismo : and(mismo, ne(roles.id, salvo)));
       return filas.length > 0;
     },
     async permisosDeRol(rolId) {

@@ -7,7 +7,14 @@ import {
   declararTarea,
   verificarRolSeguro,
 } from "@app/plataforma";
-import { crearAcceso, crearEquipo, rutasDeEquipo, rutasDeSesion } from "@app/identidad";
+import {
+  crearAcceso,
+  crearEquipo,
+  crearRoles,
+  rutasDeEquipo,
+  rutasDeRoles,
+  rutasDeSesion,
+} from "@app/identidad";
 import { rutasDeAlumnos } from "@app/personas";
 import { abonoVigente, crearAbonos, rutasDeAbonos } from "@app/abonos";
 import { crearAgenda, liberarLugares, rutasDeAgenda } from "@app/agenda";
@@ -15,6 +22,7 @@ import { crearAsistencia, ocupadasDeMas, rutasDeAsistencia } from "@app/asistenc
 import { crearCaja, EVENTO_PAGO_REGISTRADO, rutasDeCaja } from "@app/caja";
 import { crearGastos, rutasDeGastos } from "@app/gastos";
 import { construirApp } from "./app.ts";
+import { CATALOGO } from "./catalogo.ts";
 
 const logger = crearLogger({ nivel: "info" });
 
@@ -58,6 +66,7 @@ const app = construirApp({
 });
 await app.register(rutasDeSesion(acceso));
 await app.register(rutasDeEquipo(crearEquipo(base)));
+await app.register(rutasDeRoles(crearRoles(base, { catalogo: CATALOGO })));
 await app.register(rutasDeAlumnos(base, { alDarDeBaja: liberarLugares }));
 await app.register(rutasDeAgenda(crearAgenda(base, { ocupadasDeMas })));
 // Se recupera dentro del abono vigente del alumno (0020): abonos se lo dice a asistencia.

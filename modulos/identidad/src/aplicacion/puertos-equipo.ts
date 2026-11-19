@@ -25,6 +25,8 @@ export interface PaginaDe<T> extends Pagina {
 interface RolDelCentro {
   id: string;
   nombre: string;
+  /** La plantilla de la que salió (no se edita), o null si es propio del centro. */
+  plantilla: string | null;
 }
 
 /** Corre dentro de enContexto: RLS limita al centro y a las sedes visibles. */
