@@ -6,6 +6,7 @@ import { useId, type ReactNode } from "react";
 import { ListaRemota, pesos, Resultados } from "../../base/controles/ListaRemota.tsx";
 import { usePermiso, useSesion } from "../../base/sesion.ts";
 import { textoDelCiclo } from "./ciclo.ts";
+import estilos from "./CuotasDelAlumno.module.css";
 
 /** Una cuota pagada: siempre trae el pago que la saldó. */
 type CuotaPagada = Cuota & { pagadaEn: string; pagoId: string };
@@ -22,8 +23,10 @@ export function CuotasDelAlumno({ alumnoId, accion }: Props) {
   const zona = useSesion().data?.centroActivo?.zonaHoraria;
   if (!permitido || zona === undefined) return null;
   return (
-    <section aria-labelledby={titulo}>
-      <h3 id={titulo}>Cuotas</h3>
+    <section className={estilos.cuotas} aria-labelledby={titulo}>
+      <h3 id={titulo} className={estilos.titulo}>
+        Cuotas
+      </h3>
       <ListaRemota
         ruta={`/alumnos/${alumnoId}/cuotas`}
         esquema={paginaDeCuotas}

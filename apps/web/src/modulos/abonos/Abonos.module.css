@@ -1,0 +1,29 @@
+.abonos {
+  display: grid;
+  gap: var(--si-espacio-4);
+}
+
+/* Mismo título de pantalla que Alumnos. */
+.titulo {
+  margin: 0;
+  font-size: var(--si-letra-titulo);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Cada plan: nombre, sus desplegables y el detalle, con aire parejo entre ellos. */
+.plan {
+  display: grid;
+  gap: var(--si-espacio-3);
+}
+
+.nombre {
+  font-size: var(--si-letra-media);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+.detalle {
+  margin: 0;
+  color: var(--si-texto-medio);
+}

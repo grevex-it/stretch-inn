@@ -5,6 +5,7 @@ import { EditarPlan } from "./EditarPlan.tsx";
 import { paginaDePlanes } from "@app/contratos";
 import { ListaRemota, pesos, Resultados } from "../../base/controles/ListaRemota.tsx";
 import { usePermiso, useSesion } from "../../base/sesion.ts";
+import estilos from "./Abonos.module.css";
 
 export function Abonos() {
   const gestionar = usePermiso("abonos.gestionar");
@@ -12,8 +13,8 @@ export function Abonos() {
   const { data } = useSesion();
   const centro = data?.centroActivo;
   return (
-    <section>
-      <h1>Abonos</h1>
+    <section className={estilos.abonos}>
+      <h1 className={estilos.titulo}>Abonos</h1>
       {gestionar && (
         <FormularioDesplegable titulo="Nuevo plan">
           <EditarPlan />
@@ -29,17 +30,17 @@ export function Abonos() {
               datos={datos}
               alIrA={alIrA}
               fila={(plan) => (
-                <li key={plan.id}>
-                  <strong>{plan.nombre}</strong>
+                <li key={plan.id} className={estilos.plan}>
+                  <strong className={estilos.nombre}>{plan.nombre}</strong>
                   {gestionar && <Edicion plan={plan} />}
                   <GenerarCuota plan={plan} />
-                  <p>
+                  <p className={estilos.detalle}>
                     {plan.clases} {plan.clases === 1 ? "clase" : "clases"} ·{" "}
                     {pesos.format(plan.precio)} de precio general ·{" "}
                     {plan.activo ? "Activo" : "De baja"}
                   </p>
                   {plan.preciosDeSede.map((precio) => (
-                    <p key={precio.sedeId}>
+                    <p key={precio.sedeId} className={estilos.detalle}>
                       {centro?.sedes.find((sede) => sede.id === precio.sedeId)?.nombre ??
                         "Otra sede"}{" "}
                       · {pesos.format(precio.precio)}
