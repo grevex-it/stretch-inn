@@ -30,3 +30,52 @@
   border: 1px solid var(--si-borde-control);
   border-radius: var(--si-radio-sm);
 }
+
+/* Desplegable: el título con el aspecto del botón secundario (48px) y el contenido en una
+   tarjeta crema debajo. Ícono de trazo que se da vuelta al abrir (0018). */
+.desplegable {
+  display: grid;
+  justify-items: start;
+  gap: var(--si-espacio-2);
+}
+
+.resumen {
+  display: inline-flex;
+  gap: var(--si-espacio-2);
+  align-items: center;
+  min-height: var(--si-alto-control);
+  padding: 0 var(--si-espacio-4);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+  list-style: none;
+  cursor: pointer;
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-md);
+}
+
+.resumen::-webkit-details-marker {
+  display: none;
+}
+
+.resumen:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}
+
+.icono {
+  width: var(--si-espacio-5);
+  height: var(--si-espacio-5);
+}
+
+.desplegable[open] .icono {
+  transform: rotate(180deg);
+}
+
+.contenido {
+  justify-self: stretch;
+  padding: var(--si-espacio-4);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde);
+  border-radius: var(--si-radio-md);
+}
