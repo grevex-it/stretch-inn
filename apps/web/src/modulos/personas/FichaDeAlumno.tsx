@@ -1,5 +1,5 @@
 // Alta, edición y vista de un alumno, con sus antecedentes de salud y sus cuotas. Lo obligatorio:
-// nombre, apellido y teléfono. La edición manda la versión que se vio (0013): si alguien la
+// nombre y apellido; sin celular el alumno queda pendiente de completar (0022). La edición manda la versión que se vio (0013): si alguien la
 // cambió en el medio, la API avisa y no se pisa nada. Sin personas.editar se abre en solo lectura.
 import type { Alumno, FichaDeAlumno as Ficha } from "@app/contratos";
 import { useId, useState } from "react";

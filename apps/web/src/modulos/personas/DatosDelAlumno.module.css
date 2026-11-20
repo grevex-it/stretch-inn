@@ -8,9 +8,11 @@
   border: 0;
 }
 
-/* Dos columnas en pantallas anchas, una en el celular. */
+/* Dos columnas en pantallas anchas, una en el celular. Alineadas arriba: la ayuda de un campo
+   no empuja al de al lado. */
 .columnas {
   display: grid;
+  align-items: start;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
 }

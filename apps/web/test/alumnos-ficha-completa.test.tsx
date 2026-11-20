@@ -124,6 +124,36 @@ describe("sumar alumno con la ficha completa", () => {
   });
 });
 
+describe("el celular es opcional (0022)", () => {
+  it("el alta se guarda sin teléfono y la edición tampoco lo exige", async () => {
+    const servidor = conAlumnos(EDITA, {
+      "POST /api/alumnos": { estado: 201, cuerpo: { id: CARO } },
+      [`GET /api/alumnos/${CARO}`]: {
+        estado: 200,
+        cuerpo: { ...COMPLETA, id: CARO, nombre: "Caro", apellido: "Gómez", telefono: null },
+      },
+    });
+    const usuario = montarPanel();
+    await abrirAlumnos(usuario);
+    await usuario.click(await screen.findByRole("button", { name: "Sumar alumno" }));
+    expect(screen.getByLabelText<HTMLInputElement>("Teléfono").required).toBe(false);
+    await usuario.type(screen.getByLabelText("Nombre"), "Caro");
+    await usuario.type(screen.getByLabelText("Apellido"), "Gómez");
+    await usuario.click(screen.getByRole("button", { name: "Guardar" }));
+    await vi.waitFor(() => {
+      expect(servidor.pedidos.find((p) => p.clave === "POST /api/alumnos")?.cuerpo).toMatchObject({
+        telefono: "",
+      });
+    });
+
+    await screen.findByRole("heading", { name: "Editar a Caro Gómez" });
+    await usuario.click(screen.getByRole("button", { name: "Cancelar" }));
+    const ana = await screen.findByRole("row", { name: /Pérez, Ana/ });
+    await usuario.click(within(ana).getByRole("button", { name: "Editar" }));
+    expect(screen.getByLabelText<HTMLInputElement>("Teléfono").required).toBe(false);
+  });
+});
+
 describe("editar la ficha completa", () => {
   it("abre con sus datos y manda los cambios del contacto y el profe", async () => {
     const servidor = conAlumnos(EDITA, {

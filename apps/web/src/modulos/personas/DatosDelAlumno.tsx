@@ -66,7 +66,7 @@ export function DatosDelAlumno({ campo, alumno, soloLectura }: Props) {
       <div className={estilos.columnas}>
         <Campo etiqueta="Nombre" autoComplete="off" {...campo("nombre")} />
         <Campo etiqueta="Apellido" autoComplete="off" {...campo("apellido")} />
-        <Campo etiqueta="Teléfono" tipo="tel" autoComplete="off" {...campo("telefono")} />
+        <Campo etiqueta="Teléfono" tipo="tel" opcional autoComplete="off" {...campo("telefono")} />
         <Campo etiqueta="Documento" opcional autoComplete="off" {...campo("documento")} />
         <Campo etiqueta="Fecha de nacimiento" tipo="date" opcional {...campo("fechaNacimiento")} />
         <Campo
