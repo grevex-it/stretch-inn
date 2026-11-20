@@ -7,12 +7,30 @@ import { Boton } from "../../base/controles/Boton.tsx";
 import { usePermiso } from "../../base/sesion.ts";
 import estilos from "./Alumnos.module.css";
 import { Buscador } from "./Buscador.tsx";
-import { useAlumnos, type Filtro } from "./consultas.ts";
+import { useAlumno, useAlumnos, type Filtro } from "./consultas.ts";
 import { FichaDeAlumno } from "./FichaDeAlumno.tsx";
 import { TablaDeAlumnos } from "./TablaDeAlumnos.tsx";
 
-/** Qué ficha está abierta: ninguna, una nueva o la de un alumno. */
-type Editando = { alumno: Alumno | undefined } | null;
+/**
+ * Qué ficha está abierta: ninguna, una nueva, la de un alumno de la lista o la del que se acaba
+ * de sumar (por su id: así se cargan enseguida sus datos de salud).
+ */
+type Editando = { alumno: Alumno | undefined } | { id: string } | null;
+
+type PropsDeFicha = Omit<Parameters<typeof FichaDeAlumno>[0], "alumno">;
+
+/** La ficha del alumno recién sumado: se pide a la API para tenerla con su versión. */
+function FichaDelNuevo({ id, ...props }: PropsDeFicha & { id: string }) {
+  const alumno = useAlumno(id);
+  if (alumno.error !== null) return <Aviso tono="error">{mensajeDe(alumno.error)}</Aviso>;
+  if (alumno.data === undefined) return null;
+  return <FichaDeAlumno alumno={alumno.data} {...props} />;
+}
+
+function Ficha({ editando, ...props }: PropsDeFicha & { editando: NonNullable<Editando> }) {
+  if ("id" in editando) return <FichaDelNuevo key={editando.id} id={editando.id} {...props} />;
+  return <FichaDeAlumno key={editando.alumno?.id ?? "nuevo"} alumno={editando.alumno} {...props} />;
+}
 
 /** El buscador y la tabla. Cambiar la búsqueda o las bajas vuelve a la página 1. */
 interface PropsDeLista {
@@ -85,12 +103,11 @@ export function Alumnos() {
       />
       {guardado !== null && <Aviso tono="ok">Guardamos a {guardado}.</Aviso>}
       {editando !== null && (
-        <FichaDeAlumno
-          key={editando.alumno?.id ?? "nuevo"}
-          alumno={editando.alumno}
+        <Ficha
+          editando={editando}
           soloLectura={!edita}
-          alGuardar={(nombre) => {
-            setEditando(null);
+          alGuardar={(nombre, idNuevo) => {
+            setEditando(idNuevo === undefined ? null : { id: idNuevo });
             setGuardado(nombre);
           }}
           alCancelar={() => {

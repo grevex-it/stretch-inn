@@ -1,0 +1,29 @@
+.salud {
+  display: grid;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--si-borde);
+}
+
+.titulo {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Mismo aspecto que los campos de texto (controles/Campo). */
+.patologias {
+  padding: 10px 14px;
+  font: inherit;
+  color: var(--si-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-sm);
+  resize: vertical;
+}
+
+.patologias:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}
