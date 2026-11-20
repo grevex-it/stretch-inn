@@ -25,28 +25,30 @@ export function TablaDeAlumnos({ pagina, buscar, edita, daDeBaja, alIrA, alAbrir
   }
   return (
     <>
-      <table className={estilos.tabla}>
-        <thead>
-          <tr>
-            <th scope="col">Alumno</th>
-            <th scope="col">Teléfono</th>
-            <th scope="col">Documento</th>
-            <th scope="col">Estado</th>
-            <th scope="col">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pagina.elementos.map((alumno) => (
-            <FilaDeAlumno
-              key={alumno.id}
-              alumno={alumno}
-              edita={edita}
-              daDeBaja={daDeBaja}
-              alAbrir={alAbrir}
-            />
-          ))}
-        </tbody>
-      </table>
+      <div className={estilos.marco}>
+        <table className={estilos.tabla}>
+          <thead>
+            <tr>
+              <th scope="col">Alumno</th>
+              <th scope="col">Teléfono</th>
+              <th scope="col">Documento</th>
+              <th scope="col">Estado</th>
+              <th scope="col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pagina.elementos.map((alumno) => (
+              <FilaDeAlumno
+                key={alumno.id}
+                alumno={alumno}
+                edita={edita}
+                daDeBaja={daDeBaja}
+                alAbrir={alAbrir}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
       <Paginacion pagina={pagina} alIrA={alIrA} />
     </>
   );

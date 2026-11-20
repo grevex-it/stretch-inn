@@ -59,7 +59,7 @@ describe("sumar alumno con la ficha completa", () => {
     const usuario = montarPanel();
     await abrirAlumnos(usuario);
     await usuario.click(await screen.findByRole("button", { name: "Sumar alumno" }));
-    expect(screen.queryByRole("heading", { name: "Antecedentes y patologías" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Salud" })).toBeNull();
 
     await usuario.type(screen.getByLabelText("Nombre"), "Caro");
     await usuario.type(screen.getByLabelText("Apellido"), "Gómez");
@@ -87,7 +87,7 @@ describe("sumar alumno con la ficha completa", () => {
       notas: "",
       email: "",
     });
-    expect(await screen.findByRole("heading", { name: "Antecedentes y patologías" })).toBeDefined();
+    expect(await screen.findByRole("heading", { name: "Salud" })).toBeDefined();
   });
 
   it("sin número de socio no lo manda (lo pone la API) y sin profe manda null", async () => {
