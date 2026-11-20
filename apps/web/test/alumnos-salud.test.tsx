@@ -85,22 +85,49 @@ describe("antecedentes y patologías", () => {
     expect(servidor.pedidos.some((p) => p.clave === `PUT /api/alumnos/${ANA}`)).toBe(false);
   });
 
-  it("si otra persona las cambió en el medio, muestra el aviso de la API", async () => {
-    conSalud([...EDITA, ...EDITA_SALUD], {
-      [`PUT ${RUTA}`]: {
-        estado: 409,
-        cuerpo: {
-          error: { codigo: "cambio-concurrente", mensaje: "Esta ficha cambió. Volvé a cargarla." },
-        },
-      },
+  it("si otra persona las cambió en el medio, muestra lo de ahora y aparte lo que se había escrito", async () => {
+    const servidor = conSalud([...EDITA, ...EDITA_SALUD], {
+      [`PUT ${RUTA}`]: (pedido) =>
+        (pedido as { version: number }).version === 4
+          ? { estado: 200, cuerpo: { version: 5 } }
+          : {
+              estado: 409,
+              cuerpo: {
+                error: {
+                  codigo: "cambio-concurrente",
+                  mensaje: "Esta ficha cambió. Volvé a cargarla.",
+                },
+              },
+            },
     });
     const usuario = await abrirAna("Editar");
     await vi.waitFor(() => {
       expect(patologias().value).toBe("Escoliosis.");
     });
+    // Otra persona los guardó en el medio: desde ahora la API devuelve la versión 4.
+    servidor.responder(`GET ${RUTA}`, {
+      estado: 200,
+      cuerpo: { patologias: "Escoliosis. Operada en 2024.", version: 4 },
+    });
+    await usuario.type(patologias(), " Hernia de disco.");
     await usuario.click(screen.getByRole("button", { name: "Guardar antecedentes" }));
+
     expect((await screen.findByRole("alert")).textContent).toBe(
       "Esta ficha cambió. Volvé a cargarla.",
     );
+    await vi.waitFor(() => {
+      expect(patologias().value).toBe("Escoliosis. Operada en 2024.");
+    });
+    const escrito = screen.getByRole("region", { name: "Lo que habías escrito" });
+    expect(within(escrito).getByText("Escoliosis. Hernia de disco.")).toBeDefined();
+
+    await usuario.type(patologias(), " Hernia de disco.");
+    await usuario.click(screen.getByRole("button", { name: "Guardar antecedentes" }));
+    expect(await screen.findByText("Guardamos los antecedentes.")).toBeDefined();
+    expect(screen.queryByRole("region", { name: "Lo que habías escrito" })).toBeNull();
+    expect(servidor.pedidos.filter((p) => p.clave === `PUT ${RUTA}`).map((p) => p.cuerpo)).toEqual([
+      { patologias: "Escoliosis. Hernia de disco.", version: 3 },
+      { patologias: "Escoliosis. Operada en 2024. Hernia de disco.", version: 4 },
+    ]);
   });
 });

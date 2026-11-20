@@ -1,8 +1,10 @@
 // Antecedentes y patologías del alumno: aparte de la ficha y con permisos propios (0019). Se ven
 // con personas.ver-salud y se guardan con personas.editar-salud, con su propia versión (0013): si
-// otra persona los cambió en el medio, la API avisa y se muestra lo que hay ahora.
+// otra persona los cambió en el medio, la API avisa, se muestra lo que hay ahora y, aparte, lo que
+// se había escrito, para volver a cargarlo sin perderlo.
 import type { SaludDeAlumno } from "@app/contratos";
 import { useId, useState } from "react";
+import { ErrorDeApi } from "../../base/api.ts";
 import { Aviso, mensajeDe } from "../../base/controles/Aviso.tsx";
 import { Boton } from "../../base/controles/Boton.tsx";
 import { Formulario } from "../../base/controles/Formulario.tsx";
@@ -47,10 +49,41 @@ function FormularioDeSalud({ salud, titulo, edita, enviando, alGuardar }: PropsD
   );
 }
 
+/** Lo que la persona había escrito cuando la API respondió que los datos cambiaron (409). */
+function LoQueHabiasEscrito({ texto }: { texto: string }) {
+  const titulo = useId();
+  return (
+    <section className={estilos.escrito} aria-labelledby={titulo}>
+      <h4 id={titulo} className={estilos.subtitulo}>
+        Lo que habías escrito
+      </h4>
+      <p className={estilos.texto}>{texto}</p>
+    </section>
+  );
+}
+
+const cambioEnElMedio = (error: Error) => error instanceof ErrorDeApi && error.estado === 409;
+
+function useGuardarSinPerder(alumnoId: string) {
+  const guardar = useGuardarSalud(alumnoId);
+  const [escrito, setEscrito] = useState<string | null>(null);
+  const mutar = (datos: SaludDeAlumno) => {
+    guardar.mutate(datos, {
+      onSuccess: () => {
+        setEscrito(null);
+      },
+      onError: (error) => {
+        if (cambioEnElMedio(error)) setEscrito(datos.patologias);
+      },
+    });
+  };
+  return { guardar, escrito, mutar };
+}
+
 function Contenido({ alumnoId, titulo }: { alumnoId: string; titulo: string }) {
   const edita = usePermiso("personas.editar-salud");
   const salud = useSalud(alumnoId, true);
-  const guardar = useGuardarSalud(alumnoId);
+  const { guardar, escrito, mutar } = useGuardarSinPerder(alumnoId);
   const error = mensajeDe(salud.error) ?? mensajeDe(guardar.error);
   return (
     <>
@@ -61,12 +94,11 @@ function Contenido({ alumnoId, titulo }: { alumnoId: string; titulo: string }) {
           titulo={titulo}
           edita={edita}
           enviando={guardar.isPending}
-          alGuardar={(datos) => {
-            guardar.mutate(datos);
-          }}
+          alGuardar={mutar}
         />
       )}
       {error !== undefined && <Aviso tono="error">{error}</Aviso>}
+      {escrito !== null && <LoQueHabiasEscrito texto={escrito} />}
       {guardar.isSuccess && <Aviso tono="ok">Guardamos los antecedentes.</Aviso>}
     </>
   );

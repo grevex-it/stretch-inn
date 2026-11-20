@@ -41,7 +41,7 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
     (`ElegirProfe.tsx`: los integrantes activos del equipo, todas las páginas, solo para editar)
     y contacto de emergencia (0019); el email, opcional, al final. Al sumar un alumno su ficha
     queda abierta, para cargar enseguida los antecedentes de salud (`SaludDelAlumno.tsx`: se ven
-    con `personas.ver-salud` y se guardan aparte, con su versión, con `personas.editar-salud`).
+    con `personas.ver-salud` y se guardan aparte, con su versión, con `personas.editar-salud`; si la API responde 409, muestra lo de ahora y, aparte, «Lo que habías escrito»).
     En las dos se ven las cuotas del alumno (`abonos.ver`) y, en cada cuota pagada, anular su
     pago (`caja.anular`), sin `caja.ver`: ni totales ni caja del día (0019). «Dar de baja» y
     «Reactivar» aparecen con `personas.dar-de-baja`, con o sin `personas.editar`.
