@@ -1,0 +1,7 @@
+/* Mismo tamaño que los subtítulos de la ficha del alumno («Salud», «Cuotas»). */
+.subtitulo {
+  margin: var(--si-espacio-4) 0 0;
+  font-size: var(--si-letra-media);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}

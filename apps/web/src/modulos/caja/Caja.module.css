@@ -1,0 +1,51 @@
+.caja {
+  display: grid;
+  gap: var(--si-espacio-4);
+}
+
+/* Mismo título de pantalla que Alumnos y Abonos. */
+.titulo {
+  margin: 0;
+  font-size: var(--si-letra-titulo);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* El día de caja no necesita todo el ancho. */
+.dia {
+  justify-self: start;
+}
+
+.total {
+  margin: 0;
+  font-size: var(--si-letra-grande);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Cada pago: el dato arriba y, debajo, anular o el motivo de la anulación. */
+.pago {
+  display: grid;
+  gap: var(--si-espacio-2);
+}
+
+.dato {
+  margin: 0;
+  color: var(--si-texto-medio);
+}
+
+.monto {
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Par de color controlado por el test de @app/ui, con la palabra que lo nombra. */
+.anulado {
+  display: inline-block;
+  margin-right: var(--si-espacio-2);
+  padding: var(--si-espacio-1) var(--si-espacio-3);
+  color: var(--si-neutro-texto);
+  white-space: nowrap;
+  background: var(--si-neutro-fondo);
+  border-radius: var(--si-radio-pildora);
+}

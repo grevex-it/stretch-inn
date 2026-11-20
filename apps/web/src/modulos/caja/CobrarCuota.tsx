@@ -1,10 +1,11 @@
 import { BuscarAlumno } from "../../base/controles/BuscarAlumno.tsx";
 import { paginaDeCuotas, pedidoDeCobro, type Cuota } from "@app/contratos";
 import { useRef, useState } from "react";
-import { FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
+import { FormularioDesplegable, FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
 import { ListaRemota, pesos, Resultados } from "../../base/controles/ListaRemota.tsx";
 import { usePermiso } from "../../base/sesion.ts";
 import { textoDelCiclo } from "../abonos/ciclo.ts";
+import estilos from "./CobrarCuota.module.css";
 
 export function CobrarCuota({ sede }: { sede: string }) {
   const permitido = usePuedeCobrar();
@@ -12,18 +13,17 @@ export function CobrarCuota({ sede }: { sede: string }) {
   const [alumno, elegir] = useState<{ id: string; nombre: string }>();
   if (!permitido) return null;
   return (
-    <details>
-      <summary>Cobrar cuota</summary>
+    <FormularioDesplegable titulo="Cobrar cuota">
       <BuscarAlumno alElegir={elegir} />
       {alumno && <Cuotas key={alumno.id} alumno={alumno} sede={sede} />}
-    </details>
+    </FormularioDesplegable>
   );
 }
 
 function Cuotas({ alumno, sede }: { alumno: { id: string; nombre: string }; sede: string }) {
   return (
     <>
-      <h3>Cuotas de {alumno.nombre}</h3>
+      <h3 className={estilos.subtitulo}>Cuotas de {alumno.nombre}</h3>
       <ListaRemota
         ruta={`/alumnos/${alumno.id}/cuotas`}
         esquema={paginaDeCuotas}
