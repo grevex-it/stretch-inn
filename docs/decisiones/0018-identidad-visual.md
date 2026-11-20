@@ -14,7 +14,9 @@ tipografía.
   `#646854`) y **crema** (`#F3ECE2` / `#F6F1E8`), con el isotipo de las dos «S» entrelazadas y su
   patrón de fondo.
 - **Tipografía:** Jost, geométrica como el logotipo. Liviana (300) para textos secundarios y
-  bajadas, media (500) para títulos y botones.
+  bajadas, media (500) para títulos y botones. Cada app la carga alojada con ella
+  (`@fontsource/jost`, pesos 300, 400 y 500), no desde Google Fonts: sirve sin
+  conexión y sin depender de un tercero.
 - **Tokens en `paquetes/ui`:** `tokens.css` (variables `--si-…`) y `tokens.ts` con los mismos
   valores. Las pantallas usan solo las variables, nunca valores escritos a mano.
 - **Accesibilidad AA como piso:** 4.5:1 para texto y 3:1 para bordes de controles y foco. Un test

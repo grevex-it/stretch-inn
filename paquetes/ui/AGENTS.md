@@ -23,7 +23,8 @@ identidad visual, los logos y, más adelante, los componentes compartidos. Ver
 
 - `tokens`: objeto con todos los tokens por nombre (`tokens["si-oliva-700"]`).
 - `variable(token)`: devuelve `var(--token)` para estilos armados desde TypeScript.
-- `@app/ui/tokens.css`: la hoja con las variables.
+- `@app/ui/tokens.css`: la hoja con las variables. `--si-fuente` nombra a Jost, pero no la carga:
+  cada app la carga alojada con ella, con `@fontsource/jost` (pesos 300, 400 y 500, 0018).
 
 ## Reglas de uso
 
@@ -50,5 +51,4 @@ identidad visual, los logos y, más adelante, los componentes compartidos. Ver
 ## Pendientes
 
 - Reemplazar los PNG de `assets/` por los SVG originales del logo.
-- Elegir cómo se carga Jost: Google Fonts o `@fontsource/jost` empaquetada con la app.
 - Sumar una regla de Stylelint que rechace colores escritos a mano fuera de `tokens.css`.
