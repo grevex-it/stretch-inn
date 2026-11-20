@@ -15,6 +15,7 @@ acuerdo.
 - `src/abonos.ts`: planes del centro, precios por sede y cuotas de los alumnos: paquetes de
   clases (0020).
 - `src/caja.ts`: cobros con clave de idempotencia, anulaciones y el día de caja.
+- `src/profesores.ts`: los profes con su tipo y las tarifas por clase (0024).
 - `src/gastos.ts`: gastos de cada sede con clave de idempotencia, anulaciones y por período (0022).
 - `src/paginas.ts`: la forma común de toda lista (`paginaDe`, `numeroDePagina`).
 
@@ -88,6 +89,10 @@ acuerdo.
   `gastoCargado` (`{ id, repetido }`), `pedidoDeGastos` (query `?sede&desde&hasta&pagina`),
   `gasto` y `paginaDeGastos` (una página más `gastado`), con sus tipos. `CATEGORIAS_DE_GASTO`:
   las mismas que `gastos` (un test lo controla). La anulación usa `pedidoDeAnulacion`.
+
+- `paginaDeProfesConTipo`, `pedidoDeTipoDeProfe`, `pedidoDeTarifas` (query `?sede&pagina`),
+  `pedidoDeTarifa` (`{ sedeId, profeId, monto, desde }`, null: todos), `tarifa` y
+  `paginaDeTarifas`, con sus tipos (0024).
 
 ## Reglas de uso
 
