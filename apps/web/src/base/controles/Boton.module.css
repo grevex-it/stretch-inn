@@ -1,6 +1,6 @@
 .boton {
   min-height: var(--si-alto-control);
-  padding: 0 20px;
+  padding: 0 var(--si-espacio-5);
   font: inherit;
   font-weight: var(--si-peso-medio);
   border-radius: var(--si-radio-md);

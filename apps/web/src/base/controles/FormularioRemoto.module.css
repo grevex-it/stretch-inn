@@ -1,14 +1,14 @@
 .formulario {
   display: grid;
   justify-items: start;
-  gap: 12px;
-  padding-block: 12px;
+  gap: var(--si-espacio-3);
+  padding-block: var(--si-espacio-3);
 }
 
 .formulario fieldset {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--si-espacio-3);
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -17,13 +17,13 @@
 
 .formulario label {
   display: grid;
-  gap: 4px;
+  gap: var(--si-espacio-2);
 }
 
 .formulario :is(input, select) {
-  min-height: var(--si-alto-control-min);
+  min-height: var(--si-alto-control);
   max-width: 100%;
-  padding-inline: 8px;
+  padding-inline: var(--si-espacio-4);
   font: inherit;
   color: var(--si-texto);
   background: var(--si-superficie);
