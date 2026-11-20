@@ -33,6 +33,9 @@ export const alumnos = pgTable(
     fechaDeInicio: date("fecha_de_inicio", { mode: "string" }),
     /** El profe asignado: un usuario del equipo (0022). */
     profeId: uuid("profe_id"),
+    /** El contacto de emergencia (0019): opcional; el vínculo va dentro del nombre. */
+    emergenciaNombre: text("emergencia_nombre"),
+    emergenciaTelefono: text("emergencia_telefono"),
     /**
      * Nombre, apellido, documento y dígitos del teléfono en minúsculas y sin acentos: lo que
      * compara el buscador. Lo arma la app en cada alta y edición.

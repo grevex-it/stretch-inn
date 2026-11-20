@@ -7,7 +7,7 @@ import Fastify, { type FastifyContextConfig } from "fastify";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
 import { rutasDeAlumnos } from "../src/index.ts";
-import { ANA, contextoConPermisos } from "./ayudas.ts";
+import { ANA, contextoConPermisos, profe } from "./ayudas.ts";
 
 let base: Base;
 beforeAll(() => {
@@ -53,6 +53,7 @@ describe("rutas de alumnos", () => {
     expect(Object.fromEntries(Object.entries(declaradas).map(([r, c]) => [r, c.permiso]))).toEqual({
       "GET /alumnos": "personas.ver",
       "GET /alumnos/:id": "personas.ver",
+      "GET /alumnos/profes": "personas.editar",
       "POST /alumnos": "personas.editar",
       "PUT /alumnos/:id": "personas.editar",
       "PUT /alumnos/:id/baja": "personas.dar-de-baja",
@@ -99,6 +100,9 @@ describe("rutas de alumnos", () => {
       numeroDeSocio: 1,
       fechaDeInicio: null,
       profeId: null,
+      profeNombre: null,
+      emergenciaNombre: null,
+      emergenciaTelefono: null,
       activo: true,
       bajaEn: null,
       pendienteDeCompletar: false,
@@ -106,6 +110,31 @@ describe("rutas de alumnos", () => {
     });
     const lista = await servidor.inject({ url: "/alumnos?buscar=perez" });
     expect(lista.json()).toMatchObject({ pagina: 1, porPagina: 50, total: 1 });
+  });
+
+  it("los profes para elegir y el nombre del profe de cada alumno, en la ficha y en la lista", async () => {
+    const ctx = await contextoConPermisos(base, ["personas.ver", "personas.editar"]);
+    const lore = await profe(ctx, "Lore");
+    await profe(ctx, "Bloqueada", false);
+    const { servidor } = await app(ctx);
+
+    const profes = await servidor.inject({ url: "/alumnos/profes?pagina=1" });
+    const ana = ctx.actor.tipo === "usuario" ? ctx.actor.usuarioId : "";
+    expect(profes.json()).toEqual({
+      pagina: 1,
+      porPagina: 50,
+      total: 2,
+      elementos: [
+        { id: ana, nombre: "Ana" },
+        { id: lore, nombre: "Lore" },
+      ],
+    });
+    const id = await crear(servidor, { profeId: lore });
+    const ficha = alumno.parse((await servidor.inject({ url: `/alumnos/${id}` })).json());
+    expect([ficha.profeId, ficha.profeNombre]).toEqual([lore, "Lore"]);
+    const lista = await servidor.inject({ url: "/alumnos" });
+    expect(lista.json()).toMatchObject({ elementos: [{ id, profeNombre: "Lore" }] });
+    expect((await servidor.inject({ url: "/alumnos/profes?pagina=0" })).statusCode).toBe(400);
   });
 
   it("editar con una versión vieja responde 409; un documento repetido también", async () => {

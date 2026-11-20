@@ -44,7 +44,10 @@ acuerdo.
 - `pedidoDeAlumnos` (query `?pagina&buscar&bajas=si`), `fichaDeAlumno`, `edicionDeAlumno`,
   `alumno` y `paginaDeAlumnos`, con sus tipos. El celular es opcional; `numeroDeSocio` y
   `fechaDeInicio` y `profeId` también, y si no vienen en la edición se conservan. El alumno trae
-  `numeroDeSocio`, `fechaDeInicio`, `profeId`, `bajaEn` y `pendienteDeCompletar` (0022).
+  `numeroDeSocio`, `fechaDeInicio`, `profeId`, `profeNombre`, `bajaEn` y `pendienteDeCompletar`
+  (0022). El contacto de emergencia (`emergenciaNombre` y `emergenciaTelefono`, 0019) es
+  opcional y, si no viene en la edición, se conserva. `paginaDeProfes` (`{ id, nombre }`): los
+  profes para elegir.
 - `saludDeAlumno` (`{ patologias, version }`, hasta 4000 caracteres) y `saludGuardada`
   (`{ version }`): los datos de salud del alumno, aparte de la ficha (0019), con su tipo.
 - `pedidoDeClases` (query `?pagina&sede`), `fichaDeClase`, `edicionDeClase`, `clase`,

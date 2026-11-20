@@ -45,6 +45,13 @@ export const fichaDeAlumno = z.object({
   fechaDeInicio: opcional(z.iso.date("Revisá la fecha de inicio.")).optional(),
   /** Su profe asignado, un usuario del equipo (0022). Sin él, la edición lo conserva. */
   profeId: z.uuid("Ese profe no existe.").nullable().optional(),
+  /** El contacto de emergencia (0019), con el vínculo en el nombre. Sin él, la edición lo conserva. */
+  emergenciaNombre: opcional(
+    z.string().trim().max(100, "El nombre del contacto de emergencia es muy largo."),
+  ).optional(),
+  emergenciaTelefono: opcional(
+    z.string().trim().max(40, "Revisá el teléfono de emergencia."),
+  ).optional(),
 });
 
 /** La edición lleva la versión que vio quien edita (0013). */
@@ -62,6 +69,10 @@ export const alumno = z.object({
   numeroDeSocio: z.number().int(),
   fechaDeInicio: z.string().nullable(),
   profeId: z.uuid().nullable(),
+  /** El nombre del profe asignado, para mostrarlo sin pedir el equipo. */
+  profeNombre: z.string().nullable(),
+  emergenciaNombre: z.string().nullable(),
+  emergenciaTelefono: z.string().nullable(),
   activo: z.boolean(),
   /** En UTC: cuándo se dio de baja; null si está activo. */
   bajaEn: z.iso.datetime().nullable(),
@@ -71,6 +82,9 @@ export const alumno = z.object({
 });
 
 export const paginaDeAlumnos = paginaDe(alumno);
+
+/** Respuesta de GET /alumnos/profes: los integrantes activos del equipo, para elegir el profe. */
+export const paginaDeProfes = paginaDe(z.object({ id: z.uuid(), nombre: z.string() }));
 
 /** Respuesta de POST /alumnos. */
 export const alumnoCreado = z.object({ id: z.uuid() });
@@ -95,4 +109,5 @@ export type FichaDeAlumno = z.infer<typeof fichaDeAlumno>;
 export type EdicionDeAlumno = z.infer<typeof edicionDeAlumno>;
 export type PaginaDeAlumnos = z.infer<typeof paginaDeAlumnos>;
 export type Alumno = z.infer<typeof alumno>;
+export type PaginaDeProfes = z.infer<typeof paginaDeProfes>;
 export type SaludDeAlumno = z.infer<typeof saludDeAlumno>;

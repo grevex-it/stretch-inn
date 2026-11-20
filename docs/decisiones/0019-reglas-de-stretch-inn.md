@@ -84,6 +84,7 @@ _Reemplazado por 0020: el abono es un paquete de 4 clases, no un período de 4 s
 - **Datos de salud:** los ven los profesores. **La contadora no.** Las patologías y la ficha
   médica necesitan un permiso propio, separado de ver la ficha del alumno.
 - No se pide el email de los alumnos.
+- **Contacto de emergencia:** requisito del cliente (documento de requerimientos, 07/10).
 
 ## Consecuencias
 
