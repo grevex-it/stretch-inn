@@ -2,7 +2,7 @@
 // El profe es un usuario del equipo, leído por la API pública de identidad (regla 4).
 import { obtenerUsuarios } from "@app/identidad";
 import type { Transaccion } from "@app/plataforma";
-import { and, between, count, eq, isNull, lte, sql } from "drizzle-orm";
+import { and, asc, between, count, eq, isNull, lte, sql } from "drizzle-orm";
 import type { RepositorioAgenda } from "../aplicacion/puertos.ts";
 import { clases, ocurrencias, profesDeSede } from "./esquema.ts";
 
@@ -70,7 +70,7 @@ function paraElPago(tx: Transaccion): Pick<RepositorioAgenda, "dictadas" | "nomb
     async dictadas({ sedeId, desde, hasta, ahora }) {
       const profe = sql<string | null>`coalesce(${ocurrencias.profeId}, ${clases.profeId})`;
       return tx
-        .select({ profeId: profe, clases: count() })
+        .select({ fecha: ocurrencias.fecha, profeId: profe, clases: count() })
         .from(ocurrencias)
         .innerJoin(clases, eq(clases.id, ocurrencias.claseId))
         .where(
@@ -81,7 +81,8 @@ function paraElPago(tx: Transaccion): Pick<RepositorioAgenda, "dictadas" | "nomb
             lte(ocurrencias.terminaEn, ahora),
           ),
         )
-        .groupBy(profe);
+        .groupBy(ocurrencias.fecha, profe)
+        .orderBy(asc(ocurrencias.fecha), sql`${profe} nulls last`);
     },
   };
 }

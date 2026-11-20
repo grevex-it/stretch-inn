@@ -3,6 +3,8 @@ import type { ContextoCentro, Resultado } from "@app/nucleo";
 import type { Transaccion } from "@app/plataforma";
 import type { DatosDeClase, ErrorDeClase } from "../dominio/clase.ts";
 import type { ErrorDeCamas } from "../dominio/camas.ts";
+import type { ClasesDictadas } from "./dictadas-tipos.ts";
+import type { RepositorioDeCamas, RepositorioDeProfes } from "./puertos-de-sede.ts";
 import type { ErrorDeInscripcion } from "../dominio/inscripcion.ts";
 
 export interface Pagina {
@@ -44,7 +46,7 @@ export interface FechaDeClase {
 }
 
 /** Corre dentro de enContexto: RLS limita al centro y a las sedes visibles. */
-export interface RepositorioAgenda {
+export interface RepositorioAgenda extends RepositorioDeProfes, RepositorioDeCamas {
   zonaHoraria(): Promise<string>;
   clases(filtro: Pagina & { sedeIds: readonly string[] }): Promise<PaginaDe<Clase>>;
   /** Con `bloquear`, la fila queda tomada hasta el fin de la transacción (`for update`). */
@@ -64,30 +66,6 @@ export interface RepositorioAgenda {
     datos: DatosDeClase,
     profeId?: string | null,
   ): Promise<number | undefined>;
-  /** Si es un usuario activo del centro (identidad). */
-  profeValido(id: string): Promise<boolean>;
-  /** El profe fijo de la sede, o undefined. */
-  profeDeSede(sedeId: string): Promise<string | undefined>;
-  guardarProfeDeSede(sedeId: string, profeId: string | null): Promise<void>;
-  /** Con null, la fecha vuelve a ser del profe de la clase. */
-  fijarProfeDeFecha(id: string, profeId: string | null): Promise<void>;
-  /**
-   * Cuántas fechas de la sede en el período (días, inclusive) ya terminaron y no se cancelaron,
-   * por quién las dio (el reemplazo o el profe de la clase; null si ninguno).
-   */
-  dictadas(filtro: {
-    sedeId: string;
-    desde: string;
-    hasta: string;
-    ahora: Date;
-  }): Promise<{ profeId: string | null; clases: number }[]>;
-  /** El nombre de cada profe (identidad, hasta 100). */
-  nombresDeProfes(ids: readonly string[]): Promise<Map<string, string>>;
-  /**
-   * Las fechas que ya empezaron y no tenían profe propio quedan con ese (el que tenía la clase):
-   * cambiar el profe de la clase no cambia quién dio las pasadas.
-   */
-  congelarProfe(claseId: string, profeId: string | null, ahora: Date): Promise<void>;
   fijarActiva(id: string, activa: boolean): Promise<void>;
   /** Las que falten; las que ya están no se tocan (sin efecto doble). */
   guardarFechas(
@@ -116,25 +94,6 @@ export interface RepositorioAgenda {
     claseIds: readonly string[],
     ahora: Date,
   ): Promise<{ claseId: string; fecha: string; deMas: number } | undefined>;
-  /** Las camas de la sede, o undefined si no tiene tope. */
-  camas(sedeId: string): Promise<number | undefined>;
-  /** Los cambios de camas de una sede van de a uno hasta el fin de la transacción. */
-  bloquearCamas(sedeId: string): Promise<void>;
-  /**
-   * Para leer las camas sin que cambien hasta el fin de la transacción: espera a un cambio en
-   * curso, pero no a otras lecturas. Va antes de tomar cualquier clase de la sede.
-   */
-  compartirCamas(sedeId: string): Promise<void>;
-  /** Con null, la sede queda sin tope. */
-  guardarCamas(sedeId: string, camas: number | null): Promise<void>;
-  /** Las clases de la sede con más cupo que esas camas, tomadas con `for update`. */
-  clasesPorEncimaDe(
-    sedeId: string,
-    camas: number,
-  ): Promise<{ id: string; nombre: string; inscriptos: number }[]>;
-  bajarCupos(ids: readonly string[], camas: number): Promise<void>;
-  /** Las clases de la sede con menos cupo pasan a esas camas, en una sola escritura. */
-  subirCupos(sedeId: string, camas: number): Promise<void>;
 }
 
 /**
@@ -168,13 +127,6 @@ export type EdicionDeClase = DatosDeClase & {
   version: number;
   profeId?: string | null | undefined;
 };
-
-/** Las clases dictadas por cada profe en un período (0022), y las de clases sin profe. */
-export interface ClasesDictadas {
-  /** Por profe: el que más clases dio primero y, si empatan, por nombre. */
-  profes: { profeId: string; nombre: string; clases: number }[];
-  sinProfe: number;
-}
 
 /** Lo que exporta el módulo: cada operación corre en su transacción con el contexto. */
 export interface Agenda {
