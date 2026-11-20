@@ -2,10 +2,10 @@
 // Cuenta las fechas que ya terminaron y no se cancelaron, con su reemplazo si lo tuvieron, y arma
 // las que falten. Sobre Postgres real, con RLS.
 import type { ContextoCentro } from "@app/nucleo";
-import { crearBase, type Base } from "@app/plataforma";
+import { crearBase, enContexto, type Base } from "@app/plataforma";
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, inject, it } from "vitest";
-import { crearAgenda, type Agenda } from "../src/index.ts";
+import { crearAgenda, dictadasPorDia, type Agenda } from "../src/index.ts";
 import { centroConDosSedes, comoDueno, lunesDe, STRETCHING, TODO } from "./ayudas.ts";
 
 let base: Base;
@@ -112,5 +112,38 @@ describe("clasesDictadas", () => {
       hasta: diaMas(desde, 62),
     });
     expect(!largo.ok && largo.error.codigo).toBe("periodo-invalido");
+  });
+});
+
+describe("dictadasPorDia (para profesores, 0024)", () => {
+  it("cada día con quién dio sus clases: para pagar cada una con la tarifa de ese día", async () => {
+    const { ctx, norte, lore, lucia, desde, hasta } = await escenario();
+    const primero = await lunes(ctx, norte, desde);
+    await agenda.fijarProfeDeFecha(ctx, { id: primero.id, profeId: lucia });
+    const tercero = await lunes(ctx, norte, diaMas(desde, 14));
+    await agenda.fijarCancelada(ctx, { id: tercero.id, cancelada: true });
+    const ahora = new Date(Date.now() + 35 * DIA);
+
+    const porDia = await enContexto(base, ctx, (tx) =>
+      dictadasPorDia(tx, { sedeId: norte, desde, hasta, ahora }),
+    );
+
+    expect(porDia).toEqual([
+      { fecha: desde, profeId: lucia, clases: 1 },
+      { fecha: diaMas(desde, 2), profeId: null, clases: 1 },
+      { fecha: diaMas(desde, 7), profeId: lore, clases: 1 },
+      { fecha: diaMas(desde, 9), profeId: null, clases: 1 },
+      { fecha: diaMas(desde, 16), profeId: null, clases: 1 },
+    ]);
+  });
+
+  it("un período de más de 62 días falla", async () => {
+    const { ctx, norte, desde } = await escenario();
+
+    await expect(
+      enContexto(base, ctx, (tx) =>
+        dictadasPorDia(tx, { sedeId: norte, desde, hasta: diaMas(desde, 62), ahora: new Date() }),
+      ),
+    ).rejects.toThrow("62 días");
   });
 });

@@ -74,7 +74,7 @@ cancelación de una fecha. Las inscripciones fijas de alumnos en cada clase, con
 - `PERMISOS_AGENDA`: la sección «Agenda» del catálogo (`agenda.ver`, `agenda.gestionar`,
   `agenda.inscribir`).
 
-Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContexto`:
+Para otros módulos (asistencia, abonos y profesores). Reciben la `Transaccion` de `enContexto`:
 
 - `obtenerFecha(tx, id)`: una fecha con su clase (`claseId`, `sedeId`, `nombre`, `cupo`,
   `fecha`, `empiezaEn`, `terminaEn`, `cancelada`), o undefined.
@@ -87,6 +87,11 @@ Para otros módulos (asistencia y abonos). Reciben la `Transaccion` de `enContex
   `empiezaEn`, `terminaEn`). No cuentan las canceladas ni las de clases en las que no estaba
   inscripto en ese momento. Arma a pedido las fechas que falten, como `semana`. Para abonos:
   cada una gasta una clase del abono (0020).
+- `dictadasPorDia(tx, { sedeId, desde, hasta, ahora })`: para liquidar a los profes (0024), las
+  clases dictadas de la sede por día y por profe (`{ fecha, profeId, clases }`, `profeId` null si
+  la clase no tiene), en orden de fecha: las que ya terminaron y no se cancelaron, con su
+  reemplazo. Arma antes las fechas que falten, como `clasesDictadas`. No controla permisos (los
+  controla quien la llama) y falla con un período de más de 62 días.
 - `liberarLugares(tx, { alumnoId, ahora })`: la baja del alumno (0019). Da de baja sus
   inscripciones vigentes con fecha `ahora`, descuenta cada lugar de su clase y devuelve cuántas
   liberó; repetirla no tiene efecto doble. Escribe en las tablas de agenda, desde agenda: la
