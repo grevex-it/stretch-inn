@@ -1,6 +1,8 @@
-# Antes de subir se corre el mismo control que el CI (ver docs/decisiones/0006).
-# Se puede saltear con `git push --no-verify`, pero el CI lo vuelve a correr.
+# Antes de subir se corre la parte liviana de `pnpm check` (ver docs/decisiones/0006).
+# Tests y código muerto (knip) quedan para el CI: en algunas máquinas se quedan sin memoria.
+# Se puede saltear con `git push --no-verify`, pero el CI corre `pnpm check` completo.
+# Si cambia `check` en package.json, revisar esta línea.
 pre-push:
   commands:
     check:
-      run: pnpm check
+      run: pnpm formato && pnpm lint && pnpm tipos && pnpm tamanos && pnpm agentes && pnpm arquitectura

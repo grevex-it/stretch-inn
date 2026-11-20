@@ -15,7 +15,7 @@ Somos dos. Uno se encarga de la estructura (repo limpio, funciones generales, pl
 - `nucleo`, `contratos` y la API pública de `plataforma` los usan todos: cambiarlos afecta a todo el sistema.
 - En los `AGENTS.md` no figuran nombres de personas: solo los frentes y la regla de frontera.
 - **Sin aprobaciones obligatorias ni reglas que bloqueen en GitHub.** El CI corre en cada PR y en cada push a `main` y avisa; mergear queda a criterio de cada uno. Plan gratuito de GitHub.
-- Hook `pre-push` con `pnpm check` para ver los problemas antes de subir (se puede saltear).
+- Hook `pre-push` con la parte liviana de `pnpm check` (formato, lint, tipos, tamaños, instrucciones y arquitectura) para ver los problemas antes de subir (se puede saltear). Tests y código muerto quedan para el CI, que corre `pnpm check` completo: en algunas máquinas se quedan sin memoria.
 
 ## Consecuencias
 

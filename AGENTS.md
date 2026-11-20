@@ -81,6 +81,11 @@ Las carpetas que todavía no existen se crean a medida que se construyen.
 tipos estrictos, código muerto y que cada `AGENTS.md` esté completo. No hace falta
 verificarlos a mano. Cuando se sume un comando, agregalo acá.
 
+El hook `pre-push` (lefthook) corre solo la parte liviana: formato, lint, tipos, tamaños,
+instrucciones y arquitectura. Tests y código muerto (knip) quedan para el CI, que corre
+`pnpm check` completo, porque en algunas máquinas se quedan sin memoria. El hook no
+reemplaza a `pnpm check`: antes de dar algo por terminado, corrélo igual.
+
 ## Estructura y negocio
 
 El repo se trabaja en dos frentes separados:
