@@ -21,6 +21,7 @@
     "@app/nucleo": "workspace:*",
     "@app/personas": "workspace:*",
     "@app/plataforma": "workspace:*",
+    "@app/profesores": "workspace:*",
     "fastify": "^5.12.7"
   },
   "devDependencies": {

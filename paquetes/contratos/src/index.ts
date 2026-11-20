@@ -164,3 +164,16 @@ export {
   type PaginaDeGastos,
   type PedidoDeGasto,
 } from "./gastos.ts";
+export {
+  paginaDeProfesConTipo,
+  paginaDeTarifas,
+  pedidoDeTarifa,
+  pedidoDeTarifas,
+  pedidoDeTipoDeProfe,
+  tarifa,
+  TIPOS_DE_PROFE,
+  type PaginaDeProfesConTipo,
+  type PaginaDeTarifas,
+  type PedidoDeTarifa,
+  type Tarifa,
+} from "./profesores.ts";

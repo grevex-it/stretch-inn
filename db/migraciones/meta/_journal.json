@@ -358,6 +358,20 @@
       "when": 1795128919559,
       "tag": "20261119225519_personas-contacto-de-emergencia",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1795178827128,
+      "tag": "20261120124707_profesores-tarifas",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1795178828729,
+      "tag": "20261120124708_rls-profesores-tarifas",
+      "breakpoints": true
     }
   ]
 }
