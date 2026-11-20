@@ -1,4 +1,4 @@
 .formulario {
   display: grid;
-  gap: 16px;
+  gap: var(--si-espacio-4);
 }

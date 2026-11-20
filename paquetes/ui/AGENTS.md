@@ -28,8 +28,13 @@ identidad visual, los logos y, más adelante, los componentes compartidos. Ver
 
 ## Reglas de uso
 
-- **Nada de valores escritos a mano** en los CSS Modules: colores, radios, sombras y fuente se
-  usan siempre como `var(--si-…)`. Si falta un valor, se agrega acá; no se inventa en la pantalla.
+- **Nada de valores escritos a mano** en los CSS Modules: colores, radios, sombras, fuente,
+  tamaños de letra y espacios se usan siempre como `var(--si-…)`. Si falta un valor, se agrega
+  acá; no se inventa en la pantalla. Quedan fuera los bordes de 1px y el foco de 2px.
+- Espacios (`gap`, `padding`, `margin`): la escala `--si-espacio-1` a `-8`, de 4 en 4 (4, 8, 12,
+  16, 20, 24 y 32px). Un valor intermedio se redondea al paso más cercano.
+- Tamaños de letra: `--si-letra-chica`, `-normal` (1rem, la del documento), `-media`, `-grande`
+  y `-titulo` (el título de cada pantalla).
 - Texto sobre fondos crema: `--si-texto`, `--si-texto-medio` o `--si-texto-suave`. Nunca más claro.
 - Texto sobre oliva: `--si-texto-sobre-oliva`.
 - Bordes de inputs y controles: `--si-borde-control` (llega a 3:1). `--si-borde` es solo para

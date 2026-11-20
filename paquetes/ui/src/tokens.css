@@ -48,6 +48,20 @@
   --si-peso-liviano: 300;
   --si-peso-normal: 400;
   --si-peso-medio: 500;
+  --si-letra-chica: 0.875rem;
+  --si-letra-normal: 1rem;
+  --si-letra-media: 1.125rem;
+  --si-letra-grande: 1.25rem;
+  --si-letra-titulo: 1.5rem;
+
+  /* Espacios: de 4 en 4, para gap, padding y margin */
+  --si-espacio-1: 4px;
+  --si-espacio-2: 8px;
+  --si-espacio-3: 12px;
+  --si-espacio-4: 16px;
+  --si-espacio-5: 20px;
+  --si-espacio-6: 24px;
+  --si-espacio-8: 32px;
 
   /* Forma */
   --si-radio-sm: 10px;

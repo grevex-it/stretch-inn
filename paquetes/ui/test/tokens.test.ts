@@ -36,6 +36,44 @@ describe("tokens", () => {
   });
 });
 
+describe("escalas", () => {
+  const espacios: [Token, number][] = [
+    ["si-espacio-1", 4],
+    ["si-espacio-2", 8],
+    ["si-espacio-3", 12],
+    ["si-espacio-4", 16],
+    ["si-espacio-5", 20],
+    ["si-espacio-6", 24],
+    ["si-espacio-8", 32],
+  ];
+
+  it.each(espacios)("%s mide %ipx: la escala va de 4 en 4", (token, px) => {
+    expect(tokens[token]).toBe(`${px}px`);
+  });
+
+  const letras: Token[] = [
+    "si-letra-chica",
+    "si-letra-normal",
+    "si-letra-media",
+    "si-letra-grande",
+    "si-letra-titulo",
+  ];
+
+  it("los tamaños de letra van en rem y crecen de chica a título", () => {
+    const valores = letras.map((token) => {
+      const valor = tokens[token];
+      expect(valor).toMatch(/^[0-9.]+rem$/);
+      return parseFloat(valor);
+    });
+    expect(valores).toEqual([...valores].sort((a, b) => a - b));
+    expect(new Set(valores).size).toBe(valores.length);
+  });
+
+  it("el texto normal es el del documento: 1rem", () => {
+    expect(tokens["si-letra-normal"]).toBe("1rem");
+  });
+});
+
 describe("contraste (WCAG AA)", () => {
   const textoNormal: [Token, Token][] = [
     ["si-texto", "si-crema-50"],
