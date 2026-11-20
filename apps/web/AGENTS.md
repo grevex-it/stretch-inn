@@ -8,6 +8,8 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
 
 - `src/base/`: sesión, cliente de la API, ruteo, estructura de pantalla y controles comunes. Es
   estructura (0006): no se cambia de paso desde una tarea de negocio.
+  - `fuente.ts`: carga Jost (pesos 300, 400 y 500) con `@fontsource/jost`, alojada con el
+    panel: sirve sin conexión y sin Google Fonts. `--si-fuente` la toma.
   - `api.ts`: el único lugar que hace `fetch`. `consultar(ruta, esquema)` valida la respuesta
     con el contrato; `enviar(metodo, ruta, cuerpo)` para los cambios, y
     `enviarYLeer(metodo, ruta, esquema, cuerpo)` cuando hace falta la respuesta.
@@ -97,6 +99,5 @@ textos, no detalles internos.
 
 ## Pendientes
 
-- Cargar Jost (ver `paquetes/ui/AGENTS.md`); hasta entonces se ve la fuente del sistema.
 - En producción, servir el panel y la API bajo el mismo dominio propio (`docs/pendientes.md`).
 - Flujos críticos con Playwright (0004) cuando haya pantallas de negocio.

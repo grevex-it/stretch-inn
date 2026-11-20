@@ -3,6 +3,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Aplicacion } from "./base/Aplicacion.tsx";
 import { crearClienteDeConsultas } from "./base/consultas.ts";
+import "./base/fuente.ts";
 import "./base/estilos.css";
 
 const raiz = document.getElementById("raiz");
