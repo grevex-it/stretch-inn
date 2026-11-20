@@ -39,6 +39,6 @@ El código lo escriben agentes. Gana el stack donde las reglas se pueden **verif
 | Estructura de módulos                                       | Generador `pnpm nuevo-modulo`                          |
 | Aislamiento entre centros y sedes                           | Test de RLS (ver 0002)                                 |
 | Rutas sin permiso declarado                                 | Test que falla si una ruta no exige permiso (ver 0007) |
-| Antes de subir                                              | Hook `pre-push` con `pnpm check` (lefthook)            |
+| Antes de subir                                              | Hook `pre-push` sin tests ni knip (lefthook, ver 0006) |
 
 Ningún control es obligatorio en GitHub (ver 0006): el CI corre y avisa, pero no bloquea el merge.
