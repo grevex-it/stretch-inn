@@ -11,7 +11,7 @@
   color: var(--si-texto);
 }
 
-/* Cada plan: nombre, sus desplegables y el detalle, con aire parejo entre ellos. */
+/* Cada plan: el nombre, debajo el dato y, al final, las acciones. */
 .plan {
   display: grid;
   gap: var(--si-espacio-3);
@@ -26,4 +26,17 @@
 .detalle {
   margin: 0;
   color: var(--si-texto-medio);
+}
+
+/* «Editar plan» y «Generar cuota» en la misma fila. El que se abre ocupa todo el ancho, para
+   que su formulario no quede apretado al lado del otro. */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--si-espacio-3);
+  align-items: start;
+}
+
+.acciones > details[open] {
+  flex-basis: 100%;
 }
