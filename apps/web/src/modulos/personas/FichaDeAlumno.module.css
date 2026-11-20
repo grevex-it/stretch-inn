@@ -1,8 +1,8 @@
 .ficha {
   display: grid;
-  gap: 16px;
+  gap: var(--si-espacio-4);
   max-width: 720px;
-  padding: 20px;
+  padding: var(--si-espacio-5);
   background: var(--si-superficie);
   border: 1px solid var(--si-borde);
   border-radius: var(--si-radio-md);
@@ -10,7 +10,7 @@
 
 .titulo {
   margin: 0;
-  font-size: 1.125rem;
+  font-size: var(--si-letra-grande);
   font-weight: var(--si-peso-medio);
   color: var(--si-texto);
 }
@@ -18,5 +18,5 @@
 .acciones {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--si-espacio-3);
 }

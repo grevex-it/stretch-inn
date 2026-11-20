@@ -28,12 +28,12 @@ export function Buscador({ conBajas, alBuscar, alCambiarBajas }: Props) {
             valor={texto}
             alCambiar={setTexto}
             autoComplete="off"
-            ayuda="Nombre, apellido, documento o teléfono."
           />
           <Boton tipo="submit" variante="secundario">
             Buscar
           </Boton>
         </div>
+        <p className={estilos.ayuda}>Nombre, apellido, documento o teléfono.</p>
       </Formulario>
       <label className={estilos.bajas}>
         <input

@@ -1,6 +1,6 @@
 .campo {
   display: grid;
-  gap: 6px;
+  gap: var(--si-espacio-2);
 }
 
 .etiqueta {
@@ -11,7 +11,7 @@
 /* Mismo aspecto que los campos de texto (controles/Campo). */
 .lista {
   min-height: var(--si-alto-control);
-  padding: 0 14px;
+  padding: 0 var(--si-espacio-4);
   font: inherit;
   color: var(--si-texto);
   background: var(--si-superficie);

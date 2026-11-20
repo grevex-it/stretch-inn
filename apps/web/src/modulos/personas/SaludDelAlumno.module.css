@@ -1,20 +1,31 @@
 .salud {
   display: grid;
-  gap: 12px;
-  padding-top: 16px;
+  gap: var(--si-espacio-3);
+  padding-top: var(--si-espacio-4);
   border-top: 1px solid var(--si-borde);
 }
 
 .titulo {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--si-letra-media);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Etiqueta arriba del campo, como en controles/Campo. */
+.campo {
+  display: grid;
+  gap: var(--si-espacio-2);
+}
+
+.etiqueta {
   font-weight: var(--si-peso-medio);
   color: var(--si-texto);
 }
 
 /* Mismo aspecto que los campos de texto (controles/Campo). */
 .patologias {
-  padding: 10px 14px;
+  padding: var(--si-espacio-3) var(--si-espacio-4);
   font: inherit;
   color: var(--si-texto);
   background: var(--si-superficie);
@@ -31,15 +42,15 @@
 /* Lo que se había escrito antes del aviso de cambio: aparte, para copiarlo. */
 .escrito {
   display: grid;
-  gap: 6px;
-  padding: 10px 14px;
+  gap: var(--si-espacio-2);
+  padding: var(--si-espacio-3) var(--si-espacio-4);
   border: 1px dashed var(--si-borde-control);
   border-radius: var(--si-radio-sm);
 }
 
 .subtitulo {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--si-letra-normal);
   font-weight: var(--si-peso-medio);
   color: var(--si-texto);
 }

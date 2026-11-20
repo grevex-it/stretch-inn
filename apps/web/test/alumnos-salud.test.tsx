@@ -42,15 +42,14 @@ async function abrirAna(boton: "Editar" | "Ver") {
   return usuario;
 }
 
-const patologias = () =>
-  screen.getByRole<HTMLTextAreaElement>("textbox", { name: "Antecedentes y patologías" });
+const patologias = () => screen.getByLabelText<HTMLTextAreaElement>("Antecedentes y patologías");
 
 describe("antecedentes y patologías", () => {
   it("sin personas.ver-salud no aparecen ni se piden", async () => {
     const servidor = conSalud(EDITA);
     await abrirAna("Editar");
     await screen.findByRole("heading", { name: "Editar a Ana Pérez" });
-    expect(screen.queryByRole("heading", { name: "Antecedentes y patologías" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Salud" })).toBeNull();
     expect(servidor.pedidos.some((p) => p.clave === `GET ${RUTA}`)).toBe(false);
   });
 
@@ -61,6 +60,9 @@ describe("antecedentes y patologías", () => {
       expect(patologias().value).toBe("Escoliosis.");
     });
     expect(patologias().disabled).toBe(true);
+    // Etiqueta visible arriba del campo, como el resto de la ficha (0018).
+    expect(screen.getByText("Antecedentes y patologías", { selector: "label" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "Salud" })).toBeDefined();
     expect(screen.queryByRole("button", { name: "Guardar antecedentes" })).toBeNull();
   });
 

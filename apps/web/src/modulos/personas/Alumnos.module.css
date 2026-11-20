@@ -1,19 +1,19 @@
 .alumnos {
   display: grid;
-  gap: 16px;
+  gap: var(--si-espacio-4);
 }
 
 .encabezado {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--si-espacio-3);
   align-items: center;
   justify-content: space-between;
 }
 
 .titulo {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--si-letra-titulo);
   font-weight: var(--si-peso-medio);
   color: var(--si-texto);
 }

@@ -14,30 +14,35 @@ import estilos from "./SaludDelAlumno.module.css";
 
 interface PropsDeFormulario {
   salud: SaludDeAlumno;
-  titulo: string;
   edita: boolean;
   enviando: boolean;
   alGuardar: (salud: SaludDeAlumno) => void;
 }
 
-function FormularioDeSalud({ salud, titulo, edita, enviando, alGuardar }: PropsDeFormulario) {
+function FormularioDeSalud({ salud, edita, enviando, alGuardar }: PropsDeFormulario) {
   const [patologias, setPatologias] = useState(salud.patologias);
+  const id = useId();
   return (
     <Formulario
       alEnviar={() => {
         if (edita) alGuardar({ patologias, version: salud.version });
       }}
     >
-      <textarea
-        aria-labelledby={titulo}
-        className={estilos.patologias}
-        value={patologias}
-        rows={4}
-        disabled={!edita}
-        onChange={(evento) => {
-          setPatologias(evento.target.value);
-        }}
-      />
+      <div className={estilos.campo}>
+        <label htmlFor={id} className={estilos.etiqueta}>
+          Antecedentes y patologías
+        </label>
+        <textarea
+          id={id}
+          className={estilos.patologias}
+          value={patologias}
+          rows={4}
+          disabled={!edita}
+          onChange={(evento) => {
+            setPatologias(evento.target.value);
+          }}
+        />
+      </div>
       {edita && (
         <div>
           <Boton tipo="submit" variante="secundario" deshabilitado={enviando}>
@@ -80,7 +85,7 @@ function useGuardarSinPerder(alumnoId: string) {
   return { guardar, escrito, mutar };
 }
 
-function Contenido({ alumnoId, titulo }: { alumnoId: string; titulo: string }) {
+function Contenido({ alumnoId }: { alumnoId: string }) {
   const edita = usePermiso("personas.editar-salud");
   const salud = useSalud(alumnoId, true);
   const { guardar, escrito, mutar } = useGuardarSinPerder(alumnoId);
@@ -91,7 +96,6 @@ function Contenido({ alumnoId, titulo }: { alumnoId: string; titulo: string }) {
         <FormularioDeSalud
           key={salud.data.version}
           salud={salud.data}
-          titulo={titulo}
           edita={edita}
           enviando={guardar.isPending}
           alGuardar={mutar}
@@ -111,9 +115,9 @@ export function SaludDelAlumno({ alumnoId }: { alumnoId: string }) {
   return (
     <section className={estilos.salud} aria-labelledby={titulo}>
       <h3 id={titulo} className={estilos.titulo}>
-        Antecedentes y patologías
+        Salud
       </h3>
-      <Contenido alumnoId={alumnoId} titulo={titulo} />
+      <Contenido alumnoId={alumnoId} />
     </section>
   );
 }
