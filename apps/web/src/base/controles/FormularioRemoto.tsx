@@ -51,9 +51,23 @@ export function FormularioDesplegable({
   children?: ReactNode;
 }) {
   return (
-    <details>
-      <summary>{titulo}</summary>
-      {children}
+    <details className={estilos.desplegable}>
+      <summary className={estilos.resumen}>
+        {titulo}
+        <svg
+          className={estilos.icono}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </summary>
+      <div className={estilos.contenido}>{children}</div>
     </details>
   );
 }
