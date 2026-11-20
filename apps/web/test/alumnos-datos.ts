@@ -48,7 +48,7 @@ export async function abrirAlumnos(usuario: UserEvent) {
 }
 
 export const LORE = "9b0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f69";
-export const PABLO = "ab0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f6a";
+const PABLO = "ab0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f6a";
 /** GET /alumnos/profes: los integrantes activos del equipo. */
 export const PROFES = pagina([
   { id: LORE, nombre: "Lore" },
