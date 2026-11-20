@@ -46,3 +46,13 @@ export async function abrirAlumnos(usuario: UserEvent) {
   await usuario.click(await screen.findByRole("link", { name: "Alumnos" }));
   await screen.findByRole("heading", { level: 1, name: "Alumnos" });
 }
+
+export const LORE = "9b0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f69";
+const PABLO = "ab0f3a3e-6a8f-4f58-9a43-1b2c3d4e5f6a";
+/** GET /alumnos/profes: los integrantes activos del equipo. */
+export const PROFES = pagina([
+  { id: LORE, nombre: "Lore" },
+  { id: PABLO, nombre: "Pablo" },
+]);
+export const SALUD = ["personas.ver-salud"];
+export const EDITA_SALUD = ["personas.ver-salud", "personas.editar-salud"];

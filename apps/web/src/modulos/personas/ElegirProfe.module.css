@@ -1,0 +1,25 @@
+.campo {
+  display: grid;
+  gap: 6px;
+}
+
+.etiqueta {
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Mismo aspecto que los campos de texto (controles/Campo). */
+.lista {
+  min-height: var(--si-alto-control);
+  padding: 0 14px;
+  font: inherit;
+  color: var(--si-texto);
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-sm);
+}
+
+.lista:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}

@@ -15,49 +15,6 @@
   color: var(--si-texto);
 }
 
-/* Agrupa los datos para deshabilitarlos juntos en solo lectura: sin marco propio. */
-.datos {
-  display: grid;
-  gap: 16px;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-/* Dos columnas en pantallas anchas, una en el celular. */
-.columnas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-}
-
-.campo {
-  display: grid;
-  gap: 6px;
-}
-
-.etiqueta {
-  font-weight: var(--si-peso-medio);
-  color: var(--si-texto);
-}
-
-/* Mismo aspecto que los campos de texto (controles/Campo). */
-.notas {
-  padding: 10px 14px;
-  font: inherit;
-  color: var(--si-texto);
-  background: var(--si-superficie);
-  border: 1px solid var(--si-borde-control);
-  border-radius: var(--si-radio-sm);
-  resize: vertical;
-}
-
-.notas:focus-visible {
-  outline: 2px solid var(--si-foco);
-  outline-offset: 2px;
-}
-
 .acciones {
   display: flex;
   flex-wrap: wrap;

@@ -39,8 +39,11 @@ async function completarAlta(usuario: UserEvent) {
 }
 
 describe("sumar alumno", () => {
-  it("con lo obligatorio alcanza: lo opcional viaja vacío y la lista se actualiza", async () => {
-    const servidor = conAlumnos({ "POST /api/alumnos": { estado: 201, cuerpo: { id: ANA } } });
+  it("con lo obligatorio alcanza: lo opcional viaja vacío y queda abierta su ficha", async () => {
+    const servidor = conAlumnos({
+      "POST /api/alumnos": { estado: 201, cuerpo: { id: ANA } },
+      [`GET /api/alumnos/${ANA}`]: { estado: 200, cuerpo: alumno(ANA, "Caro", "Gómez") },
+    });
     const usuario = montarPanel();
     await abrirAlumnos(usuario);
     await completarAlta(usuario);
@@ -53,8 +56,13 @@ describe("sumar alumno", () => {
       documento: "",
       email: "",
       fechaNacimiento: "",
+      fechaDeInicio: "",
+      profeId: null,
+      emergenciaNombre: "",
+      emergenciaTelefono: "",
       notas: "",
     });
+    expect(await screen.findByRole("heading", { name: "Editar a Caro Gómez" })).toBeDefined();
     expect(screen.queryByRole("heading", { name: "Sumar alumno" })).toBeNull();
     expect(servidor.pedidos.filter((p) => p.clave === "GET /api/alumnos?pagina=1")).toHaveLength(2);
   });
