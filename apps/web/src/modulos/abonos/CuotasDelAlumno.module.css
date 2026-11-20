@@ -1,0 +1,14 @@
+.cuotas {
+  display: grid;
+  gap: var(--si-espacio-3);
+  padding-top: var(--si-espacio-4);
+  border-top: 1px solid var(--si-borde);
+}
+
+/* Mismo tamaño que «Salud» en la ficha del alumno. */
+.titulo {
+  margin: 0;
+  font-size: var(--si-letra-media);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
