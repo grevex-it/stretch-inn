@@ -11,18 +11,22 @@ export function FormularioRemoto({
   cuerpo,
   children,
   etiqueta = "Guardar",
+  alGuardar,
 }: {
   ruta: string;
   metodo: "POST" | "PUT" | "DELETE";
   cuerpo: (datos: FormData) => unknown;
   children?: ReactNode;
   etiqueta?: string;
+  /** Después de guardar bien y de volver a consultar los datos. */
+  alGuardar?: () => void;
 }) {
   const cliente = useQueryClient();
   const guardar = useMutation({
     mutationFn: (datos: FormData) => enviar(metodo, ruta, cuerpo(datos)),
     onSuccess: async () => {
       await cliente.invalidateQueries();
+      alGuardar?.();
     },
   });
   return (

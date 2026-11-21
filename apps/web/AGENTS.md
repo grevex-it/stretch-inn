@@ -23,7 +23,11 @@ El panel del centro: React + TypeScript + Vite + TanStack Router y Query (ver
   - `controles/`: campo (obligatorio salvo `opcional`), botón, aviso, formulario y paginación;
     `ListaRemota` y `FormularioRemoto` para listas y formularios contra la API, y
     `BuscarAlumno` para elegir un alumno (un `Campo` de búsqueda y cada resultado como una fila
-    que se toca entera). `FormularioDesplegable` es el único desplegable del
+    que se toca entera). `AccionDeAlumno` busca un alumno y confirma una acción con él (inscribir,
+    reservar una recuperación): al confirmar bien vuelve a empezar, sin búsqueda ni alumno
+    elegido, y avisa «Listo: <nombre>.»; si la API lo rechaza, queda como estaba, con el motivo.
+    `FormularioRemoto` acepta `alGuardar`, que corre después de guardar bien y de volver a
+    consultar los datos. `FormularioDesplegable` es el único desplegable del
     panel: título de 48px con el aspecto del botón secundario y el contenido en una tarjeta crema que
     ocupa el ancho disponible.
 - `src/modulos/<modulo>/`: pantallas de cada módulo. Una carpeta por módulo, como en el backend.
