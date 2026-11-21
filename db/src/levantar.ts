@@ -2,21 +2,20 @@
 // Uso: pnpm db:levantar (queda corriendo; Ctrl+C lo detiene). Los datos quedan en db/.datos/.
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import EmbeddedPostgres from "embedded-postgres";
 import pg from "pg";
+import { PostgresLocal } from "./postgres-local.ts";
 
 const POR_DEFECTO = "postgres://postgres:clave@localhost:5432/stretch_inn";
 const url = new URL(process.env["DATABASE_URL_MIGRACIONES"] ?? POR_DEFECTO);
 const baseDeDatos = url.pathname.slice(1);
 const carpetaDatos = join(import.meta.dirname, "..", ".datos");
 
-const postgres = new EmbeddedPostgres({
+const postgres = new PostgresLocal({
   databaseDir: carpetaDatos,
   user: decodeURIComponent(url.username),
   password: decodeURIComponent(url.password),
   port: Number(url.port || 5432),
   persistent: true,
-  onLog: () => undefined,
 });
 
 async function crearBaseSiFalta(): Promise<void> {
@@ -36,11 +35,11 @@ if (!existsSync(carpetaDatos)) {
 try {
   await postgres.start();
 } catch (error) {
+  console.error(error instanceof Error ? error.message : error);
   console.error(
-    `No se pudo arrancar Postgres en el puerto ${url.port || 5432}. ¿Quedó otro corriendo?\n` +
+    `\nSi el puerto ${url.port || 5432} está ocupado, quizás quedó otro Postgres corriendo.\n` +
       "En Windows: taskkill /IM postgres.exe /F (cierra los Postgres de este usuario).",
   );
-  console.error(error);
   process.exit(1);
 }
 await crearBaseSiFalta();
