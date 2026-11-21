@@ -1,0 +1,31 @@
+/* Los selectores llevan la etiqueta para ganarle a los estilos comunes de FormularioRemoto. */
+
+/* Los campos numéricos crecían a 51px con la letra de la pantalla: van de 48px, como el resto. */
+label > input.numero {
+  height: var(--si-alto-control);
+}
+
+/* «Puede recuperar sin abono vigente»: la casilla chica al lado del texto y toda la fila (48px)
+   es la etiqueta, que se puede tocar, a la altura de los campos, como «Mostrar también los de baja» en Alumnos. */
+fieldset > label.sinAbono {
+  display: flex;
+  gap: var(--si-espacio-3);
+  align-self: end;
+  align-items: center;
+  min-height: var(--si-alto-control);
+  color: var(--si-texto);
+}
+
+label.sinAbono > input.casilla {
+  width: var(--si-espacio-5);
+  height: var(--si-espacio-5);
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--si-oliva-700);
+}
+
+label.sinAbono > input.casilla:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}

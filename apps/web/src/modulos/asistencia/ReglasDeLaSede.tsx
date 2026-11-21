@@ -6,6 +6,7 @@ import { consultar } from "../../base/api.ts";
 import { Aviso, mensajeDe } from "../../base/controles/Aviso.tsx";
 import { FormularioDesplegable, FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
 import { usePermiso } from "../../base/sesion.ts";
+import estilos from "./ReglasDeLaSede.module.css";
 
 export function ReglasDeLaSede({ sede }: { sede: string }) {
   const configurar = usePermiso("asistencia.configurar");
@@ -42,32 +43,45 @@ function Formulario({ ruta, reglas }: { ruta: string; reglas: ReglasDeRecuperaci
         })
       }
     >
-      <label>
-        Anticipación para anotarse a recuperar (minutos antes de la clase)
+      <Numero
+        etiqueta="Anticipación para anotarse a recuperar (minutos antes de la clase)"
+        nombre="anticipacion"
+        maximo={10_080}
+        valor={reglas.anticipacionMinutos}
+      />
+      <Numero
+        etiqueta="Máximo de recuperaciones por abono"
+        nombre="maximo"
+        maximo={100}
+        valor={reglas.maximoPorAbono}
+      />
+      <label className={estilos.sinAbono}>
         <input
-          name="anticipacion"
-          type="number"
-          min={0}
-          max={10_080}
-          required
-          defaultValue={reglas.anticipacionMinutos}
+          className={estilos.casilla}
+          name="sinAbono"
+          type="checkbox"
+          value="si"
+          defaultChecked={reglas.sinAbono}
         />
-      </label>
-      <label>
-        Máximo de recuperaciones por abono
-        <input
-          name="maximo"
-          type="number"
-          min={0}
-          max={100}
-          required
-          defaultValue={reglas.maximoPorAbono}
-        />
-      </label>
-      <label>
-        <input name="sinAbono" type="checkbox" value="si" defaultChecked={reglas.sinAbono} />
         Puede recuperar sin abono vigente
       </label>
     </FormularioRemoto>
+  );
+}
+
+function Numero(props: { etiqueta: string; nombre: string; maximo: number; valor: number }) {
+  return (
+    <label>
+      {props.etiqueta}
+      <input
+        className={estilos.numero}
+        name={props.nombre}
+        type="number"
+        min={0}
+        max={props.maximo}
+        required
+        defaultValue={props.valor}
+      />
+    </label>
   );
 }

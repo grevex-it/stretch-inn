@@ -26,10 +26,11 @@ export function AvisoDeAusencia({
   const permitido = usePermiso("asistencia.avisar");
   if (!permitido) return null;
   const etiqueta = avisoId ? "Anular aviso de ausencia" : "Avisar ausencia";
+  // Con cada aviso (o anulación) el desplegable se vuelve a armar cerrado: no queda «Confirmar»
+  // listo para deshacer lo que se acaba de hacer. La fila ya dice si avisó.
   return (
-    <FormularioDesplegable titulo={etiqueta}>
+    <FormularioDesplegable key={avisoId ?? "sin-aviso"} titulo={etiqueta}>
       <FormularioRemoto
-        key={avisoId ?? alumnoId}
         ruta={avisoId ? `/asistencia/avisos/${avisoId}` : `/asistencia/fechas/${fecha}/avisos`}
         metodo={avisoId ? "DELETE" : "POST"}
         etiqueta="Confirmar"
