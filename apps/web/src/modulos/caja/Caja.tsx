@@ -2,8 +2,10 @@ import { AnularPago } from "./AnularPago.tsx";
 import { CobrarCuota } from "./CobrarCuota.tsx";
 import { diaDeCaja } from "@app/contratos";
 import { useState } from "react";
+import { Campo } from "../../base/controles/Campo.tsx";
 import { fechaLocal, ListaRemota, pesos, Resultados } from "../../base/controles/ListaRemota.tsx";
 import { usePermiso, useSesion } from "../../base/sesion.ts";
+import estilos from "./Caja.module.css";
 
 const medios = {
   efectivo: "Efectivo",
@@ -15,8 +17,8 @@ export function Caja() {
   const { data } = useSesion();
   const centro = data?.centroActivo;
   return (
-    <section>
-      <h1>Caja</h1>
+    <section className={estilos.caja}>
+      <h1 className={estilos.titulo}>Caja</h1>
       {permitido && centro ? (
         centro.sedeActiva === "todas" ? (
           <p>Elegí una sede en la barra para consultar su caja.</p>
@@ -40,16 +42,9 @@ function Pagos({ sede, zona }: { sede: string; zona: string }) {
   return (
     <>
       <CobrarCuota sede={sede} />
-      <label>
-        Día de caja{" "}
-        <input
-          type="date"
-          value={dia}
-          onChange={(evento) => {
-            cambiarDia(evento.target.value);
-          }}
-        />
-      </label>
+      <div className={estilos.dia}>
+        <Campo etiqueta="Día de caja" tipo="date" valor={dia} alCambiar={cambiarDia} />
+      </div>
       {dia && (
         <ListaRemota
           key={ruta}
@@ -57,16 +52,20 @@ function Pagos({ sede, zona }: { sede: string; zona: string }) {
           esquema={diaDeCaja}
           mostrar={(datos, alIrA) => (
             <>
-              <h2>Total cobrado: {pesos.format(datos.cobrado)}</h2>
+              <h2 className={estilos.total}>Total cobrado: {pesos.format(datos.cobrado)}</h2>
               <Resultados
                 datos={datos}
                 alIrA={alIrA}
                 fila={(pago) => (
-                  <li key={pago.id}>
-                    <strong>{pesos.format(pago.monto)}</strong> · {medios[pago.medio]} ·{" "}
-                    {horaLocal(pago.registradoEn, zona)}
+                  <li key={pago.id} className={estilos.pago}>
+                    <p className={estilos.dato}>
+                      <strong className={estilos.monto}>{pesos.format(pago.monto)}</strong> ·{" "}
+                      {medios[pago.medio]} · {horaLocal(pago.registradoEn, zona)}
+                    </p>
                     {pago.anuladoEn ? (
-                      <p>Anulado · {pago.motivoAnulacion}</p>
+                      <p className={estilos.dato}>
+                        <span className={estilos.anulado}>Anulado</span> {pago.motivoAnulacion}
+                      </p>
                     ) : (
                       <AnularPago id={pago.id} />
                     )}
