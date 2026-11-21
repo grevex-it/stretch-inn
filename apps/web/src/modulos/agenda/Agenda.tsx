@@ -1,8 +1,8 @@
-import { AccionDeAlumno } from "../../base/controles/AccionDeAlumno.tsx";
 import type { Clase } from "@app/contratos";
 import { FormularioDesplegable, FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
 import { CamasDeLaSede } from "./CamasDeLaSede.tsx";
 import { EditarClase } from "./EditarClase.tsx";
+import { InscribirAlumno } from "./InscribirAlumno.tsx";
 import { paginaDeClases, paginaDeInscriptos } from "@app/contratos";
 import { useId, useState } from "react";
 import { ListaRemota, Resultados } from "../../base/controles/ListaRemota.tsx";
@@ -66,27 +66,26 @@ function Inscriptos({ clase, id }: { clase: Clase; id: string }) {
   return (
     <section id={id} className={estilos.inscriptos}>
       <h2 className={estilos.subtitulo}>Inscriptos</h2>
-      {inscribir && buscar && clase.activa && (
-        <AccionDeAlumno
-          ruta={`/agenda/clases/${clase.id}/inscriptos`}
-          etiqueta="Inscribir alumno"
-        />
-      )}
+      {inscribir && buscar && clase.activa && <InscribirAlumno claseId={clase.id} />}
       <ListaRemota
         ruta={`/agenda/clases/${clase.id}/inscriptos`}
         esquema={paginaDeInscriptos}
-        mostrar={(datos, alIrA) => (
-          <Resultados
-            datos={datos}
-            alIrA={alIrA}
-            fila={(item) => (
-              <li key={item.id} className={estilos.inscripto}>
-                {item.nombre} {item.apellido}
-                {inscribir && <BajaInscripcion id={item.id} />}
-              </li>
-            )}
-          />
-        )}
+        mostrar={(datos, alIrA) =>
+          datos.total === 0 ? (
+            <p className={estilos.vacio}>Todavía no hay inscriptos.</p>
+          ) : (
+            <Resultados
+              datos={datos}
+              alIrA={alIrA}
+              fila={(item) => (
+                <li key={item.id} className={estilos.inscripto}>
+                  {item.nombre} {item.apellido}
+                  {inscribir && <BajaInscripcion id={item.id} />}
+                </li>
+              )}
+            />
+          )
+        }
       />
     </section>
   );
@@ -97,12 +96,12 @@ function Encabezado({ sede, gestionar }: { sede: string; gestionar: boolean }) {
     <>
       <h1 className={estilos.titulo}>Agenda</h1>
       {gestionar && sede !== "todas" && (
-        <>
+        <div className={estilos.desplegables}>
           <CamasDeLaSede sede={sede} />
           <FormularioDesplegable titulo="Nueva clase">
             <EditarClase sede={sede} />
           </FormularioDesplegable>
-        </>
+        </div>
       )}
     </>
   );

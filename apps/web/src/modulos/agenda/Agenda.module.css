@@ -11,6 +11,13 @@
   color: var(--si-texto);
 }
 
+/* «Camas de la sede» y «Nueva clase», uno debajo del otro con el mismo espacio que separa a
+   los desplegables en el resto del panel. */
+.desplegables {
+  display: grid;
+  gap: var(--si-espacio-3);
+}
+
 /* Cada clase: el nombre, debajo el dato y, al final, las acciones. */
 .clase {
   display: grid;
@@ -83,4 +90,9 @@
 .inscripto {
   display: grid;
   gap: var(--si-espacio-2);
+}
+
+/* La lista sin inscriptos: como «No hay resultados.» de las otras listas, con su texto. */
+.vacio {
+  margin: 0;
 }

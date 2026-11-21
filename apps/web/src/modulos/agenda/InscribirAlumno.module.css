@@ -1,0 +1,18 @@
+/* El buscador, la confirmación y el aviso, uno debajo del otro. */
+.inscribir {
+  display: grid;
+  gap: var(--si-espacio-3);
+}
+
+/* Como los formularios de FormularioRemoto: el alumno elegido y «Confirmar» debajo. */
+.confirmar {
+  display: grid;
+  justify-items: start;
+  gap: var(--si-espacio-3);
+  padding-block: var(--si-espacio-3);
+}
+
+.alumno {
+  margin: 0;
+  color: var(--si-texto);
+}
