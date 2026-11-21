@@ -41,7 +41,7 @@
   flex-basis: 100%;
 }
 
-/* «Ver inscriptos» con el aspecto del botón secundario; marcado, el de la clase que se ve. */
+/* «Ver inscriptos» con el aspecto del botón secundario; marcado, el de la clase abierta. */
 .ver {
   min-height: var(--si-alto-control);
   padding: 0 var(--si-espacio-4);
@@ -54,7 +54,7 @@
   border-radius: var(--si-radio-md);
 }
 
-.ver[aria-pressed="true"] {
+.ver[aria-expanded="true"] {
   background: var(--si-crema-50);
   border-color: var(--si-texto);
 }
@@ -64,7 +64,7 @@
   outline-offset: 2px;
 }
 
-/* Los inscriptos de la clase elegida, separados de la lista como las cuotas en la ficha. */
+/* Los inscriptos de la clase abierta, dentro de su tarjeta y separados de sus botones. */
 .inscriptos {
   display: grid;
   gap: var(--si-espacio-3);

@@ -4,7 +4,7 @@ import { FormularioDesplegable, FormularioRemoto } from "../../base/controles/Fo
 import { CamasDeLaSede } from "./CamasDeLaSede.tsx";
 import { EditarClase } from "./EditarClase.tsx";
 import { paginaDeClases, paginaDeInscriptos } from "@app/contratos";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ListaRemota, Resultados } from "../../base/controles/ListaRemota.tsx";
 import { usePermiso, useSesion } from "../../base/sesion.ts";
 import estilos from "./Agenda.module.css";
@@ -28,7 +28,7 @@ function AgendaDeSede({
   sedes: readonly { id: string; nombre: string }[];
 }) {
   const gestionar = usePermiso("agenda.gestionar");
-  const [clase, elegir] = useState<Clase>();
+  const [abierta, abrir] = useState<string>();
   const ruta = sede === "todas" ? "/agenda/clases" : "/agenda/clases?sede=" + sede;
   return (
     <section className={estilos.agenda}>
@@ -46,33 +46,33 @@ function AgendaDeSede({
                 item={item}
                 sede={sedes.find((s) => s.id === item.sedeId)?.nombre}
                 gestionar={gestionar}
-                elegida={clase?.id === item.id}
-                alElegir={elegir}
+                abierta={abierta === item.id}
+                alTocar={() => {
+                  abrir((actual) => (actual === item.id ? undefined : item.id));
+                }}
               />
             )}
           />
         )}
       />
-      {clase && <Inscriptos clase={clase} />}
     </section>
   );
 }
 
-function Inscriptos({ clase }: { clase: Clase }) {
+/** Los inscriptos de la clase abierta, dentro de su tarjeta y debajo de sus botones. */
+function Inscriptos({ clase, id }: { clase: Clase; id: string }) {
   const inscribir = usePermiso("agenda.inscribir");
   const buscar = usePermiso("personas.ver");
   return (
-    <section className={estilos.inscriptos}>
-      <h2 className={estilos.subtitulo}>Inscriptos en {clase.nombre}</h2>
+    <section id={id} className={estilos.inscriptos}>
+      <h2 className={estilos.subtitulo}>Inscriptos</h2>
       {inscribir && buscar && clase.activa && (
         <AccionDeAlumno
-          key={clase.id}
           ruta={`/agenda/clases/${clase.id}/inscriptos`}
           etiqueta="Inscribir alumno"
         />
       )}
       <ListaRemota
-        key={clase.id}
         ruta={`/agenda/clases/${clase.id}/inscriptos`}
         esquema={paginaDeInscriptos}
         mostrar={(datos, alIrA) => (
@@ -108,21 +108,22 @@ function Encabezado({ sede, gestionar }: { sede: string; gestionar: boolean }) {
   );
 }
 
-/** Una clase: el nombre, debajo el dato (horario, sede, lugares y estado) y, al final,
- * «Editar clase» y «Ver inscriptos» en la misma fila. */
+/** Una clase: el nombre, debajo el dato (horario, sede, lugares y estado), después «Editar
+ * clase» y «Ver inscriptos» en la misma fila y, si está abierta, sus inscriptos. */
 function FichaDeClase({
   item,
   sede,
   gestionar,
-  elegida,
-  alElegir,
+  abierta,
+  alTocar,
 }: {
   item: Clase;
   sede: string | undefined;
   gestionar: boolean;
-  elegida: boolean;
-  alElegir: (clase: Clase) => void;
+  abierta: boolean;
+  alTocar: () => void;
 }) {
+  const id = useId();
   return (
     <li className={estilos.clase}>
       <strong className={estilos.nombre}>{item.nombre}</strong>
@@ -137,14 +138,14 @@ function FichaDeClase({
         <button
           type="button"
           className={estilos.ver}
-          aria-pressed={elegida}
-          onClick={() => {
-            alElegir(item);
-          }}
+          aria-expanded={abierta}
+          aria-controls={abierta ? id : undefined}
+          onClick={alTocar}
         >
           Ver inscriptos
         </button>
       </div>
+      {abierta && <Inscriptos clase={item} id={id} />}
     </li>
   );
 }
