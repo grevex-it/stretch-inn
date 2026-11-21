@@ -1,0 +1,33 @@
+.buscar {
+  display: grid;
+  gap: var(--si-espacio-3);
+}
+
+/* La fila no lleva relleno propio: lo pone el botón, para que toda la fila se pueda tocar.
+   Doble clase para ganarle a `.lista > li` de ListaRemota, sin depender del orden del CSS. */
+.fila.fila {
+  padding: 0;
+}
+
+.opcion {
+  display: block;
+  width: 100%;
+  min-height: var(--si-alto-control);
+  padding: var(--si-espacio-3) var(--si-espacio-4);
+  font: inherit;
+  color: var(--si-texto);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: var(--si-radio-sm);
+}
+
+.opcion:hover {
+  background: var(--si-crema-50);
+}
+
+.opcion:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}
