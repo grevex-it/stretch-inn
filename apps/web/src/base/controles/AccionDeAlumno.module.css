@@ -1,0 +1,5 @@
+/* El aviso de lo hecho, separado del buscador. El buscador y la confirmación quedan como en
+   cualquier otro formulario. */
+.listo {
+  margin-top: var(--si-espacio-3);
+}
