@@ -5,7 +5,10 @@
   padding-block: var(--si-espacio-3);
 }
 
+/* El fieldset ocupa todo el ancho del formulario; cada campo conserva su ancho propio y uno puede
+   pedir la fila entera desde su pantalla. */
 .formulario fieldset {
+  justify-self: stretch;
   display: flex;
   flex-wrap: wrap;
   gap: var(--si-espacio-3);
@@ -33,13 +36,17 @@
 
 /* Desplegable: el título con el aspecto del botón secundario (48px) y el contenido en una
    tarjeta crema debajo. Ícono de trazo que se da vuelta al abrir (0018). */
+/* La tarjeta ocupa el ancho disponible y el título queda a la izquierda. El estiramiento va en el
+   details y no en .contenido: el navegador envuelve el contenido del details en una caja propia,
+   que con justify-items: start se achicaba al contenido. */
 .desplegable {
   display: grid;
-  justify-items: start;
+  justify-items: stretch;
   gap: var(--si-espacio-2);
 }
 
 .resumen {
+  justify-self: start;
   display: inline-flex;
   gap: var(--si-espacio-2);
   align-items: center;
@@ -73,7 +80,6 @@
 }
 
 .contenido {
-  justify-self: stretch;
   padding: var(--si-espacio-4);
   background: var(--si-superficie);
   border: 1px solid var(--si-borde);
