@@ -1,0 +1,91 @@
+.asistencia {
+  display: grid;
+  gap: var(--si-espacio-4);
+}
+
+/* Mismo título de pantalla que Alumnos, Abonos, Caja y Agenda. */
+.titulo {
+  margin: 0;
+  font-size: var(--si-letra-titulo);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* La semana no necesita todo el ancho. */
+.semana {
+  justify-self: start;
+}
+
+/* Cada fecha: el nombre, debajo el dato y, al final, «Ver planilla». */
+.fecha {
+  display: grid;
+  gap: var(--si-espacio-3);
+}
+
+.nombre {
+  font-size: var(--si-letra-media);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+.detalle {
+  margin: 0;
+  color: var(--si-texto-medio);
+}
+
+/* «Ver planilla» con el aspecto del botón secundario; marcado, el de la fecha que se ve. */
+.ver {
+  justify-self: start;
+  min-height: var(--si-alto-control);
+  padding: 0 var(--si-espacio-4);
+  font: inherit;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+  cursor: pointer;
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-md);
+}
+
+.ver[aria-pressed="true"] {
+  background: var(--si-crema-50);
+  border-color: var(--si-texto);
+}
+
+.ver:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}
+
+/* La planilla de la fecha elegida, separada de la lista como los inscriptos en Agenda. */
+.planilla {
+  display: grid;
+  gap: var(--si-espacio-3);
+  padding-top: var(--si-espacio-4);
+  border-top: 1px solid var(--si-borde);
+}
+
+.subtitulo {
+  margin: 0;
+  font-size: var(--si-letra-media);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Cada alumno: el dato arriba y, debajo, sus acciones en una fila. El desplegable abierto ocupa
+   todo el ancho, para que su formulario no quede apretado al lado de los demás. */
+.alumno {
+  display: grid;
+  gap: var(--si-espacio-2);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--si-espacio-3);
+  align-items: start;
+}
+
+.acciones > details[open] {
+  flex-basis: 100%;
+}
