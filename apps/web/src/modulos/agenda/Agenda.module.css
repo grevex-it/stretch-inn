@@ -1,0 +1,86 @@
+.agenda {
+  display: grid;
+  gap: var(--si-espacio-4);
+}
+
+/* Mismo título de pantalla que Alumnos, Abonos y Caja. */
+.titulo {
+  margin: 0;
+  font-size: var(--si-letra-titulo);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+/* Cada clase: el nombre, debajo el dato y, al final, las acciones. */
+.clase {
+  display: grid;
+  gap: var(--si-espacio-3);
+}
+
+.nombre {
+  font-size: var(--si-letra-media);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+.detalle {
+  margin: 0;
+  color: var(--si-texto-medio);
+}
+
+/* «Editar clase» y «Ver inscriptos» en la misma fila. El desplegable abierto ocupa todo el
+   ancho, para que su formulario no quede apretado al lado del botón. */
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--si-espacio-3);
+  align-items: start;
+}
+
+.acciones > details[open] {
+  flex-basis: 100%;
+}
+
+/* «Ver inscriptos» con el aspecto del botón secundario; marcado, el de la clase que se ve. */
+.ver {
+  min-height: var(--si-alto-control);
+  padding: 0 var(--si-espacio-4);
+  font: inherit;
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+  cursor: pointer;
+  background: var(--si-superficie);
+  border: 1px solid var(--si-borde-control);
+  border-radius: var(--si-radio-md);
+}
+
+.ver[aria-pressed="true"] {
+  background: var(--si-crema-50);
+  border-color: var(--si-texto);
+}
+
+.ver:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}
+
+/* Los inscriptos de la clase elegida, separados de la lista como las cuotas en la ficha. */
+.inscriptos {
+  display: grid;
+  gap: var(--si-espacio-3);
+  padding-top: var(--si-espacio-4);
+  border-top: 1px solid var(--si-borde);
+}
+
+/* Mismo tamaño que los subtítulos de la ficha del alumno («Salud», «Cuotas»). */
+.subtitulo {
+  margin: 0;
+  font-size: var(--si-letra-media);
+  font-weight: var(--si-peso-medio);
+  color: var(--si-texto);
+}
+
+.inscripto {
+  display: grid;
+  gap: var(--si-espacio-2);
+}

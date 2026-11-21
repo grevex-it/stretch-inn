@@ -7,6 +7,7 @@ import { paginaDeClases, paginaDeInscriptos } from "@app/contratos";
 import { useState } from "react";
 import { ListaRemota, Resultados } from "../../base/controles/ListaRemota.tsx";
 import { usePermiso, useSesion } from "../../base/sesion.ts";
+import estilos from "./Agenda.module.css";
 
 const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
 
@@ -30,7 +31,7 @@ function AgendaDeSede({
   const [clase, elegir] = useState<Clase>();
   const ruta = sede === "todas" ? "/agenda/clases" : "/agenda/clases?sede=" + sede;
   return (
-    <section>
+    <section className={estilos.agenda}>
       <Encabezado sede={sede} gestionar={gestionar} />
       <ListaRemota
         ruta={ruta}
@@ -40,27 +41,14 @@ function AgendaDeSede({
             datos={datos}
             alIrA={alIrA}
             fila={(item) => (
-              <li key={item.id}>
-                <strong>{item.nombre}</strong>
-                {gestionar && <Edicion item={item} />}
-                <p>
-                  {dias[item.dia - 1]} · {item.hora} · {item.duracionMinutos} min ·{" "}
-                  {sedes.find((s) => s.id === item.sedeId)?.nombre}
-                </p>
-                <p>
-                  {item.inscriptos} de {item.cupo} lugares ocupados ·{" "}
-                  {item.activa ? "Activa" : "De baja"}
-                </p>
-                <button
-                  type="button"
-                  aria-pressed={clase?.id === item.id}
-                  onClick={() => {
-                    elegir(item);
-                  }}
-                >
-                  Ver inscriptos
-                </button>
-              </li>
+              <FichaDeClase
+                key={item.id}
+                item={item}
+                sede={sedes.find((s) => s.id === item.sedeId)?.nombre}
+                gestionar={gestionar}
+                elegida={clase?.id === item.id}
+                alElegir={elegir}
+              />
             )}
           />
         )}
@@ -74,8 +62,8 @@ function Inscriptos({ clase }: { clase: Clase }) {
   const inscribir = usePermiso("agenda.inscribir");
   const buscar = usePermiso("personas.ver");
   return (
-    <section>
-      <h2>Inscriptos en {clase.nombre}</h2>
+    <section className={estilos.inscriptos}>
+      <h2 className={estilos.subtitulo}>Inscriptos en {clase.nombre}</h2>
       {inscribir && buscar && clase.activa && (
         <AccionDeAlumno
           key={clase.id}
@@ -92,7 +80,7 @@ function Inscriptos({ clase }: { clase: Clase }) {
             datos={datos}
             alIrA={alIrA}
             fila={(item) => (
-              <li key={item.id}>
+              <li key={item.id} className={estilos.inscripto}>
                 {item.nombre} {item.apellido}
                 {inscribir && <BajaInscripcion id={item.id} />}
               </li>
@@ -107,7 +95,7 @@ function Inscriptos({ clase }: { clase: Clase }) {
 function Encabezado({ sede, gestionar }: { sede: string; gestionar: boolean }) {
   return (
     <>
-      <h1>Agenda</h1>{" "}
+      <h1 className={estilos.titulo}>Agenda</h1>
       {gestionar && sede !== "todas" && (
         <>
           <CamasDeLaSede sede={sede} />
@@ -117,6 +105,47 @@ function Encabezado({ sede, gestionar }: { sede: string; gestionar: boolean }) {
         </>
       )}
     </>
+  );
+}
+
+/** Una clase: el nombre, debajo el dato (horario, sede, lugares y estado) y, al final,
+ * «Editar clase» y «Ver inscriptos» en la misma fila. */
+function FichaDeClase({
+  item,
+  sede,
+  gestionar,
+  elegida,
+  alElegir,
+}: {
+  item: Clase;
+  sede: string | undefined;
+  gestionar: boolean;
+  elegida: boolean;
+  alElegir: (clase: Clase) => void;
+}) {
+  return (
+    <li className={estilos.clase}>
+      <strong className={estilos.nombre}>{item.nombre}</strong>
+      <p className={estilos.detalle}>
+        {dias[item.dia - 1]} · {item.hora} · {item.duracionMinutos} min · {sede}
+      </p>
+      <p className={estilos.detalle}>
+        {item.inscriptos} de {item.cupo} lugares ocupados · {item.activa ? "Activa" : "De baja"}
+      </p>
+      <div className={estilos.acciones}>
+        {gestionar && <Edicion item={item} />}
+        <button
+          type="button"
+          className={estilos.ver}
+          aria-pressed={elegida}
+          onClick={() => {
+            alElegir(item);
+          }}
+        >
+          Ver inscriptos
+        </button>
+      </div>
+    </li>
   );
 }
 

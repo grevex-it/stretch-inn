@@ -1,15 +1,16 @@
-/* Como los formularios de FormularioRemoto: la etiqueta arriba y el campo debajo. */
+/* Como los formularios de FormularioRemoto: la etiqueta arriba y el campo de 48px debajo. */
 .formulario {
   display: grid;
   justify-items: start;
-  gap: 12px;
-  padding-block: 12px;
+  gap: var(--si-espacio-3);
+  padding-block: var(--si-espacio-3);
 }
 
 .formulario fieldset {
+  justify-self: stretch;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--si-espacio-3);
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -18,16 +19,30 @@
 
 .formulario label {
   display: grid;
-  gap: 4px;
+  gap: var(--si-espacio-2);
 }
 
 .formulario input {
-  min-height: var(--si-alto-control-min);
+  min-height: var(--si-alto-control);
   max-width: 100%;
-  padding-inline: 8px;
+  padding-inline: var(--si-espacio-4);
   font: inherit;
   color: var(--si-texto);
   background: var(--si-superficie);
   border: 1px solid var(--si-borde-control);
   border-radius: var(--si-radio-sm);
+}
+
+.formulario input:focus-visible {
+  outline: 2px solid var(--si-foco);
+  outline-offset: 2px;
+}
+
+/* Las clases que impiden bajar las camas, una debajo de la otra. */
+.impiden {
+  display: grid;
+  gap: var(--si-espacio-1);
+  margin: 0;
+  padding-left: var(--si-espacio-5);
+  color: var(--si-texto-medio);
 }

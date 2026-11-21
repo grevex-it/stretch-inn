@@ -115,7 +115,10 @@ function Formulario({ sede, camas }: { sede: string; camas: number | null }) {
 
 function QueLoImpiden({ error }: { error: CamasQueDejanAfuera }) {
   return (
-    <ul aria-label={`Clases con más fijos que ${String(error.camas)} camas`}>
+    <ul
+      className={estilos.impiden}
+      aria-label={`Clases con más fijos que ${String(error.camas)} camas`}
+    >
       {error.clases.map((clase) => (
         <li key={clase.id}>
           {clase.nombre} · {clase.inscriptos} fijos
