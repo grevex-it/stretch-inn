@@ -5,7 +5,10 @@
   padding-block: var(--si-espacio-3);
 }
 
+/* El fieldset ocupa todo el ancho del formulario; cada campo conserva su ancho propio y uno puede
+   pedir la fila entera desde su pantalla. */
 .formulario fieldset {
+  justify-self: stretch;
   display: flex;
   flex-wrap: wrap;
   gap: var(--si-espacio-3);
