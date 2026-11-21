@@ -1,0 +1,8 @@
+/* El motivo ocupa la fila entera de su tarjeta: es texto libre y suele ser largo. */
+.motivo {
+  flex: 1 1 100%;
+}
+
+.motivo input {
+  width: 100%;
+}

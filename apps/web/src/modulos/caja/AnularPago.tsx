@@ -1,6 +1,7 @@
 import { pedidoDeAnulacion } from "@app/contratos";
 import { FormularioDesplegable, FormularioRemoto } from "../../base/controles/FormularioRemoto.tsx";
 import { usePermiso } from "../../base/sesion.ts";
+import estilos from "./AnularPago.module.css";
 
 export function AnularPago({ id }: { id: string }) {
   const permitido = usePermiso("caja.anular");
@@ -13,7 +14,7 @@ export function AnularPago({ id }: { id: string }) {
         etiqueta="Confirmar anulación"
         cuerpo={(datos) => pedidoDeAnulacion.parse({ motivo: datos.get("motivo") })}
       >
-        <label>
+        <label className={estilos.motivo}>
           Motivo de la anulación
           <input name="motivo" required maxLength={500} />
         </label>
